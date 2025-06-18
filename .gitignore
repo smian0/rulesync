@@ -166,3 +166,8 @@ package-lock.json
 
 # pnpm
 pnpm-lock.yaml
+
+CLAUDE.md
+.github/instructions
+.cursor
+.clinerules
