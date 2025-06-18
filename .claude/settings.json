@@ -3,6 +3,9 @@
 		"allow": [
       "Bash(node:*)",
 			"Bash(pnpm:*)",
+			"Bash(rg:*)",
+			"Bash(find:*)",
+			"Bash(grep:*)",
       "WebFetch(domain:code.visualstudio.com)",
       "WebFetch(domain:docs.cursor.com)",
       "WebFetch(domain:docs.cline.bot)"

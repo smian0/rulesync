@@ -223,13 +223,13 @@ pnpm publish
 ```bash
 # プロジェクト初期化
 cd my-project
-ai-rules init
+rulesync init
 
 # .rulesync/coding-rules.md を編集
 vim .rulesync/coding-rules.md
 
 # 設定ファイル生成
-ai-rules generate
+rulesync generate
 
 # 結果確認
 ls copilot-instructions.md
