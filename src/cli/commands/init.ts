@@ -1,0 +1,109 @@
+import { join } from "node:path";
+import { ensureDir, writeFileContent, fileExists } from "../../utils/index.js";
+
+export async function initCommand(): Promise<void> {
+  const aiRulesDir = ".ai-rules";
+  
+  console.log("Initializing ai-rules...");
+  
+  // Create .ai-rules directory
+  await ensureDir(aiRulesDir);
+  
+  // Create sample rule files
+  await createSampleFiles(aiRulesDir);
+  
+  console.log("✅ ai-rules initialized successfully!");
+  console.log("\nNext steps:");
+  console.log("1. Edit rule files in .ai-rules/");
+  console.log("2. Run 'ai-rules generate' to create configuration files");
+}
+
+async function createSampleFiles(aiRulesDir: string): Promise<void> {
+  const sampleFiles = [
+    {
+      filename: "coding-rules.md",
+      content: `---
+priority: high
+targets: ["*"]
+description: "General coding standards and best practices"
+globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
+---
+
+# Coding Rules
+
+## General Guidelines
+
+- Use TypeScript for all new code
+- Follow consistent naming conventions
+- Write self-documenting code with clear variable and function names
+- Prefer composition over inheritance
+- Use meaningful comments for complex business logic
+
+## Code Style
+
+- Use 2 spaces for indentation
+- Use semicolons
+- Use double quotes for strings
+- Use trailing commas in multi-line objects and arrays
+`,
+    },
+    {
+      filename: "naming-conventions.md", 
+      content: `---
+priority: high
+targets: ["*"]
+description: "Naming conventions for variables, functions, and files"
+globs: ["**/*.ts", "**/*.js"]
+---
+
+# Naming Conventions
+
+## Variables and Functions
+- Use camelCase for variables and functions
+- Use descriptive names that explain the purpose
+- Avoid abbreviations unless they are well-known
+
+## Files and Directories
+- Use kebab-case for file names
+- Use PascalCase for component files
+- Use lowercase for directory names
+
+## Constants
+- Use SCREAMING_SNAKE_CASE for constants
+- Group related constants in enums or const objects
+`,
+    },
+    {
+      filename: "architecture.md",
+      content: `---
+priority: low
+targets: [copilot, cursor]
+description: "Architectural patterns and project structure guidelines"
+globs: ["src/**/*.ts"]
+---
+
+# Architecture Guidelines
+
+## Project Structure
+- Organize code by feature, not by file type
+- Keep related files close together
+- Use index files for clean imports
+
+## Design Patterns
+- Use dependency injection for better testability
+- Implement proper error handling
+- Follow single responsibility principle
+`,
+    },
+  ];
+
+  for (const file of sampleFiles) {
+    const filepath = join(aiRulesDir, file.filename);
+    if (!(await fileExists(filepath))) {
+      await writeFileContent(filepath, file.content);
+      console.log(`Created ${filepath}`);
+    } else {
+      console.log(`Skipped ${filepath} (already exists)`);
+    }
+  }
+}

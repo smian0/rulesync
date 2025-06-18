@@ -20,15 +20,24 @@ ai-rulesは、統一されたAIルール設定ファイル（`.ai-rules/*.md`）
 
 ### 2. 対応ツール設定生成
 
-#### GitHub Copilot
+#### GitHub Copilot Custom Instructions
+
+https://code.visualstudio.com/docs/copilot/copilot-customization#_use-instructionsmd-files
+
 - **出力先**: `.github/instructions/*.md`
 - **形式**: GitHub Copilot用のプレーンMarkdown形式
 
-#### Cursor
+#### Cursor Project Rules
+
+https://docs.cursor.com/context/rules
+
 - **出力先**: `.cursor/rules/*.md`
 - **形式**: Cursor IDE用のルール設定ファイル
 
-#### Cline
+#### Cline Rules
+
+https://docs.cline.bot/features/cline-rules
+
 - **出力先**: `.clinerules/*.md`
 - **形式**: Cline AI Assistant用のルール設定ファイル
 
