@@ -3,17 +3,20 @@ import { generateClineConfig } from "./cline.js";
 import type { Config, ParsedRule } from "../types/index.js";
 
 const mockConfig: Config = {
+  aiRulesDir: ".rulesync",
   outputPaths: {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
   },
   defaultTargets: ["copilot", "cursor", "cline"],
+  watchEnabled: false,
 };
 
 const mockRules: ParsedRule[] = [
   {
     filename: "security.md",
+    filepath: "/path/to/security.md",
     frontmatter: {
       targets: ["*"],
       priority: "high",
@@ -24,6 +27,7 @@ const mockRules: ParsedRule[] = [
   },
   {
     filename: "styling.md",
+    filepath: "/path/to/styling.md",
     frontmatter: {
       targets: ["cline"],
       priority: "low",
@@ -37,7 +41,7 @@ const mockRules: ParsedRule[] = [
 describe("generateClineConfig", () => {
   it("should generate cline configuration with correct structure", async () => {
     const result = await generateClineConfig(mockRules, mockConfig);
-    
+
     expect(result.tool).toBe("cline");
     expect(result.filepath).toBe(".clinerules/01-ai-rules.md");
     expect(result.content).toContain("# Cline AI Assistant Rules");
@@ -45,23 +49,23 @@ describe("generateClineConfig", () => {
 
   it("should separate high and low priority rules", async () => {
     const result = await generateClineConfig(mockRules, mockConfig);
-    
+
     expect(result.content).toContain("## High Priority Guidelines");
     expect(result.content).toContain("## Standard Guidelines");
   });
 
   it("should sort rules by priority (high first)", async () => {
     const result = await generateClineConfig(mockRules, mockConfig);
-    
+
     const highSectionIndex = result.content.indexOf("## High Priority Guidelines");
     const standardSectionIndex = result.content.indexOf("## Standard Guidelines");
-    
+
     expect(highSectionIndex).toBeLessThan(standardSectionIndex);
   });
 
   it("should include rule descriptions and content", async () => {
     const result = await generateClineConfig(mockRules, mockConfig);
-    
+
     expect(result.content).toContain("Security best practices");
     expect(result.content).toContain("Always validate user input and sanitize data");
     expect(result.content).toContain("Code styling guidelines");
@@ -70,49 +74,52 @@ describe("generateClineConfig", () => {
 
   it("should include file patterns", async () => {
     const result = await generateClineConfig(mockRules, mockConfig);
-    
+
     expect(result.content).toContain("**/*.ts, **/*.js");
     expect(result.content).toContain("**/*.css");
   });
 
   it("should handle only high priority rules", async () => {
-    const highPriorityOnly = mockRules.filter(r => r.frontmatter.priority === "high");
+    const highPriorityOnly = mockRules.filter((r) => r.frontmatter.priority === "high");
     const result = await generateClineConfig(highPriorityOnly, mockConfig);
-    
+
     expect(result.content).toContain("## High Priority Guidelines");
     expect(result.content).not.toContain("## Standard Guidelines");
   });
 
   it("should handle only low priority rules", async () => {
-    const lowPriorityOnly = mockRules.filter(r => r.frontmatter.priority === "low");
+    const lowPriorityOnly = mockRules.filter((r) => r.frontmatter.priority === "low");
     const result = await generateClineConfig(lowPriorityOnly, mockConfig);
-    
+
     expect(result.content).not.toContain("## High Priority Guidelines");
     expect(result.content).toContain("## Standard Guidelines");
   });
 
   it("should handle empty rules", async () => {
     const result = await generateClineConfig([], mockConfig);
-    
+
     expect(result.content).toContain("# Cline AI Assistant Rules");
     expect(result.content).not.toContain("## High Priority Guidelines");
     expect(result.content).not.toContain("## Standard Guidelines");
   });
 
   it("should handle rules without globs", async () => {
-    const rulesWithoutGlobs: ParsedRule[] = [{
-      filename: "general.md",
-      frontmatter: {
-        targets: ["*"],
-        priority: "high",
-        description: "General guidelines",
-        globs: [],
+    const rulesWithoutGlobs: ParsedRule[] = [
+      {
+        filename: "general.md",
+        filepath: "/path/to/general.md",
+        frontmatter: {
+          targets: ["*"],
+          priority: "high",
+          description: "General guidelines",
+          globs: [],
+        },
+        content: "General content",
       },
-      content: "General content",
-    }];
-    
+    ];
+
     const result = await generateClineConfig(rulesWithoutGlobs, mockConfig);
-    
+
     expect(result.content).toContain("General guidelines");
     expect(result.content).not.toContain("**Applies to files:**");
   });

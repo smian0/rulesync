@@ -20,25 +20,30 @@ const mockConfig = {
     cline: ".clinerules",
   },
   defaultTargets: ["copilot", "cursor", "cline"],
-};
+  watchEnabled: false,
+} as const;
 
-const mockRules = [{
-  filename: "test.md",
-  filepath: ".rulesync/test.md",
-  frontmatter: {
-    targets: ["*"],
-    priority: "high",
-    description: "Test rule",
-    globs: ["**/*.ts"],
+const mockRules = [
+  {
+    filename: "test.md",
+    filepath: ".rulesync/test.md",
+    frontmatter: {
+      targets: ["*"],
+      priority: "high",
+      description: "Test rule",
+      globs: ["**/*.ts"],
+    },
+    content: "Test content",
   },
-  content: "Test content",
-}];
+];
 
-const mockOutputs = [{
-  tool: "copilot",
-  filepath: ".github/instructions/test.md",
-  content: "Generated content",
-}];
+const mockOutputs = [
+  {
+    tool: "copilot",
+    filepath: ".github/instructions/test.md",
+    content: "Generated content",
+  },
+];
 
 describe("generateCommand", () => {
   beforeEach(() => {
@@ -48,7 +53,7 @@ describe("generateCommand", () => {
     mockParseRulesFromDirectory.mockResolvedValue(mockRules);
     mockGenerateConfigurations.mockResolvedValue(mockOutputs);
     mockWriteFileContent.mockResolvedValue();
-    
+
     // Mock console methods
     vi.spyOn(console, "log").mockImplementation(() => {});
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -64,14 +69,19 @@ describe("generateCommand", () => {
     expect(mockFileExists).toHaveBeenCalledWith(".rulesync");
     expect(mockParseRulesFromDirectory).toHaveBeenCalledWith(".rulesync");
     expect(mockGenerateConfigurations).toHaveBeenCalledWith(mockRules, mockConfig, undefined);
-    expect(mockWriteFileContent).toHaveBeenCalledWith(".github/instructions/test.md", "Generated content");
+    expect(mockWriteFileContent).toHaveBeenCalledWith(
+      ".github/instructions/test.md",
+      "Generated content"
+    );
   });
 
   it("should exit if .rulesync directory does not exist", async () => {
     mockFileExists.mockResolvedValue(false);
 
     await expect(generateCommand()).rejects.toThrow("process.exit called");
-    expect(console.error).toHaveBeenCalledWith("❌ .rulesync directory not found. Run 'rulesync init' first.");
+    expect(console.error).toHaveBeenCalledWith(
+      "❌ .rulesync directory not found. Run 'rulesync init' first."
+    );
   });
 
   it("should warn if no rules found", async () => {
@@ -107,6 +117,9 @@ describe("generateCommand", () => {
     mockParseRulesFromDirectory.mockRejectedValue(new Error("Parse error"));
 
     await expect(generateCommand()).rejects.toThrow("process.exit called");
-    expect(console.error).toHaveBeenCalledWith("❌ Failed to generate configurations:", expect.any(Error));
+    expect(console.error).toHaveBeenCalledWith(
+      "❌ Failed to generate configurations:",
+      expect.any(Error)
+    );
   });
 });
