@@ -4,7 +4,7 @@
 
 ## プロジェクト概要
 
-ai-rulesは、統一されたルールファイル（`.ai-rules/*.md`）から、さまざまなAI開発ツール（GitHub Copilot、Cursor、Cline）用の設定ファイルを生成するNode.js CLIツールです。このツールは、異なる開発環境間でのAIルールの一貫性の確保という問題を解決します。
+rulesyncは、統一されたルールファイル（`.rulesync/*.md`）から、さまざまなAI開発ツール（GitHub Copilot、Cursor、Cline）用の設定ファイルを生成するNode.js CLIツールです。このツールは、異なる開発環境間でのAIルールの一貫性の確保という問題を解決します。
 
 ## コアアーキテクチャ
 
@@ -13,7 +13,7 @@ ai-rulesは、統一されたルールファイル（`.ai-rules/*.md`）から�
 - `src/cli/commands/` - 個別のコマンド実装（init、generate、watch、status、validate）
 
 ### コア処理
-- `src/core/parser.ts` - gray-matterフロントマターで`.ai-rules/*.md`ファイルを解析
+- `src/core/parser.ts` - gray-matterフロントマターで`.rulesync/*.md`ファイルを解析
 - `src/core/generator.ts` - ターゲット設定ファイルの生成をオーケストレート
 - `src/core/validator.ts` - ルールファイルの構造と内容を検証
 
@@ -23,7 +23,7 @@ ai-rulesは、統一されたルールファイル（`.ai-rules/*.md`）から�
 - `src/generators/cline.ts` - `.clinerules/*.md`を生成
 
 ### 入力形式
-`.ai-rules/`のルールファイルは以下のフロントマターを使用：
+`.rulesync/`のルールファイルは以下のフロントマターを使用：
 - `priority`: high|low
 - `targets`: ["*"] または [copilot, cursor, cline] - "*"はすべてのツールに適用
 - `description`: ルールの簡潔な説明

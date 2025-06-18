@@ -1,9 +1,9 @@
-# ai-rules
+# rulesync
 
-[![CI](https://github.com/dyoshikawa/ai-rules/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/ai-rules/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/ai-rules.svg)](https://www.npmjs.com/package/ai-rules)
+[![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
 
-統一されたAIルール設定ファイル（`.ai-rules/*.md`）から、各種AI開発支援ツールの設定ファイルを自動生成するNode.js CLIツールです。
+統一されたAIルール設定ファイル（`.rulesync/*.md`）から、各種AI開発支援ツールの設定ファイルを自動生成するNode.js CLIツールです。
 
 ## 対応ツール
 
@@ -14,11 +14,11 @@
 ## インストール
 
 ```bash
-npm install -g ai-rules
+npm install -g rulesync
 # または
-pnpm add -g ai-rules
+pnpm add -g rulesync
 # または  
-yarn global add ai-rules
+yarn global add rulesync
 ```
 
 ## 使用方法
@@ -26,10 +26,10 @@ yarn global add ai-rules
 ### 1. 初期化
 
 ```bash
-ai-rules init
+rulesync init
 ```
 
-`.ai-rules/` ディレクトリとサンプルルールファイルが作成されます。
+`.rulesync/` ディレクトリとサンプルルールファイルが作成されます。
 
 ### 2. ルールファイルの編集
 
@@ -53,25 +53,25 @@ globs: ["**/*.ts", "**/*.tsx"]
 
 ```bash
 # 全ツール用設定ファイル生成
-ai-rules generate
+rulesync generate
 
 # 特定ツールのみ
-ai-rules generate --copilot
-ai-rules generate --cursor  
-ai-rules generate --cline
+rulesync generate --copilot
+rulesync generate --cursor  
+rulesync generate --cline
 ```
 
 ### 4. その他のコマンド
 
 ```bash
 # 設定の妥当性チェック
-ai-rules validate
+rulesync validate
 
 # 現在の状況確認
-ai-rules status
+rulesync status
 
 # ファイル監視・自動生成
-ai-rules watch
+rulesync watch
 ```
 
 ## 設定ファイル構造

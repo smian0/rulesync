@@ -4,15 +4,15 @@ import { fileExists, getDefaultConfig } from "../../utils/index.js";
 export async function statusCommand(): Promise<void> {
   const config = getDefaultConfig();
 
-  console.log("ai-rules Status");
+  console.log("rulesync Status");
   console.log("===============");
 
   // Check if .ai-rules directory exists
   const aiRulesExists = await fileExists(config.aiRulesDir);
-  console.log(`\n📁 .ai-rules directory: ${aiRulesExists ? "✅ Found" : "❌ Not found"}`);
+  console.log(`\n📁 .rulesync directory: ${aiRulesExists ? "✅ Found" : "❌ Not found"}`);
 
   if (!aiRulesExists) {
-    console.log("\n💡 Run 'ai-rules init' to get started");
+    console.log("\n💡 Run 'rulesync init' to get started");
     return;
   }
 
@@ -58,7 +58,7 @@ export async function statusCommand(): Promise<void> {
     }
 
     if (rules.length > 0) {
-      console.log("\n💡 Run 'ai-rules generate' to update configuration files");
+      console.log("\n💡 Run 'rulesync generate' to update configuration files");
     }
   } catch (error) {
     console.error("\n❌ Failed to get status:", error);

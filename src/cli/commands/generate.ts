@@ -14,7 +14,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
 
   // Check if .ai-rules directory exists
   if (!(await fileExists(config.aiRulesDir))) {
-    console.error("❌ .ai-rules directory not found. Run 'ai-rules init' first.");
+    console.error("❌ .rulesync directory not found. Run 'rulesync init' first.");
     process.exit(1);
   }
 
@@ -26,7 +26,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
     const rules = await parseRulesFromDirectory(config.aiRulesDir);
 
     if (rules.length === 0) {
-      console.warn("⚠️  No rules found in .ai-rules directory");
+      console.warn("⚠️  No rules found in .rulesync directory");
       return;
     }
 

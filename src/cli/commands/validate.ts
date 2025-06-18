@@ -8,7 +8,7 @@ export async function validateCommand(): Promise<void> {
 
   // Check if .ai-rules directory exists
   if (!(await fileExists(config.aiRulesDir))) {
-    console.error("❌ .ai-rules directory not found. Run 'ai-rules init' first.");
+    console.error("❌ .rulesync directory not found. Run 'rulesync init' first.");
     process.exit(1);
   }
 

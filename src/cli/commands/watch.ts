@@ -5,7 +5,7 @@ import { generateCommand } from "./generate.js";
 export async function watchCommand(): Promise<void> {
   const config = getDefaultConfig();
 
-  console.log("👀 Watching for changes in .ai-rules directory...");
+  console.log("👀 Watching for changes in .rulesync directory...");
   console.log("Press Ctrl+C to stop watching");
 
   // Initial generation

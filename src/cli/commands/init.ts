@@ -2,7 +2,7 @@ import { join } from "node:path";
 import { ensureDir, fileExists, writeFileContent } from "../../utils/index.js";
 
 export async function initCommand(): Promise<void> {
-  const aiRulesDir = ".ai-rules";
+  const aiRulesDir = ".rulesync";
 
   console.log("Initializing ai-rules...");
 
@@ -14,7 +14,7 @@ export async function initCommand(): Promise<void> {
 
   console.log("✅ ai-rules initialized successfully!");
   console.log("\nNext steps:");
-  console.log("1. Edit rule files in .ai-rules/");
+  console.log("1. Edit rule files in .rulesync/");
   console.log("2. Run 'ai-rules generate' to create configuration files");
 }
 

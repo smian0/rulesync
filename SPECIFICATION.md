@@ -1,12 +1,12 @@
-# ai-rules CLI Tool 仕様書
+# rulesync CLI Tool 仕様書
 
 ## 概要
 
-ai-rulesは、統一されたAIルール設定ファイル（`.ai-rules/*.md`）から、各種AI開発支援ツールの設定ファイルを自動生成するNode.js CLIツールです。
+rulesyncは、統一されたAIルール設定ファイル（`.rulesync/*.md`）から、各種AI開発支援ツールの設定ファイルを自動生成するNode.js CLIツールです。
 
 ## 目的
 
-複数のAI開発支援ツールを使用する際、それぞれ異なる設定ファイル形式でルールを記述する必要があります。ai-rulesは以下の問題を解決します：
+複数のAI開発支援ツールを使用する際、それぞれ異なる設定ファイル形式でルールを記述する必要があります。rulesyncは以下の問題を解決します：
 
 - 設定の重複管理による保守コストの増大
 - ツール間でのルール一貫性の確保
@@ -15,7 +15,7 @@ ai-rulesは、統一されたAIルール設定ファイル（`.ai-rules/*.md`）
 ## 機能
 
 ### 1. 統一設定ファイル管理
-- `.ai-rules/` ディレクトリ内のMarkdownファイルを統一設定として管理
+- `.rulesync/` ディレクトリ内のMarkdownファイルを統一設定として管理
 - セクション単位でのルール分類（コーディングルール、命名規則、アーキテクチャガイドライン等）
 
 ### 2. 対応ツール設定生成
@@ -67,32 +67,32 @@ https://docs.cline.bot/features/cline-rules
 ### 3. CLI コマンド
 
 ```bash
-# 初期化（.ai-rules/ディレクトリとサンプルファイル作成）
-ai-rules init
+# 初期化（.rulesync/ディレクトリとサンプルファイル作成）
+rulesync init
 
 # 全ツール設定ファイル生成
-ai-rules generate
+rulesync generate
 
 # 特定ツール設定ファイル生成
-ai-rules generate --copilot
-ai-rules generate --cursor
-ai-rules generate --cline
+rulesync generate --copilot
+rulesync generate --cursor
+rulesync generate --cline
 
 # 設定ファイル監視・自動生成
-ai-rules watch
+rulesync watch
 
 # 現在の設定状況確認
-ai-rules status
+rulesync status
 
 # 設定ファイルの妥当性チェック
-ai-rules validate
+rulesync validate
 ```
 
 ## 設定ファイル構造
 
-### `.ai-rules/` ディレクトリ構造
+### `.rulesync/` ディレクトリ構造
 ```
-.ai-rules/
+.rulesync/
 ├── coding-rules.md      # コーディングルール
 ├── naming-conventions.md # 命名規則
 ├── architecture.md      # アーキテクチャガイドライン
@@ -138,7 +138,7 @@ globs: ["**/*.ts", "**/*.js"]
 
 ### プロジェクト構造
 ```
-ai-rules/
+rulesync/
 ├── src/
 │   ├── cli/
 │   │   ├── commands/        # CLI コマンド実装
@@ -149,7 +149,7 @@ ai-rules/
 │   │   │   └── validate.ts
 │   │   └── index.ts        # CLI エントリーポイント
 │   ├── core/
-│   │   ├── parser.ts       # .ai-rules ファイル解析
+│   │   ├── parser.ts       # .rulesync ファイル解析
 │   │   ├── generator.ts    # 各ツール設定生成
 │   │   └── validator.ts    # 設定ファイル検証
 │   ├── generators/         # 各ツール用ジェネレーター
@@ -225,8 +225,8 @@ pnpm publish
 cd my-project
 ai-rules init
 
-# .ai-rules/coding-rules.md を編集
-vim .ai-rules/coding-rules.md
+# .rulesync/coding-rules.md を編集
+vim .rulesync/coding-rules.md
 
 # 設定ファイル生成
 ai-rules generate

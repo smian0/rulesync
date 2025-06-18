@@ -2,7 +2,7 @@ import type { Config, ToolTarget } from "../types/index.js";
 
 export function getDefaultConfig(): Config {
   return {
-    aiRulesDir: ".ai-rules",
+    aiRulesDir: ".rulesync",
     outputPaths: {
       copilot: ".github/instructions",
       cursor: ".cursor/rules",
