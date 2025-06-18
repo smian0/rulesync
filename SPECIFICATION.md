@@ -68,6 +68,20 @@ https://docs.cline.bot/features/cline-rules
 
 https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
 
+- **出力先**: `./CLAUDE.md` (プロジェクトメモリ), `~/.claude/CLAUDE.md` (ユーザーメモリ)
+- **形式**: プレーンMarkdown形式
+- **仕様詳細**:
+  - プロジェクトメモリ（`./CLAUDE.md`）: チーム共有のプロジェクト指示
+  - ユーザーメモリ（`~/.claude/CLAUDE.md`）: 全プロジェクト共通の個人設定
+  - `@path/to/import` 構文でメモリのインポートが可能
+  - 現在のディレクトリからルートに向かって再帰的に読み込み
+  - 最大5ホップまでの再帰インポートをサポート
+  - 「#」で始まる入力で素早くメモリを追加
+  - `/memory` スラッシュコマンドでシステムエディタによる編集
+  - `/init` でコードベース用のCLAUDE.mdをブートストラップ
+  - 構造化されたMarkdownと箇条書きで整理
+  - 説明的な見出しでメモリを分類
+
 ### 3. CLI コマンド
 
 ```bash
