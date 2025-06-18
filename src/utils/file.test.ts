@@ -21,7 +21,7 @@ describe("file utilities", () => {
 
   describe("ensureDir", () => {
     it("should not create directory if it exists", async () => {
-      mockStat.mockResolvedValue({} as any);
+      mockStat.mockResolvedValue({} as never);
 
       await ensureDir("/existing/dir");
 
@@ -54,7 +54,7 @@ describe("file utilities", () => {
 
   describe("writeFileContent", () => {
     it("should ensure directory exists and write file", async () => {
-      mockStat.mockResolvedValue({} as any);
+      mockStat.mockResolvedValue({} as never);
       mockWriteFile.mockResolvedValue(undefined);
 
       await writeFileContent("/path/to/file.txt", "content");
@@ -77,7 +77,7 @@ describe("file utilities", () => {
 
   describe("findFiles", () => {
     it("should find files with default .md extension", async () => {
-      mockReaddir.mockResolvedValue(["file1.md", "file2.txt", "file3.md"] as any);
+      mockReaddir.mockResolvedValue(["file1.md", "file2.txt", "file3.md"]);
 
       const result = await findFiles("/test/dir");
 
@@ -86,7 +86,7 @@ describe("file utilities", () => {
     });
 
     it("should find files with custom extension", async () => {
-      mockReaddir.mockResolvedValue(["file1.js", "file2.ts", "file3.js"] as any);
+      mockReaddir.mockResolvedValue(["file1.js", "file2.ts", "file3.js"]);
 
       const result = await findFiles("/test/dir", ".js");
 
@@ -102,7 +102,7 @@ describe("file utilities", () => {
     });
 
     it("should return empty array if no matching files found", async () => {
-      mockReaddir.mockResolvedValue(["file1.txt", "file2.js"] as any);
+      mockReaddir.mockResolvedValue(["file1.txt", "file2.js"]);
 
       const result = await findFiles("/test/dir", ".md");
 
@@ -112,7 +112,7 @@ describe("file utilities", () => {
 
   describe("fileExists", () => {
     it("should return true if file exists", async () => {
-      mockStat.mockResolvedValue({} as any);
+      mockStat.mockResolvedValue({} as never);
 
       const result = await fileExists("/path/to/file.txt");
 
