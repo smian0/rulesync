@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import { initCommand, generateCommand, validateCommand, statusCommand, watchCommand } from "./commands/index.js";
+import type { ToolTarget } from "../types/index.js";
 
 const program = new Command();
 
@@ -23,15 +24,20 @@ program
   .option("--cline", "Generate only for Cline")
   .option("-v, --verbose", "Verbose output")
   .action(async (options) => {
-    const tools = [];
+    const tools: ToolTarget[] = [];
     if (options.copilot) tools.push("copilot");
     if (options.cursor) tools.push("cursor");
     if (options.cline) tools.push("cline");
     
-    await generateCommand({
-      tools: tools.length > 0 ? tools : undefined,
+    const generateOptions: { verbose?: boolean; tools?: ToolTarget[] } = {
       verbose: options.verbose,
-    });
+    };
+    
+    if (tools.length > 0) {
+      generateOptions.tools = tools;
+    }
+    
+    await generateCommand(generateOptions);
   });
 
 program

@@ -1,0 +1,18 @@
+{
+	"permissions": {
+		"allow": [
+			"Bash(pnpm install:*)",
+			"Bash(pnpm build:*)",
+			"Bash(pnpm test:*)",
+			"Bash(pnpm check:*)",
+			"WebFetch(domain:code.visualstudio.com)",
+			"WebFetch(domain:docs.cursor.com)",
+			"WebFetch(domain:docs.cline.bot)"
+		],
+		"deny": [
+			"WebFetch(domain:*)",
+			"Bash(npm publish:*)",
+			"Bash(pnpm publish:*)"
+		]
+	}
+}
