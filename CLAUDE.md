@@ -1,76 +1,89 @@
 # CLAUDE.md
 
-このファイルは、このリポジトリでコードを扱う際にClaude Code (claude.ai/code) にガイダンスを提供します。
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## プロジェクト概要
+## Project Overview
 
-rulesyncは、統一されたルールファイル（`.rulesync/*.md`）から、さまざまなAI開発ツール（GitHub Copilot、Cursor、Cline）用の設定ファイルを生成するNode.js CLIツールです。このツールは、異なる開発環境間でのAIルールの一貫性の確保という問題を解決します。
+rulesync is a Node.js CLI tool that generates configuration files for various AI development tools (GitHub Copilot, Cursor, Cline) from unified rule files (`.rulesync/*.md`). The tool solves the problem of maintaining consistent AI rules across different development environments.
 
-## コアアーキテクチャ
+## Core Architecture
 
-### CLIエントリーポイント
-- `src/cli/index.ts` - Commander.jsを使用したメインCLI
-- `src/cli/commands/` - 個別のコマンド実装（init、generate、watch、status、validate）
+### CLI Entry Point
+- `src/cli/index.ts` - Main CLI using Commander.js
+- `src/cli/commands/` - Individual command implementations (init, generate, watch, status, validate)
 
-### コア処理
-- `src/core/parser.ts` - gray-matterフロントマターで`.rulesync/*.md`ファイルを解析
-- `src/core/generator.ts` - ターゲット設定ファイルの生成をオーケストレート
-- `src/core/validator.ts` - ルールファイルの構造と内容を検証
+### Core Processing
+- `src/core/parser.ts` - Parses `.rulesync/*.md` files with gray-matter frontmatter
+- `src/core/generator.ts` - Orchestrates generation of target configuration files
+- `src/core/validator.ts` - Validates rule file structure and content
 
-### ツール固有ジェネレーター
-- `src/generators/copilot.ts` - `.github/instructions/*.instructions.md`を生成
-- `src/generators/cursor.ts` - `.cursor/rules/*.md`を生成
-- `src/generators/cline.ts` - `.clinerules/*.md`を生成
+### Tool-Specific Generators
+- `src/generators/copilot.ts` - Generates `.github/instructions/*.instructions.md`
+- `src/generators/cursor.ts` - Generates `.cursor/rules/*.md`
+- `src/generators/cline.ts` - Generates `.clinerules/*.md`
 
-### 入力形式
-`.rulesync/`のルールファイルは以下のフロントマターを使用：
+### Input Format
+Rule files in `.rulesync/` use the following frontmatter:
 - `priority`: high|low
-- `targets`: ["*"] または [copilot, cursor, cline] - "*"はすべてのツールに適用
-- `description`: ルールの簡潔な説明
-- `globs`: ルールが適用されるファイルパターン（例: ["**/*.ts", "**/*.js"]）
+- `targets`: ["*"] or [copilot, cursor, cline] - "*" applies to all tools
+- `description`: Brief description of the rule
+- `globs`: File patterns where rule applies (e.g., ["**/*.ts", "**/*.js"])
 
-## 開発コマンド
+## Development Commands
 
 ```bash
-# ホットリロード付き開発
+# Development with hot reload
 pnpm dev
 
-# プロダクション用ビルド（CommonJS + ESM）
+# Production build (CommonJS + ESM)
 pnpm build
 
-# コード品質チェック
-pnpm lint           # Biomeリント
-pnpm format         # Biomeフォーマット
-pnpm format:check   # フォーマットチェック
-pnpm check          # Biomeリント + フォーマット
-pnpm secretlint     # シークレット検出
+# Code quality checks
+pnpm lint           # Biome linting
+pnpm format         # Biome formatting
+pnpm format:check   # Format checking
+pnpm check          # Combined lint + format
+pnpm secretlint     # Secret detection
 
-# テスト
-pnpm test           # テスト実行
-pnpm test:watch     # ウォッチモード
-pnpm test:coverage  # カバレッジレポート
+# Testing
+pnpm test           # Run tests
+pnpm test:watch     # Watch mode
+pnpm test:coverage  # Coverage report
+
+# Running specific tests
+pnpm test src/generators/copilot.test.ts
 ```
 
-## 主要な依存関係
+## Key Dependencies
 
-- **Commander.js**: CLIフレームワーク
-- **gray-matter**: フロントマター解析
-- **marked**: Markdown処理
-- **chokidar**: `watch`コマンド用のファイル監視
-- **tsup**: バンドリング（CJSとESMの両方を出力）
-- **tsx**: 開発用TypeScript実行環境
+- **Commander.js**: CLI framework
+- **gray-matter**: Frontmatter parsing
+- **marked**: Markdown processing
+- **chokidar**: File watching for `watch` command
+- **tsup**: Bundling (outputs both CJS and ESM)
+- **tsx**: TypeScript execution for development
 
-## ビルドシステム
+## Build System
 
-- Node.js 20.0.0以上が必要（推奨: 24.0.0以上）
-- `@tsconfig/node24` ベース設定を使用
-- tsupでCommonJS (`dist/index.js`) とESM (`dist/index.mjs`) の両方を出力
-- バイナリエントリーポイント: `dist/index.js`
-- 型定義ファイルもビルド出力に含まれる
+- Requires Node.js 20.0.0+ (recommended: 24.0.0+)
+- Uses `@tsconfig/node24` base configuration
+- tsup outputs both CommonJS (`dist/index.js`) and ESM (`dist/index.mjs`)
+- Binary entry point: `dist/index.js`
+- Type definitions included in build output
 
-## コード品質ツール
+## Code Quality Tools
 
-- **Biome**: 統一されたリンター/フォーマッター（`biome.json`で設定）
-- **secretlint**: シークレット漏洩防止（`.secretlintrc.json`で設定）
-- **TypeScript**: 厳密モードと追加の安全性チェック
-- VS Code: `.vscode/settings.json`で保存時自動フォーマット設定済み
+- **Biome**: Unified linter/formatter (configured in `biome.json`)
+- **secretlint**: Secret leak prevention (configured in `.secretlintrc.json`)
+- **TypeScript**: Strict mode with additional safety checks
+- VS Code: Auto-format on save configured in `.vscode/settings.json`
+
+## CLI Usage Pattern
+
+The tool follows a typical workflow:
+1. `rulesync init` - Creates `.rulesync/` directory with sample files
+2. Edit rule files in `.rulesync/` with appropriate frontmatter
+3. `rulesync generate` - Generates tool-specific configuration files
+4. `rulesync validate` - Validates rule structure
+5. `rulesync status` - Shows current state
+6. `rulesync watch` - Auto-regenerates on file changes
