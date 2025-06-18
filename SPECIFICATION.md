@@ -88,7 +88,7 @@ category: coding|naming|architecture|security|custom
 ### 環境要件
 - Node.js 18.0.0以上
 - TypeScript 5.0以上
-- npm/yarn/pnpm
+- pnpm (推奨パッケージマネージャー)
 
 ### 開発ツール
 - **TypeScript**: 型安全性とモダンJS機能
@@ -141,20 +141,20 @@ ai-rules/
 ### ビルドとパッケージング
 ```bash
 # 開発（tsx使用）
-npm run dev
+pnpm dev
 
 # 本番ビルド（tsup使用）
-npm run build
+pnpm build
 
 # リンターとフォーマッター（Biome使用）
-npm run lint
-npm run format
+pnpm lint
+pnpm format
 
 # テスト
-npm run test
+pnpm test
 
 # パッケージ公開
-npm publish
+pnpm publish
 ```
 
 ### package.json スクリプト例
