@@ -24,22 +24,45 @@ ai-rulesは、統一されたAIルール設定ファイル（`.ai-rules/*.md`）
 
 https://code.visualstudio.com/docs/copilot/copilot-customization#_use-instructionsmd-files
 
-- **出力先**: `.github/instructions/*.md`
+- **出力先**: `.github/instructions/*.instructions.md`
 - **形式**: GitHub Copilot用のプレーンMarkdown形式
+- **仕様詳細**:
+  - ファイル名は必ず `.instructions.md` で終わる必要がある
+  - 複数のinstructionsファイルが組み合わされる
+  - オプションでFront Matterメタデータ（`description`, `applyTo`）をサポート
+  - `applyTo`でファイルパターンを指定可能（例: `**/*.ts,**/*.tsx`）
+  - 短く自己完結型の指示を推奨
+  - 複数ファイルに分割して整理・再利用性を向上
 
 #### Cursor Project Rules
 
 https://docs.cursor.com/context/rules
 
-- **出力先**: `.cursor/rules/*.md`
-- **形式**: Cursor IDE用のルール設定ファイル
+- **出力先**: `.cursor/rules/*.md` 
+- **形式**: MDC（Markdown with Configuration）形式
+- **仕様詳細**:
+  - YAMLヘッダーで設定を記述
+  - ルールタイプ: `Always`, `Auto Attached`, `Agent Requested`, `Manual`
+  - サポート設定: `description`, `globs`, `alwaysApply`
+  - ファイル参照: `@filename` で他ファイルを参照可能
+  - ネストした `.cursor/rules` ディレクトリをサポート
+  - 500行未満を推奨、具体例を含める
+  - 大きな概念は複数ルールに分割
 
 #### Cline Rules
 
 https://docs.cline.bot/features/cline-rules
 
 - **出力先**: `.clinerules/*.md`
-- **形式**: Cline AI Assistant用のルール設定ファイル
+- **形式**: プレーンMarkdown形式
+- **仕様詳細**:
+  - `.clinerules/` 内の全Markdownファイルを自動処理
+  - 数値プレフィックスで整理可能（例: `01-coding.md`, `02-documentation.md`）
+  - 階層的セクション構造をサポート
+  - 「ルールバンク」アプローチでアクティブ/非アクティブセットを管理
+  - 明確で簡潔な言語を使用
+  - 望む結果に焦点を当てる（具体的なステップではなく）
+  - バージョン管理された柔軟なプロジェクトガイダンス
 
 ### 3. CLI コマンド
 

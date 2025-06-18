@@ -13,7 +13,8 @@
 		],
 		"deny": [
 			"Bash(npm publish:*)",
-			"Bash(pnpm publish:*)"
+			"Bash(pnpm publish:*)",
+      "Bash(git remote:*)"
 		]
 	}
 }
