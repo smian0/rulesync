@@ -43,7 +43,6 @@
         "noPrecisionLoss": "error",
         "noSelfAssign": "error",
         "noSetterReturn": "error",
-        "noSwitchDeclare": "error",
         "noUndeclaredVariables": "error",
         "noUnreachable": "error",
         "noUnreachableSuper": "error"
