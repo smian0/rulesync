@@ -217,6 +217,7 @@ pnpm publish
 - チーム設定の共有機能
 - 設定テンプレートライブラリ
 - Git hooks 連携
+- `/init-rulesync` カスタムスラッシュコマンド
 
 ## 使用例
 
