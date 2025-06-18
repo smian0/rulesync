@@ -18,7 +18,7 @@ ai-rules is a Node.js CLI tool that generates configuration files for various AI
 - `src/core/validator.ts` - Validates rule file structure and content
 
 ### Tool-Specific Generators
-- `src/generators/copilot.ts` - Generates `copilot-instructions.md`
+- `src/generators/copilot.ts` - Generates `.github/instructions/*.md`
 - `src/generators/cursor.ts` - Generates `.cursor/rules/*.md`
 - `src/generators/cline.ts` - Generates `.clinerules/*.md`
 
