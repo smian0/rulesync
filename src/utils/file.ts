@@ -1,5 +1,5 @@
-import { readdir, readFile, writeFile, mkdir, stat } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { dirname, join } from "node:path";
 
 export async function ensureDir(dirPath: string): Promise<void> {
   try {
@@ -21,9 +21,7 @@ export async function writeFileContent(filepath: string, content: string): Promi
 export async function findFiles(dir: string, extension: string = ".md"): Promise<string[]> {
   try {
     const files = await readdir(dir);
-    return files
-      .filter((file) => file.endsWith(extension))
-      .map((file) => join(dir, file));
+    return files.filter((file) => file.endsWith(extension)).map((file) => join(dir, file));
   } catch {
     return [];
   }

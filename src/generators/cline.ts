@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { ParsedRule, GeneratedOutput, Config } from "../types/index.js";
+import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
 export async function generateClineConfig(
   rules: ParsedRule[],
@@ -24,7 +24,7 @@ export async function generateClineConfig(
 
 function generateClineMarkdown(rules: ParsedRule[]): string {
   const lines: string[] = [];
-  
+
   lines.push("# Cline AI Assistant Rules");
   lines.push("");
   lines.push("Configuration rules for Cline AI Assistant.");
@@ -43,10 +43,10 @@ function generateClineMarkdown(rules: ParsedRule[]): string {
 
 function formatRuleForCline(rule: ParsedRule): string[] {
   const lines: string[] = [];
-  
+
   lines.push(`### ${rule.filename}`);
   lines.push("");
-  
+
   // Add metadata
   lines.push("```yaml");
   lines.push(`priority: ${rule.frontmatter.priority}`);
@@ -59,9 +59,9 @@ function formatRuleForCline(rule: ParsedRule): string[] {
   }
   lines.push("```");
   lines.push("");
-  
+
   lines.push(rule.content);
   lines.push("");
-  
+
   return lines;
 }

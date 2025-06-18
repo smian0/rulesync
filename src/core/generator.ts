@@ -1,8 +1,8 @@
-import type { ParsedRule, GeneratedOutput, ToolTarget, Config } from "../types/index.js";
-import { resolveTargets } from "../utils/index.js";
+import { generateClineConfig } from "../generators/cline.js";
 import { generateCopilotConfig } from "../generators/copilot.js";
 import { generateCursorConfig } from "../generators/cursor.js";
-import { generateClineConfig } from "../generators/cline.js";
+import type { Config, GeneratedOutput, ParsedRule, ToolTarget } from "../types/index.js";
+import { resolveTargets } from "../utils/index.js";
 
 export async function generateConfigurations(
   rules: ParsedRule[],
@@ -14,7 +14,7 @@ export async function generateConfigurations(
 
   for (const tool of toolsToGenerate) {
     const relevantRules = filterRulesForTool(rules, tool, config);
-    
+
     if (relevantRules.length === 0) {
       console.warn(`No rules found for tool: ${tool}`);
       continue;

@@ -1,17 +1,17 @@
 import { join } from "node:path";
-import { ensureDir, writeFileContent, fileExists } from "../../utils/index.js";
+import { ensureDir, fileExists, writeFileContent } from "../../utils/index.js";
 
 export async function initCommand(): Promise<void> {
   const aiRulesDir = ".ai-rules";
-  
+
   console.log("Initializing ai-rules...");
-  
+
   // Create .ai-rules directory
   await ensureDir(aiRulesDir);
-  
+
   // Create sample rule files
   await createSampleFiles(aiRulesDir);
-  
+
   console.log("✅ ai-rules initialized successfully!");
   console.log("\nNext steps:");
   console.log("1. Edit rule files in .ai-rules/");
@@ -48,7 +48,7 @@ globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
 `,
     },
     {
-      filename: "naming-conventions.md", 
+      filename: "naming-conventions.md",
       content: `---
 priority: high
 targets: ["*"]

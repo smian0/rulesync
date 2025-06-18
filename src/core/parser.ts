@@ -1,5 +1,5 @@
-import matter from "gray-matter";
 import { basename } from "node:path";
+import matter from "gray-matter";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { findFiles, readFileContent } from "../utils/index.js";
 
@@ -57,7 +57,9 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   const validTargets = ["copilot", "cursor", "cline", "*"];
   for (const target of obj.targets) {
     if (typeof target !== "string" || !validTargets.includes(target)) {
-      throw new Error(`Invalid target "${target}" in ${filepath}: must be one of ${validTargets.join(", ")}`);
+      throw new Error(
+        `Invalid target "${target}" in ${filepath}: must be one of ${validTargets.join(", ")}`
+      );
     }
   }
 

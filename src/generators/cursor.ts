@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import type { ParsedRule, GeneratedOutput, Config } from "../types/index.js";
+import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
 export async function generateCursorConfig(
   rules: ParsedRule[],
@@ -25,7 +25,7 @@ export async function generateCursorConfig(
 
 function generateCursorMarkdown(rules: ParsedRule[]): string {
   const lines: string[] = [];
-  
+
   lines.push("# Cursor IDE Rules");
   lines.push("");
   lines.push("These rules configure Cursor IDE's AI assistant behavior.");
@@ -40,14 +40,14 @@ function generateCursorMarkdown(rules: ParsedRule[]): string {
 
 function formatRuleForCursor(rule: ParsedRule): string[] {
   const lines: string[] = [];
-  
+
   const priorityBadge = rule.frontmatter.priority === "high" ? "🔴 HIGH" : "🟡 STANDARD";
   lines.push(`## ${rule.filename} ${priorityBadge}`);
   lines.push("");
-  
+
   lines.push(`**Description:** ${rule.frontmatter.description}`);
   lines.push("");
-  
+
   if (rule.frontmatter.globs.length > 0) {
     lines.push("**File Patterns:**");
     for (const glob of rule.frontmatter.globs) {
@@ -55,12 +55,12 @@ function formatRuleForCursor(rule: ParsedRule): string[] {
     }
     lines.push("");
   }
-  
+
   lines.push("**Rule:**");
   lines.push(rule.content);
   lines.push("");
   lines.push("---");
   lines.push("");
-  
+
   return lines;
 }

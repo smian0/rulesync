@@ -1,20 +1,20 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import { initCommand, generateCommand, validateCommand, statusCommand, watchCommand } from "./commands/index.js";
 import type { ToolTarget } from "../types/index.js";
+import {
+  generateCommand,
+  initCommand,
+  statusCommand,
+  validateCommand,
+  watchCommand,
+} from "./commands/index.js";
 
 const program = new Command();
 
-program
-  .name("ai-rules")
-  .description("Unified AI rules management CLI tool")
-  .version("0.1.0");
+program.name("ai-rules").description("Unified AI rules management CLI tool").version("0.1.0");
 
-program
-  .command("init")
-  .description("Initialize ai-rules in current directory")
-  .action(initCommand);
+program.command("init").description("Initialize ai-rules in current directory").action(initCommand);
 
 program
   .command("generate")
@@ -28,27 +28,21 @@ program
     if (options.copilot) tools.push("copilot");
     if (options.cursor) tools.push("cursor");
     if (options.cline) tools.push("cline");
-    
+
     const generateOptions: { verbose?: boolean; tools?: ToolTarget[] } = {
       verbose: options.verbose,
     };
-    
+
     if (tools.length > 0) {
       generateOptions.tools = tools;
     }
-    
+
     await generateCommand(generateOptions);
   });
 
-program
-  .command("validate")
-  .description("Validate ai-rules configuration")
-  .action(validateCommand);
+program.command("validate").description("Validate ai-rules configuration").action(validateCommand);
 
-program
-  .command("status")
-  .description("Show current status of ai-rules")
-  .action(statusCommand);
+program.command("status").description("Show current status of ai-rules").action(statusCommand);
 
 program
   .command("watch")
