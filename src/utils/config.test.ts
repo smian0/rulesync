@@ -5,7 +5,7 @@ describe("config utils", () => {
   describe("getDefaultConfig", () => {
     it("should return default configuration", () => {
       const config = getDefaultConfig();
-      
+
       expect(config.aiRulesDir).toBe(".ai-rules");
       expect(config.outputPaths.copilot).toBe(".github/instructions");
       expect(config.outputPaths.cursor).toBe(".cursor/rules");

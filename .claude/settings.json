@@ -2,11 +2,7 @@
 	"permissions": {
 		"allow": [
       "Bash(node:*)",
-			"Bash(pnpm install:*)",
-			"Bash(pnpm build:*)",
-			"Bash(pnpm test:*)",
-			"Bash(pnpm check:*)",
-      "Bash(pnpm run lint:*)",
+			"Bash(pnpm:*)",
       "WebFetch(domain:code.visualstudio.com)",
       "WebFetch(domain:docs.cursor.com)",
       "WebFetch(domain:docs.cline.bot)"

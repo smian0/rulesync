@@ -1,74 +1,76 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+このファイルは、このリポジトリでコードを扱う際にClaude Code (claude.ai/code) にガイダンスを提供します。
 
-## Project Overview
+## プロジェクト概要
 
-ai-rules is a Node.js CLI tool that generates configuration files for various AI development tools (GitHub Copilot, Cursor, Cline) from unified rule files in `.ai-rules/*.md`. The tool solves the problem of maintaining consistent AI rules across different development environments.
+ai-rulesは、統一されたルールファイル（`.ai-rules/*.md`）から、さまざまなAI開発ツール（GitHub Copilot、Cursor、Cline）用の設定ファイルを生成するNode.js CLIツールです。このツールは、異なる開発環境間でのAIルールの一貫性の確保という問題を解決します。
 
-## Core Architecture
+## コアアーキテクチャ
 
-### CLI Entry Point
-- `src/cli/index.ts` - Main CLI entry using Commander.js
-- `src/cli/commands/` - Individual command implementations (init, generate, watch, status, validate)
+### CLIエントリーポイント
+- `src/cli/index.ts` - Commander.jsを使用したメインCLI
+- `src/cli/commands/` - 個別のコマンド実装（init、generate、watch、status、validate）
 
-### Core Processing
-- `src/core/parser.ts` - Parses `.ai-rules/*.md` files with gray-matter frontmatter
-- `src/core/generator.ts` - Orchestrates generation of target configuration files
-- `src/core/validator.ts` - Validates rule file structure and content
+### コア処理
+- `src/core/parser.ts` - gray-matterフロントマターで`.ai-rules/*.md`ファイルを解析
+- `src/core/generator.ts` - ターゲット設定ファイルの生成をオーケストレート
+- `src/core/validator.ts` - ルールファイルの構造と内容を検証
 
-### Tool-Specific Generators
-- `src/generators/copilot.ts` - Generates `.github/instructions/*.md`
-- `src/generators/cursor.ts` - Generates `.cursor/rules/*.md`
-- `src/generators/cline.ts` - Generates `.clinerules/*.md`
+### ツール固有ジェネレーター
+- `src/generators/copilot.ts` - `.github/instructions/*.instructions.md`を生成
+- `src/generators/cursor.ts` - `.cursor/rules/*.md`を生成
+- `src/generators/cline.ts` - `.clinerules/*.md`を生成
 
-### Input Format
-Rule files in `.ai-rules/` use frontmatter to specify:
+### 入力形式
+`.ai-rules/`のルールファイルは以下のフロントマターを使用：
 - `priority`: high|low
-- `targets`: ["*"] or [copilot, cursor, cline] - "*" applies to all tools
-- `description`: Brief explanation of the rule
-- `globs`: File patterns the rule applies to (e.g., ["**/*.ts", "**/*.js"])
+- `targets`: ["*"] または [copilot, cursor, cline] - "*"はすべてのツールに適用
+- `description`: ルールの簡潔な説明
+- `globs`: ルールが適用されるファイルパターン（例: ["**/*.ts", "**/*.js"]）
 
-## Development Commands
+## 開発コマンド
 
 ```bash
-# Development with hot reload
+# ホットリロード付き開発
 pnpm dev
 
-# Build for production (CommonJS + ESM)
+# プロダクション用ビルド（CommonJS + ESM）
 pnpm build
 
-# Code quality checks
-pnpm lint           # Biome linting
-pnpm format         # Biome formatting
-pnpm check          # Biome lint + format
-pnpm secretlint     # Secret detection
+# コード品質チェック
+pnpm lint           # Biomeリント
+pnpm format         # Biomeフォーマット
+pnpm format:check   # フォーマットチェック
+pnpm check          # Biomeリント + フォーマット
+pnpm secretlint     # シークレット検出
 
-# Testing
-pnpm test           # Run tests
-pnpm test:watch     # Watch mode
-pnpm test:coverage  # Coverage report
+# テスト
+pnpm test           # テスト実行
+pnpm test:watch     # ウォッチモード
+pnpm test:coverage  # カバレッジレポート
 ```
 
-## Key Dependencies
+## 主要な依存関係
 
-- **Commander.js**: CLI framework
-- **gray-matter**: Frontmatter parsing
-- **marked**: Markdown processing
-- **chokidar**: File watching for `watch` command
-- **tsup**: Bundling (outputs both CJS and ESM)
-- **tsx**: Development TypeScript execution
+- **Commander.js**: CLIフレームワーク
+- **gray-matter**: フロントマター解析
+- **marked**: Markdown処理
+- **chokidar**: `watch`コマンド用のファイル監視
+- **tsup**: バンドリング（CJSとESMの両方を出力）
+- **tsx**: 開発用TypeScript実行環境
 
-## Build System
+## ビルドシステム
 
-- Uses `@tsconfig/node24` base configuration
-- Outputs both CommonJS (`dist/index.js`) and ESM (`dist/index.mjs`) via tsup
-- Binary entry point: `dist/index.js`
-- Type definitions included in build output
+- Node.js 20.0.0以上が必要（推奨: 24.0.0以上）
+- `@tsconfig/node24` ベース設定を使用
+- tsupでCommonJS (`dist/index.js`) とESM (`dist/index.mjs`) の両方を出力
+- バイナリエントリーポイント: `dist/index.js`
+- 型定義ファイルもビルド出力に含まれる
 
-## Code Quality Tools
+## コード品質ツール
 
-- **Biome**: Unified linter/formatter (configured in `biome.json`)
-- **secretlint**: Prevents secret leakage (configured in `.secretlintrc.json`)
-- **TypeScript**: Strict mode with additional safety checks
-- VS Code: Auto-format on save configured in `.vscode/settings.json`
+- **Biome**: 統一されたリンター/フォーマッター（`biome.json`で設定）
+- **secretlint**: シークレット漏洩防止（`.secretlintrc.json`で設定）
+- **TypeScript**: 厳密モードと追加の安全性チェック
+- VS Code: `.vscode/settings.json`で保存時自動フォーマット設定済み

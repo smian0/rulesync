@@ -28,8 +28,8 @@ function generateCopilotMarkdown(rules: ParsedRule[]): string {
 
   // Add Front Matter for GitHub Copilot
   lines.push("---");
-  lines.push("description: \"AI rules configuration for GitHub Copilot\"");
-  lines.push("applyTo: \"**\"");
+  lines.push('description: "AI rules configuration for GitHub Copilot"');
+  lines.push('applyTo: "**"');
   lines.push("---");
   lines.push("");
 
