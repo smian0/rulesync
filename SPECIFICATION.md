@@ -64,6 +64,10 @@ https://docs.cline.bot/features/cline-rules
   - 望む結果に焦点を当てる（具体的なステップではなく）
   - バージョン管理された柔軟なプロジェクトガイダンス
 
+#### Claude Code Memory
+
+https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
+
 ### 3. CLI コマンド
 
 ```bash
