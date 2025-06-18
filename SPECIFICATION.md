@@ -21,7 +21,7 @@ ai-rulesは、統一されたAIルール設定ファイル（`.ai-rules/*.md`）
 ### 2. 対応ツール設定生成
 
 #### GitHub Copilot
-- **出力先**: `copilot-instructions.md`
+- **出力先**: `.github/instructions/*.md`
 - **形式**: GitHub Copilot用のプレーンMarkdown形式
 
 #### Cursor
