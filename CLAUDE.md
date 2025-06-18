@@ -24,9 +24,10 @@ ai-rules is a Node.js CLI tool that generates configuration files for various AI
 
 ### Input Format
 Rule files in `.ai-rules/` use frontmatter to specify:
-- `priority`: high|medium|low
-- `targets`: [copilot, cursor, cline]  
-- `category`: coding|naming|architecture|security|custom
+- `priority`: high|low
+- `targets`: ["*"] or [copilot, cursor, cline] - "*" applies to all tools
+- `description`: Brief explanation of the rule
+- `globs`: File patterns the rule applies to (e.g., ["**/*.ts", "**/*.js"])
 
 ## Development Commands
 
