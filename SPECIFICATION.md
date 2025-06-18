@@ -105,7 +105,7 @@ ai-rules validate
 
 ```markdown
 ---
-priority: high|low
+priority: high|medium|low
 targets: ["*"] # または [copilot, cursor, cline]
 description: "ルールの簡潔な説明"
 globs: ["**/*.ts", "**/*.js"]

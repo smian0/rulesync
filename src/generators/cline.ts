@@ -13,7 +13,7 @@ export async function generateClineConfig(
   });
 
   const content = generateClineMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.cline, "rules.md");
+  const filepath = join(config.outputPaths.cline, "01-ai-rules.md");
 
   return {
     tool: "cline",
@@ -27,15 +27,33 @@ function generateClineMarkdown(rules: ParsedRule[]): string {
 
   lines.push("# Cline AI Assistant Rules");
   lines.push("");
-  lines.push("Configuration rules for Cline AI Assistant.");
+  lines.push("Configuration rules for Cline AI Assistant. Generated from ai-rules configuration.");
+  lines.push("");
+  lines.push("These rules provide project-specific guidance for AI-assisted development.");
   lines.push("");
 
-  // Cline prefers a more structured format
-  lines.push("## Rules");
-  lines.push("");
+  // Group by priority for better organization
+  const highPriorityRules = rules.filter((r) => r.frontmatter.priority === "high");
+  const lowPriorityRules = rules.filter((r) => r.frontmatter.priority === "low");
 
-  for (const rule of rules) {
-    lines.push(...formatRuleForCline(rule));
+  if (highPriorityRules.length > 0) {
+    lines.push("## High Priority Guidelines");
+    lines.push("");
+    lines.push("These are critical rules that should always be followed:");
+    lines.push("");
+    for (const rule of highPriorityRules) {
+      lines.push(...formatRuleForCline(rule));
+    }
+  }
+
+  if (lowPriorityRules.length > 0) {
+    lines.push("## Standard Guidelines");
+    lines.push("");
+    lines.push("These are recommended practices for this project:");
+    lines.push("");
+    for (const rule of lowPriorityRules) {
+      lines.push(...formatRuleForCline(rule));
+    }
   }
 
   return lines.join("\n");

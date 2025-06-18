@@ -14,7 +14,7 @@ export async function generateCopilotConfig(
   });
 
   const content = generateCopilotMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.copilot, "rules.md");
+  const filepath = join(config.outputPaths.copilot, "ai-rules.instructions.md");
 
   return {
     tool: "copilot",
@@ -25,6 +25,13 @@ export async function generateCopilotConfig(
 
 function generateCopilotMarkdown(rules: ParsedRule[]): string {
   const lines: string[] = [];
+
+  // Add Front Matter for GitHub Copilot
+  lines.push("---");
+  lines.push("description: \"AI rules configuration for GitHub Copilot\"");
+  lines.push("applyTo: \"**\"");
+  lines.push("---");
+  lines.push("");
 
   lines.push("# GitHub Copilot Instructions");
   lines.push("");
