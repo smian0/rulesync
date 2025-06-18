@@ -65,20 +65,20 @@ function formatRuleForCline(rule: ParsedRule): string[] {
   lines.push(`### ${rule.filename}`);
   lines.push("");
 
-  // Add metadata
-  lines.push("```yaml");
-  lines.push(`priority: ${rule.frontmatter.priority}`);
-  lines.push(`description: "${rule.frontmatter.description}"`);
-  if (rule.frontmatter.globs.length > 0) {
-    lines.push("applies_to:");
-    for (const glob of rule.frontmatter.globs) {
-      lines.push(`  - "${glob}"`);
-    }
-  }
-  lines.push("```");
+  lines.push(`**Description:** ${rule.frontmatter.description}`);
   lines.push("");
 
+  if (rule.frontmatter.globs.length > 0) {
+    lines.push(`**Applies to files:** ${rule.frontmatter.globs.join(", ")}`);
+    lines.push("");
+  }
+
+  // Add the actual rule content with clear formatting
+  lines.push("**Guidelines:**");
+  lines.push("");
   lines.push(rule.content);
+  lines.push("");
+  lines.push("---");
   lines.push("");
 
   return lines;
