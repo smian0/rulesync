@@ -4,9 +4,9 @@ import { fileExists, getDefaultConfig } from "../../utils/index.js";
 export async function validateCommand(): Promise<void> {
   const config = getDefaultConfig();
 
-  console.log("Validating ai-rules configuration...");
+  console.log("Validating rulesync configuration...");
 
-  // Check if .ai-rules directory exists
+  // Check if .rulesync directory exists
   if (!(await fileExists(config.aiRulesDir))) {
     console.error("❌ .rulesync directory not found. Run 'rulesync init' first.");
     process.exit(1);
@@ -17,7 +17,7 @@ export async function validateCommand(): Promise<void> {
     const rules = await parseRulesFromDirectory(config.aiRulesDir);
 
     if (rules.length === 0) {
-      console.warn("⚠️  No rules found in .ai-rules directory");
+      console.warn("⚠️  No rules found in .rulesync directory");
       return;
     }
 

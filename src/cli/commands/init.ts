@@ -4,18 +4,18 @@ import { ensureDir, fileExists, writeFileContent } from "../../utils/index.js";
 export async function initCommand(): Promise<void> {
   const aiRulesDir = ".rulesync";
 
-  console.log("Initializing ai-rules...");
+  console.log("Initializing rulesync...");
 
-  // Create .ai-rules directory
+  // Create .rulesync directory
   await ensureDir(aiRulesDir);
 
   // Create sample rule files
   await createSampleFiles(aiRulesDir);
 
-  console.log("✅ ai-rules initialized successfully!");
+  console.log("✅ rulesync initialized successfully!");
   console.log("\nNext steps:");
   console.log("1. Edit rule files in .rulesync/");
-  console.log("2. Run 'ai-rules generate' to create configuration files");
+  console.log("2. Run 'rulesync generate' to create configuration files");
 }
 
 async function createSampleFiles(aiRulesDir: string): Promise<void> {

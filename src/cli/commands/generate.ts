@@ -12,7 +12,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
 
   console.log("Generating configuration files...");
 
-  // Check if .ai-rules directory exists
+  // Check if .rulesync directory exists
   if (!(await fileExists(config.aiRulesDir))) {
     console.error("❌ .rulesync directory not found. Run 'rulesync init' first.");
     process.exit(1);

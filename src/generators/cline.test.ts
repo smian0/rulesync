@@ -43,7 +43,7 @@ describe("generateClineConfig", () => {
     const result = await generateClineConfig(mockRules, mockConfig);
 
     expect(result.tool).toBe("cline");
-    expect(result.filepath).toBe(".clinerules/01-ai-rules.md");
+    expect(result.filepath).toBe(".clinerules/01-rulesync.md");
     expect(result.content).toContain("# Cline AI Assistant Rules");
   });
 

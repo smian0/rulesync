@@ -35,7 +35,7 @@ describe("copilot generator", () => {
     const output = await generateCopilotConfig(mockRules, config);
 
     expect(output.tool).toBe("copilot");
-    expect(output.filepath).toBe(".github/instructions/ai-rules.instructions.md");
+    expect(output.filepath).toBe(".github/instructions/rulesync.instructions.md");
     expect(output.content).toContain("---");
     expect(output.content).toContain('description: "AI rules configuration for GitHub Copilot"');
     expect(output.content).toContain('applyTo: "**"');

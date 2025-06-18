@@ -14,7 +14,7 @@ export async function generateCopilotConfig(
   });
 
   const content = generateCopilotMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.copilot, "ai-rules.instructions.md");
+  const filepath = join(config.outputPaths.copilot, "rulesync.instructions.md");
 
   return {
     tool: "copilot",
@@ -36,7 +36,7 @@ function generateCopilotMarkdown(rules: ParsedRule[]): string {
   lines.push("# GitHub Copilot Instructions");
   lines.push("");
   lines.push(
-    "Generated from ai-rules configuration. These instructions guide GitHub Copilot's code suggestions."
+    "Generated from rulesync configuration. These instructions guide GitHub Copilot's code suggestions."
   );
   lines.push("");
 

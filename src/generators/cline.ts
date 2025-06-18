@@ -13,7 +13,7 @@ export async function generateClineConfig(
   });
 
   const content = generateClineMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.cline, "01-ai-rules.md");
+  const filepath = join(config.outputPaths.cline, "01-rulesync.md");
 
   return {
     tool: "cline",
@@ -27,7 +27,7 @@ function generateClineMarkdown(rules: ParsedRule[]): string {
 
   lines.push("# Cline AI Assistant Rules");
   lines.push("");
-  lines.push("Configuration rules for Cline AI Assistant. Generated from ai-rules configuration.");
+  lines.push("Configuration rules for Cline AI Assistant. Generated from rulesync configuration.");
   lines.push("");
   lines.push("These rules provide project-specific guidance for AI-assisted development.");
   lines.push("");

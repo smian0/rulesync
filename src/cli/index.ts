@@ -12,9 +12,9 @@ import {
 
 const program = new Command();
 
-program.name("ai-rules").description("Unified AI rules management CLI tool").version("0.1.0");
+program.name("rulesync").description("Unified AI rules management CLI tool").version("0.1.0");
 
-program.command("init").description("Initialize ai-rules in current directory").action(initCommand);
+program.command("init").description("Initialize rulesync in current directory").action(initCommand);
 
 program
   .command("generate")
@@ -40,9 +40,9 @@ program
     await generateCommand(generateOptions);
   });
 
-program.command("validate").description("Validate ai-rules configuration").action(validateCommand);
+program.command("validate").description("Validate rulesync configuration").action(validateCommand);
 
-program.command("status").description("Show current status of ai-rules").action(statusCommand);
+program.command("status").description("Show current status of rulesync").action(statusCommand);
 
 program
   .command("watch")

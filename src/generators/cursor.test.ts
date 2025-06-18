@@ -43,7 +43,7 @@ describe("generateCursorConfig", () => {
     const result = await generateCursorConfig(mockRules, mockConfig);
 
     expect(result.tool).toBe("cursor");
-    expect(result.filepath).toBe(".cursor/rules/ai-rules.md");
+    expect(result.filepath).toBe(".cursor/rules/rulesync.md");
     expect(result.content).toContain("# Cursor IDE Rules");
   });
 

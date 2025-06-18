@@ -14,7 +14,7 @@ export async function generateCursorConfig(
   });
 
   const content = generateCursorMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.cursor, "ai-rules.md");
+  const filepath = join(config.outputPaths.cursor, "rulesync.md");
 
   return {
     tool: "cursor",

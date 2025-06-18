@@ -3,123 +3,123 @@
 [![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
 [![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
 
-統一されたAIルール設定ファイル（`.rulesync/*.md`）から、各種AI開発支援ツールの設定ファイルを自動生成するNode.js CLIツールです。
+A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files (`.rulesync/*.md`).
 
-## 対応ツール
+## Supported Tools
 
 - **GitHub Copilot Custom Instructions** (`.github/instructions/*.instructions.md`)
 - **Cursor Project Rules** (`.cursor/rules/*.md`) 
 - **Cline Rules** (`.clinerules/*.md`)
 
-## インストール
+## Installation
 
 ```bash
 npm install -g rulesync
-# または
+# or
 pnpm add -g rulesync
-# または  
+# or  
 yarn global add rulesync
 ```
 
-## 使用方法
+## Usage
 
-### 1. 初期化
+### 1. Initialize
 
 ```bash
 rulesync init
 ```
 
-`.rulesync/` ディレクトリとサンプルルールファイルが作成されます。
+This creates a `.rulesync/` directory with sample rule files.
 
-### 2. ルールファイルの編集
+### 2. Edit Rule Files
 
-各Markdownファイルにフロントマターでメタデータを記述します：
+Define metadata in front matter for each Markdown file:
 
 ```markdown
 ---
 priority: high
-targets: ["*"] # または [copilot, cursor, cline]
-description: "TypeScriptコーディングルール"
+targets: ["*"] # or [copilot, cursor, cline]
+description: "TypeScript coding rules"
 globs: ["**/*.ts", "**/*.tsx"]
 ---
 
 # TypeScript Rules
 
-- TypeScriptを使用する
-- 型注釈を明確に記述する
+- Use TypeScript
+- Write clear type annotations
 ```
 
-### 3. 設定ファイル生成
+### 3. Generate Configuration Files
 
 ```bash
-# 全ツール用設定ファイル生成
+# Generate for all tools
 rulesync generate
 
-# 特定ツールのみ
+# Generate for specific tools
 rulesync generate --copilot
 rulesync generate --cursor  
 rulesync generate --cline
 ```
 
-### 4. その他のコマンド
+### 4. Other Commands
 
 ```bash
-# 設定の妥当性チェック
+# Validate configuration
 rulesync validate
 
-# 現在の状況確認
+# Check current status
 rulesync status
 
-# ファイル監視・自動生成
+# Watch files and auto-generate
 rulesync watch
 ```
 
-## 設定ファイル構造
+## Configuration File Structure
 
 ```
-.ai-rules/
-├── coding-rules.md      # コーディングルール
-├── naming-conventions.md # 命名規則
-├── architecture.md      # アーキテクチャガイドライン
-├── security.md          # セキュリティルール
-└── custom.md           # プロジェクト固有ルール
+.rulesync/
+├── coding-rules.md      # Coding rules
+├── naming-conventions.md # Naming conventions
+├── architecture.md      # Architecture guidelines
+├── security.md          # Security rules
+└── custom.md           # Project-specific rules
 ```
 
-## 生成される設定ファイル
+## Generated Configuration Files
 
-| ツール | 出力先 | 形式 |
-|--------|--------|------|
+| Tool | Output Path | Format |
+|------|------------|--------|
 | GitHub Copilot | `.github/instructions/*.instructions.md` | Front Matter + Markdown |
 | Cursor | `.cursor/rules/*.md` | MDC (YAML header + Markdown) |
-| Cline | `.clinerules/*.md` | プレーンMarkdown |
+| Cline | `.clinerules/*.md` | Plain Markdown |
 
-## 開発
+## Development
 
 ```bash
-# 依存関係インストール
+# Install dependencies
 pnpm install
 
-# 開発実行
+# Development run
 pnpm dev
 
-# ビルド
+# Build
 pnpm build
 
-# テスト
+# Test
 pnpm test
 
-# コード品質チェック
+# Code quality checks
 pnpm lint
 pnpm format
 pnpm secretlint
 ```
 
-## ライセンス
+## License
 
 MIT License
 
-## 貢献
+## Contributing
 
-Issue や Pull Request をお待ちしています！
+Issues and Pull Requests are welcome!
 
-詳細な仕様については [SPECIFICATION.md](./SPECIFICATION.md) をご覧ください。
+For detailed specifications, see [SPECIFICATION.md](./SPECIFICATION.md).

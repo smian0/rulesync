@@ -7,11 +7,11 @@ export async function statusCommand(): Promise<void> {
   console.log("rulesync Status");
   console.log("===============");
 
-  // Check if .ai-rules directory exists
-  const aiRulesExists = await fileExists(config.aiRulesDir);
-  console.log(`\n📁 .rulesync directory: ${aiRulesExists ? "✅ Found" : "❌ Not found"}`);
+  // Check if .rulesync directory exists
+  const rulesyncExists = await fileExists(config.aiRulesDir);
+  console.log(`\n📁 .rulesync directory: ${rulesyncExists ? "✅ Found" : "❌ Not found"}`);
 
-  if (!aiRulesExists) {
+  if (!rulesyncExists) {
     console.log("\n💡 Run 'rulesync init' to get started");
     return;
   }
