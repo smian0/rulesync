@@ -10,6 +10,7 @@ A Node.js CLI tool that automatically generates configuration files for various 
 - **GitHub Copilot Custom Instructions** (`.github/instructions/*.instructions.md`)
 - **Cursor Project Rules** (`.cursor/rules/*.md`) 
 - **Cline Rules** (`.clinerules/*.md`)
+- **Claude Code Memory** (`./CLAUDE.md`)
 
 ## Installation
 
@@ -38,7 +39,7 @@ Define metadata in front matter for each Markdown file:
 ```markdown
 ---
 priority: high
-targets: ["*"] # or [copilot, cursor, cline]
+targets: ["*"] # or [copilot, cursor, cline, claude]
 description: "TypeScript coding rules"
 globs: ["**/*.ts", "**/*.tsx"]
 ---
@@ -59,6 +60,7 @@ rulesync generate
 rulesync generate --copilot
 rulesync generate --cursor  
 rulesync generate --cline
+rulesync generate --claude
 ```
 
 ### 4. Other Commands
@@ -92,6 +94,7 @@ rulesync watch
 | GitHub Copilot | `.github/instructions/*.instructions.md` | Front Matter + Markdown |
 | Cursor | `.cursor/rules/*.md` | MDC (YAML header + Markdown) |
 | Cline | `.clinerules/*.md` | Plain Markdown |
+| Claude Code | `./CLAUDE.md` | Plain Markdown |
 
 ## Development
 

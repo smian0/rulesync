@@ -1,6 +1,6 @@
-export type Priority = "high" | "low";
+export type Priority = "high" | "medium" | "low";
 
-export type ToolTarget = "copilot" | "cursor" | "cline";
+export type ToolTarget = "copilot" | "cursor" | "cline" | "claude";
 
 export type RuleFrontmatter = {
   priority: Priority;

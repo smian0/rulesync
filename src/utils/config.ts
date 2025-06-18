@@ -7,9 +7,10 @@ export function getDefaultConfig(): Config {
       copilot: ".github/instructions",
       cursor: ".cursor/rules",
       cline: ".clinerules",
+      claude: ".",
     },
     watchEnabled: false,
-    defaultTargets: ["copilot", "cursor", "cline"],
+    defaultTargets: ["copilot", "cursor", "cline", "claude"],
   };
 }
 

@@ -22,12 +22,14 @@ program
   .option("--copilot", "Generate only for GitHub Copilot")
   .option("--cursor", "Generate only for Cursor")
   .option("--cline", "Generate only for Cline")
+  .option("--claude", "Generate only for Claude Code")
   .option("-v, --verbose", "Verbose output")
   .action(async (options) => {
     const tools: ToolTarget[] = [];
     if (options.copilot) tools.push("copilot");
     if (options.cursor) tools.push("cursor");
     if (options.cline) tools.push("cline");
+    if (options.claude) tools.push("claude");
 
     const generateOptions: { verbose?: boolean; tools?: ToolTarget[] } = {
       verbose: options.verbose,
