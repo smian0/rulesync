@@ -1,0 +1,132 @@
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { ensureDir, readFileContent, writeFileContent, findFiles, fileExists } from "./file.js";
+
+vi.mock("node:fs/promises");
+
+const mockStat = vi.mocked(stat);
+const mockMkdir = vi.mocked(mkdir);
+const mockReadFile = vi.mocked(readFile);
+const mockWriteFile = vi.mocked(writeFile);
+const mockReaddir = vi.mocked(readdir);
+
+describe("file utilities", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  describe("ensureDir", () => {
+    it("should not create directory if it exists", async () => {
+      mockStat.mockResolvedValue({} as any);
+
+      await ensureDir("/existing/dir");
+
+      expect(mockStat).toHaveBeenCalledWith("/existing/dir");
+      expect(mockMkdir).not.toHaveBeenCalled();
+    });
+
+    it("should create directory if it does not exist", async () => {
+      mockStat.mockRejectedValue(new Error("Directory not found"));
+      mockMkdir.mockResolvedValue(undefined);
+
+      await ensureDir("/new/dir");
+
+      expect(mockStat).toHaveBeenCalledWith("/new/dir");
+      expect(mockMkdir).toHaveBeenCalledWith("/new/dir", { recursive: true });
+    });
+  });
+
+  describe("readFileContent", () => {
+    it("should read file content as UTF-8", async () => {
+      const content = "file content";
+      mockReadFile.mockResolvedValue(content);
+
+      const result = await readFileContent("/path/to/file.txt");
+
+      expect(mockReadFile).toHaveBeenCalledWith("/path/to/file.txt", "utf-8");
+      expect(result).toBe(content);
+    });
+  });
+
+  describe("writeFileContent", () => {
+    it("should ensure directory exists and write file", async () => {
+      mockStat.mockResolvedValue({} as any);
+      mockWriteFile.mockResolvedValue(undefined);
+
+      await writeFileContent("/path/to/file.txt", "content");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to");
+      expect(mockWriteFile).toHaveBeenCalledWith("/path/to/file.txt", "content", "utf-8");
+    });
+
+    it("should create directory if it does not exist", async () => {
+      mockStat.mockRejectedValue(new Error("Directory not found"));
+      mockMkdir.mockResolvedValue(undefined);
+      mockWriteFile.mockResolvedValue(undefined);
+
+      await writeFileContent("/new/path/file.txt", "content");
+
+      expect(mockMkdir).toHaveBeenCalledWith("/new/path", { recursive: true });
+      expect(mockWriteFile).toHaveBeenCalledWith("/new/path/file.txt", "content", "utf-8");
+    });
+  });
+
+  describe("findFiles", () => {
+    it("should find files with default .md extension", async () => {
+      mockReaddir.mockResolvedValue(["file1.md", "file2.txt", "file3.md"] as any);
+
+      const result = await findFiles("/test/dir");
+
+      expect(mockReaddir).toHaveBeenCalledWith("/test/dir");
+      expect(result).toEqual(["/test/dir/file1.md", "/test/dir/file3.md"]);
+    });
+
+    it("should find files with custom extension", async () => {
+      mockReaddir.mockResolvedValue(["file1.js", "file2.ts", "file3.js"] as any);
+
+      const result = await findFiles("/test/dir", ".js");
+
+      expect(result).toEqual(["/test/dir/file1.js", "/test/dir/file3.js"]);
+    });
+
+    it("should return empty array if directory does not exist", async () => {
+      mockReaddir.mockRejectedValue(new Error("Directory not found"));
+
+      const result = await findFiles("/nonexistent/dir");
+
+      expect(result).toEqual([]);
+    });
+
+    it("should return empty array if no matching files found", async () => {
+      mockReaddir.mockResolvedValue(["file1.txt", "file2.js"] as any);
+
+      const result = await findFiles("/test/dir", ".md");
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe("fileExists", () => {
+    it("should return true if file exists", async () => {
+      mockStat.mockResolvedValue({} as any);
+
+      const result = await fileExists("/path/to/file.txt");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to/file.txt");
+      expect(result).toBe(true);
+    });
+
+    it("should return false if file does not exist", async () => {
+      mockStat.mockRejectedValue(new Error("File not found"));
+
+      const result = await fileExists("/path/to/nonexistent.txt");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to/nonexistent.txt");
+      expect(result).toBe(false);
+    });
+  });
+});
