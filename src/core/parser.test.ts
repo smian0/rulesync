@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
-import { parseRuleFile } from "../../src/core/parser.js";
+import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { describe, expect, it } from "vitest";
+import { parseRuleFile } from "../../src/core/parser.js";
 
 const testDir = join(process.cwd(), "test-tmp");
 

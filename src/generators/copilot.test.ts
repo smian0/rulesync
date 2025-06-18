@@ -1,7 +1,7 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 import { generateCopilotConfig } from "../../src/generators/copilot.js";
-import { getDefaultConfig } from "../../src/utils/config.js";
 import type { ParsedRule } from "../../src/types/index.js";
+import { getDefaultConfig } from "../../src/utils/config.js";
 
 describe("copilot generator", () => {
   const config = getDefaultConfig();

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { generateCursorConfig } from "./cursor.js";
 import type { Config, ParsedRule } from "../types/index.js";
+import { generateCursorConfig } from "./cursor.js";
 
 const mockConfig: Config = {
   aiRulesDir: ".rulesync",

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { generateClineConfig } from "./cline.js";
 import type { Config, ParsedRule } from "../types/index.js";
+import { generateClineConfig } from "./cline.js";
 
 const mockConfig: Config = {
   aiRulesDir: ".rulesync",

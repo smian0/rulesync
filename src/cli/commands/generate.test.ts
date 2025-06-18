@@ -1,7 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { generateCommand } from "./generate.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
 import { fileExists, getDefaultConfig, writeFileContent } from "../../utils/index.js";
+import { generateCommand } from "./generate.js";
 
 vi.mock("../../core/index.js");
 vi.mock("../../utils/index.js");

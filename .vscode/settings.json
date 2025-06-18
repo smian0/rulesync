@@ -17,5 +17,9 @@
 	"[jsonc]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"cSpell.words": ["clinerules", "Nonoctal"]
+	"cSpell.words": [
+		"clinerules",
+		"Nonoctal",
+		"rulesync"
+	]
 }

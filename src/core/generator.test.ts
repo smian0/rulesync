@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { generateConfigurations } from "./generator.js";
 import type { Config, ParsedRule, ToolTarget } from "../types/index.js";
+import { generateConfigurations } from "./generator.js";
 
 const mockConfig: Config = {
   aiRulesDir: ".rulesync",
