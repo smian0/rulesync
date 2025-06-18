@@ -161,5 +161,8 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
+# npm
+package-lock.json
+
 # pnpm
 pnpm-lock.yaml
