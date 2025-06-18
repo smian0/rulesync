@@ -7,9 +7,9 @@
 			"Bash(pnpm test:*)",
 			"Bash(pnpm check:*)",
       "Bash(pnpm run lint:*)",
-			"WebFetch(domain:code.visualstudio.com)",
-			"WebFetch(domain:docs.cursor.com)",
-			"WebFetch(domain:docs.cline.bot)"
+      "WebFetch(domain:code.visualstudio.com)",
+      "WebFetch(domain:docs.cursor.com)",
+      "WebFetch(domain:docs.cline.bot)"
 		],
 		"deny": [
 			"Bash(npm publish:*)",
