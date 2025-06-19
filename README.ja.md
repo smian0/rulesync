@@ -27,8 +27,6 @@ yarn global add rulesync
 
 ## 使い始める
 
-### クイックスタート
-
 1. **rulesyncをグローバルにインストール:**
    ```bash
    npm install -g rulesync

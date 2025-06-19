@@ -25,28 +25,21 @@ yarn global add rulesync
 
 ## Getting Started
 
-### Quick Start
-
-1. **Install rulesync globally:**
+1. **Initialize your project:**
    ```bash
-   npm install -g rulesync
+   npx rulesync init
    ```
 
-2. **Initialize your project:**
+2. **Edit the generated rule files** in `.rulesync/` directory to match your project needs
+
+3. **Generate tool-specific configuration files:**
    ```bash
-   rulesync init
+   npx rulesync generate
    ```
 
-3. **Edit the generated rule files** in `.rulesync/` directory to match your project needs
-
-4. **Generate tool-specific configuration files:**
+4. **Optional: Add generated files to .gitignore:**
    ```bash
-   rulesync generate
-   ```
-
-5. **Optional: Add generated files to .gitignore:**
-   ```bash
-   rulesync gitignore
+   npx rulesync gitignore
    ```
 
 That's it! Your AI coding assistants will now use the generated configuration files automatically.
@@ -112,7 +105,7 @@ Project characteristics to consider:
 ### 1. Initialize
 
 ```bash
-rulesync init
+npx rulesync init
 ```
 
 This creates a `.rulesync/` directory with sample rule files.
@@ -148,24 +141,24 @@ Each AI tool handles rule levels differently:
 
 ```bash
 # Generate for all tools
-rulesync generate
+npx rulesync generate
 
 # Generate for specific tools
-rulesync generate --copilot
-rulesync generate --cursor  
-rulesync generate --cline
-rulesync generate --claude
-rulesync generate --roo
+npx rulesync generate --copilot
+npx rulesync generate --cursor  
+npx rulesync generate --cline
+npx rulesync generate --claude
+npx rulesync generate --roo
 
 # Clean build (delete existing files first)
-rulesync generate --delete
+npx rulesync generate --delete
 
 # Clean build for specific tools
-rulesync generate --copilot --cursor --delete
+npx rulesync generate --copilot --cursor --delete
 
 # Verbose output
-rulesync generate --verbose
-rulesync generate --delete --verbose
+npx rulesync generate --verbose
+npx rulesync generate --delete --verbose
 ```
 
 #### Generate Options
@@ -178,19 +171,19 @@ rulesync generate --delete --verbose
 
 ```bash
 # Initialize project with sample files
-rulesync init
+npx rulesync init
 
 # Validate rule files
-rulesync validate
+npx rulesync validate
 
 # Check current status  
-rulesync status
+npx rulesync status
 
 # Watch files and auto-generate
-rulesync watch
+npx rulesync watch
 
 # Add generated files to .gitignore
-rulesync gitignore
+npx rulesync gitignore
 ```
 
 ## Configuration File Structure
@@ -265,7 +258,7 @@ globs: ["**/*.ts", "**/*.tsx"]
 rulesync validates your rule files and provides helpful error messages:
 
 ```bash
-rulesync validate
+npx rulesync validate
 ```
 
 Common validation rules:
