@@ -25,63 +25,21 @@ yarn global add rulesync
 
 ## Getting Started
 
-### Quick Start Example
+### Quick Start
 
-1. **Initialize your project:**
+1. **Install rulesync globally:**
+   ```bash
+   npm install -g rulesync
+   ```
+
+2. **Initialize your project:**
    ```bash
    rulesync init
    ```
 
-2. **Create an overview file** (`.rulesync/overview.md`):
-   ```markdown
-   ---
-   root: true
-   targets: ["*"]
-   description: "Project overview and development philosophy"
-   globs: ["src/**/*.ts", "src/**/*.js"]
-   ---
+3. **Edit the generated rule files** in `.rulesync/` directory to match your project needs
 
-   # Project Development Guidelines
-
-   This is a TypeScript/JavaScript project following clean architecture principles.
-   We prioritize code readability, maintainability, and type safety.
-
-   ## Tech Stack
-   - TypeScript for type safety
-   - Node.js runtime
-   - Modern ES6+ features
-   ```
-
-3. **Create detail rules** (`.rulesync/coding-rules.md`):
-   ```markdown
-   ---
-   root: false
-   targets: ["copilot", "cursor", "cline"]
-   description: "TypeScript coding standards and best practices"
-   globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
-   ---
-
-   # TypeScript Coding Rules
-
-   ## Code Style
-   - Use strict TypeScript configuration
-   - Prefer `const` over `let` when possible
-   - Use meaningful, descriptive variable names
-   - Write JSDoc comments for public APIs
-
-   ## Type Definitions
-   - Prefer interfaces over types for object shapes
-   - Use union types for controlled values
-   - Avoid `any` type - use `unknown` instead
-   - Define return types for functions explicitly
-
-   ## Error Handling
-   - Use Result pattern for error handling
-   - Throw errors only for unexpected conditions
-   - Validate input parameters at function boundaries
-   ```
-
-4. **Generate configuration files:**
+4. **Generate tool-specific configuration files:**
    ```bash
    rulesync generate
    ```
@@ -91,7 +49,7 @@ yarn global add rulesync
    rulesync gitignore
    ```
 
-This will create tool-specific configuration files that your AI coding assistants can use automatically.
+That's it! Your AI coding assistants will now use the generated configuration files automatically.
 
 ## Why rulesync?
 
@@ -161,21 +119,7 @@ This creates a `.rulesync/` directory with sample rule files.
 
 ### 2. Edit Rule Files
 
-Define metadata in front matter for each Markdown file:
-
-```markdown
----
-root: true # or false
-targets: ["*"] # or [copilot, cursor, cline, claude, roo]
-description: "TypeScript coding rules"
-globs: ["**/*.ts", "**/*.tsx"]
----
-
-# TypeScript Rules
-
-- Use TypeScript
-- Write clear type annotations
-```
+Define metadata in front matter for each Markdown file in the `.rulesync/` directory. See the [Example Files](#example-files) section below for detailed examples.
 
 ### Rule Levels
 
