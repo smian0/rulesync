@@ -48,18 +48,7 @@ function generateCursorMarkdown(rules: ParsedRule[]): string {
 function formatRuleForCursor(rule: ParsedRule): string[] {
   const lines: string[] = [];
 
-  // Generate a separate rule file for each rule (MDC format)
   const priorityBadge = rule.frontmatter.priority === "high" ? "🔴 HIGH" : "🟡 STANDARD";
-
-  // Add rule-specific MDC header
-  lines.push("---");
-  lines.push(`description: ${rule.frontmatter.description}`);
-  if (rule.frontmatter.globs.length > 0) {
-    lines.push(`globs: [${rule.frontmatter.globs.map((g) => `"${g}"`).join(", ")}]`);
-  }
-  lines.push(`alwaysApply: ${rule.frontmatter.priority === "high"}`);
-  lines.push("---");
-  lines.push("");
 
   lines.push(`## ${rule.filename} ${priorityBadge}`);
   lines.push("");
