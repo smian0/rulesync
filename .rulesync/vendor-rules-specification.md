@@ -1,9 +1,11 @@
 ---
 root: false
 targets: ['*']
-description: ""
+description: "各ベンダーのAIルール仕様書"
 globs: []
 ---
+
+# Each vendor rules specifications
 
 ## GitHub Copilot Custom Instructions
 
