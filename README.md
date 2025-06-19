@@ -22,6 +22,132 @@ pnpm add -g rulesync
 yarn global add rulesync
 ```
 
+## Getting Started
+
+### Quick Start Example
+
+1. **Initialize your project:**
+   ```bash
+   rulesync init
+   ```
+
+2. **Create an overview file** (`.rulesync/overview.md`):
+   ```markdown
+   ---
+   ruleLevel: overview
+   targets: ["*"]
+   description: "Project overview and development philosophy"
+   globs: ["src/**/*.ts", "src/**/*.js"]
+   ---
+
+   # Project Development Guidelines
+
+   This is a TypeScript/JavaScript project following clean architecture principles.
+   We prioritize code readability, maintainability, and type safety.
+
+   ## Tech Stack
+   - TypeScript for type safety
+   - Node.js runtime
+   - Modern ES6+ features
+   ```
+
+3. **Create detail rules** (`.rulesync/coding-rules.md`):
+   ```markdown
+   ---
+   ruleLevel: detail
+   targets: ["copilot", "cursor", "cline"]
+   description: "TypeScript coding standards and best practices"
+   globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
+   ---
+
+   # TypeScript Coding Rules
+
+   ## Code Style
+   - Use strict TypeScript configuration
+   - Prefer `const` over `let` when possible
+   - Use meaningful, descriptive variable names
+   - Write JSDoc comments for public APIs
+
+   ## Type Definitions
+   - Prefer interfaces over types for object shapes
+   - Use union types for controlled values
+   - Avoid `any` type - use `unknown` instead
+   - Define return types for functions explicitly
+
+   ## Error Handling
+   - Use Result pattern for error handling
+   - Throw errors only for unexpected conditions
+   - Validate input parameters at function boundaries
+   ```
+
+4. **Generate configuration files:**
+   ```bash
+   rulesync generate
+   ```
+
+5. **Optional: Add generated files to .gitignore:**
+   ```bash
+   rulesync gitignore
+   ```
+
+This will create tool-specific configuration files that your AI coding assistants can use automatically.
+
+## Why rulesync?
+
+### 🔧 **Tool Flexibility**
+Team members can freely choose their preferred AI coding tools. Whether it's GitHub Copilot, Cursor, Cline, or Claude Code, each developer can use the tool that maximizes their productivity.
+
+### 📈 **Future-Proof Development**
+AI development tools evolve rapidly with new tools emerging frequently. With rulesync, switching between tools doesn't require redefining your rules from scratch.
+
+### 🎯 **Multi-Tool Workflow**
+Enable hybrid development workflows combining multiple AI tools:
+- GitHub Copilot for code completion
+- Cursor for refactoring
+- Claude Code for architecture design
+- Cline for debugging assistance
+
+### 🔓 **No Vendor Lock-in**
+Avoid vendor lock-in completely. If you decide to stop using rulesync, you can continue using the generated rule files (`.github/instructions/`, `.cursor/rules/`, `.clinerules/`, `CLAUDE.md`, etc.) as-is.
+
+### 🎯 **Consistency Across Tools**
+Apply consistent rules across all AI tools, improving code quality and development experience for the entire team.
+
+## Claude Code Integration
+
+### Creating Custom Slash Commands
+
+Instead of using Claude Code's built-in `/init` command, we recommend creating a custom slash command specifically for rulesync.
+
+Refer to the [Claude Code slash commands documentation](https://docs.anthropic.com/en/docs/claude-code/slash-commands) and add the following custom command:
+
+**`.claude/commands/init-rulesync.md`**
+
+```markdown
+Review this project's content and update .rulesync/*.md files as needed.
+
+Steps:
+1. Analyze project structure and codebase
+2. Review existing .rulesync/ files
+3. Consider project's tech stack, architecture, and coding conventions
+4. Update .rulesync/*.md files if missing elements or improvements are found
+5. Run rulesync generate if necessary
+
+Project characteristics to consider:
+- Technology stack
+- Architecture patterns
+- Coding conventions
+- Security requirements
+- Performance considerations
+```
+
+### Integration Benefits
+
+- **Project-Specific Initialization**: Optimized rule configuration for each project
+- **Automatic Rule Updates**: Rules adapt to project changes automatically
+- **Team Standardization**: All members use the same rule set
+- **Continuous Improvement**: Rules evolve with project growth
+
 ## Usage
 
 ### 1. Initialize
