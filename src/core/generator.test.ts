@@ -8,8 +8,9 @@ const mockConfig: Config = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
+    claude: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline"],
+  defaultTargets: ["copilot", "cursor", "cline", "claude"],
   watchEnabled: false,
 };
 
@@ -36,14 +37,25 @@ const mockRules: ParsedRule[] = [
     },
     content: "This is a copilot only rule",
   },
+  {
+    filename: "claude-only.md",
+    filepath: "/path/to/claude-only.md",
+    frontmatter: {
+      targets: ["claude"],
+      priority: "medium",
+      description: "Claude only rule",
+      globs: ["**/*.tsx"],
+    },
+    content: "This is a claude only rule",
+  },
 ];
 
 describe("generateConfigurations", () => {
   it("should generate configurations for all default targets", async () => {
     const outputs = await generateConfigurations(mockRules, mockConfig);
 
-    expect(outputs).toHaveLength(3);
-    expect(outputs.map((o) => o.tool)).toEqual(["copilot", "cursor", "cline"]);
+    expect(outputs).toHaveLength(4);
+    expect(outputs.map((o) => o.tool)).toEqual(["copilot", "cursor", "cline", "claude"]);
   });
 
   it("should generate configurations for specified targets only", async () => {
@@ -58,6 +70,18 @@ describe("generateConfigurations", () => {
 
     expect(outputs[0].content).toContain("This is a test rule");
     expect(outputs[0].content).toContain("This is a copilot only rule");
+    expect(outputs[0].content).not.toContain("This is a claude only rule");
+  });
+
+  it("should generate claude configuration correctly", async () => {
+    const outputs = await generateConfigurations(mockRules, mockConfig, ["claude"]);
+
+    expect(outputs).toHaveLength(1);
+    expect(outputs[0].tool).toBe("claude");
+    expect(outputs[0].filepath).toBe("./CLAUDE.md");
+    expect(outputs[0].content).toContain("This is a test rule");
+    expect(outputs[0].content).toContain("This is a claude only rule");
+    expect(outputs[0].content).not.toContain("This is a copilot only rule");
   });
 
   it("should handle empty rules gracefully", async () => {

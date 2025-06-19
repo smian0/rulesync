@@ -132,4 +132,42 @@ describe("validateRules", () => {
     expect(result.errors).toHaveLength(0);
     expect(result.warnings).toHaveLength(0);
   });
+
+  it("should validate claude target correctly", async () => {
+    const rules = [
+      createMockRule({
+        frontmatter: {
+          targets: ["claude"],
+          priority: "medium",
+          description: "Claude specific rule",
+          globs: ["**/*.md"],
+        },
+      }),
+    ];
+
+    const result = await validateRules(rules);
+
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+    expect(result.warnings).toHaveLength(0);
+  });
+
+  it("should validate mixed targets including claude", async () => {
+    const rules = [
+      createMockRule({
+        frontmatter: {
+          targets: ["copilot", "claude"],
+          priority: "high",
+          description: "Rule for both copilot and claude",
+          globs: ["**/*.ts", "**/*.js"],
+        },
+      }),
+    ];
+
+    const result = await validateRules(rules);
+
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+    expect(result.warnings).toHaveLength(0);
+  });
 });
