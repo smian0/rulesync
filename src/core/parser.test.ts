@@ -22,7 +22,7 @@ describe("parser", () => {
   describe("parseRuleFile", () => {
     it("should parse valid rule file", async () => {
       const ruleContent = `---
-priority: high
+ruleLevel: overview
 targets: ["copilot", "cursor"]
 description: "Test rule"
 globs: ["**/*.ts"]
@@ -38,7 +38,7 @@ This is a test rule content.
 
       const rule = await parseRuleFile(filepath);
 
-      expect(rule.frontmatter.priority).toBe("high");
+      expect(rule.frontmatter.ruleLevel).toBe("overview");
       expect(rule.frontmatter.targets).toEqual(["copilot", "cursor"]);
       expect(rule.frontmatter.description).toBe("Test rule");
       expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
@@ -49,7 +49,7 @@ This is a test rule content.
 
     it("should handle wildcard targets", async () => {
       const ruleContent = `---
-priority: low
+ruleLevel: detail
 targets: ["*"]
 description: "Test rule with wildcard"
 globs: ["**/*.js"]
@@ -66,9 +66,9 @@ globs: ["**/*.js"]
       expect(rule.frontmatter.targets).toEqual(["*"]);
     });
 
-    it("should throw error for invalid priority", async () => {
+    it("should throw error for invalid ruleLevel", async () => {
       const ruleContent = `---
-priority: medium
+ruleLevel: medium
 targets: ["copilot"]
 description: "Test rule"
 globs: ["**/*.ts"]
@@ -80,7 +80,7 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "invalid-rule.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid priority");
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid ruleLevel");
     });
 
     it("should throw error for invalid targets", async () => {
@@ -97,12 +97,12 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "invalid-targets.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid target");
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid ruleLevel");
     });
 
     it("should throw error for missing description", async () => {
       const ruleContent = `---
-priority: high
+ruleLevel: overview
 targets: ["copilot"]
 globs: ["**/*.ts"]
 ---

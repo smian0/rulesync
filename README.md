@@ -38,8 +38,8 @@ Define metadata in front matter for each Markdown file:
 
 ```markdown
 ---
-priority: high
-targets: ["*"] # or [copilot, cursor, cline, claude]
+ruleLevel: overview # or detail
+targets: ["*"] # or [copilot, cursor, cline, claudecode]
 description: "TypeScript coding rules"
 globs: ["**/*.ts", "**/*.tsx"]
 ---
@@ -49,6 +49,15 @@ globs: ["**/*.ts", "**/*.tsx"]
 - Use TypeScript
 - Write clear type annotations
 ```
+
+### Rule Levels
+
+- **overview**: Project-wide overview and policies (only one file allowed)
+- **detail**: Specific implementation rules and detailed guidelines (multiple files allowed)
+
+Each tool handles rule levels differently:
+- **Claude Code**: overview → `CLAUDE.md`, detail → `.claude/memories/*.md`
+- **Cursor**: overview → `ruletype: always`, detail → `ruletype: autoattached`
 
 ### 3. Generate Configuration Files
 
@@ -94,7 +103,7 @@ rulesync watch
 | GitHub Copilot | `.github/instructions/*.instructions.md` | Front Matter + Markdown |
 | Cursor | `.cursor/rules/*.md` | MDC (YAML header + Markdown) |
 | Cline | `.clinerules/*.md` | Plain Markdown |
-| Claude Code | `./CLAUDE.md` | Plain Markdown |
+| Claude Code | `./CLAUDE.md` (overview), `.claude/memories/*.md` (detail) | Plain Markdown |
 
 ## Development
 

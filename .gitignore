@@ -168,6 +168,7 @@ package-lock.json
 pnpm-lock.yaml
 
 CLAUDE.md
+.claude/memories
 .github/instructions
 .cursor
 .clinerules

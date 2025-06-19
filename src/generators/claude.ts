@@ -4,27 +4,44 @@ import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 export async function generateClaudeConfig(
   rules: ParsedRule[],
   config: Config
-): Promise<GeneratedOutput> {
-  const sortedRules = rules.sort((a, b) => {
-    // Sort by priority (high first), then by filename
-    if (a.frontmatter.priority !== b.frontmatter.priority) {
-      return a.frontmatter.priority === "high" ? -1 : 1;
-    }
-    return a.filename.localeCompare(b.filename);
+): Promise<GeneratedOutput[]> {
+  const outputs: GeneratedOutput[] = [];
+
+  // Separate overview and detail rules
+  const overviewRules = rules.filter(r => r.frontmatter.ruleLevel === "overview");
+  const detailRules = rules.filter(r => r.frontmatter.ruleLevel === "detail");
+
+  // Generate CLAUDE.md with overview rule and references to detail files
+  const claudeMdContent = generateClaudeMarkdown(overviewRules, detailRules);
+  outputs.push({
+    tool: "claude",
+    filepath: join(config.outputPaths.claude, "CLAUDE.md"),
+    content: claudeMdContent,
   });
 
-  const content = generateClaudeMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.claude, "CLAUDE.md");
+  // Generate individual memory files for detail rules
+  for (const rule of detailRules) {
+    const memoryContent = generateMemoryFile(rule);
+    outputs.push({
+      tool: "claude",
+      filepath: join(config.outputPaths.claude, ".claude", "memories", `${rule.filename}.md`),
+      content: memoryContent,
+    });
+  }
 
-  return {
-    tool: "claude",
-    filepath,
-    content,
-  };
+  return outputs;
 }
 
-function generateClaudeMarkdown(rules: ParsedRule[]): string {
+function generateClaudeMarkdown(overviewRules: ParsedRule[], detailRules: ParsedRule[]): string {
   const lines: string[] = [];
+
+  // Add references to memory files at the top
+  if (detailRules.length > 0) {
+    for (const rule of detailRules) {
+      lines.push(`@${rule.filename}`);
+    }
+    lines.push("");
+  }
 
   lines.push("# Claude Code Memory - Project Instructions");
   lines.push("");
@@ -33,34 +50,9 @@ function generateClaudeMarkdown(rules: ParsedRule[]): string {
   );
   lines.push("");
 
-  // Group by priority
-  const highPriorityRules = rules.filter((r) => r.frontmatter.priority === "high");
-  const mediumPriorityRules = rules.filter((r) => r.frontmatter.priority === "medium");
-  const lowPriorityRules = rules.filter((r) => r.frontmatter.priority === "low");
-
-  if (highPriorityRules.length > 0) {
-    lines.push("## Critical Rules");
-    lines.push("These are the most important guidelines to follow:");
-    lines.push("");
-    for (const rule of highPriorityRules) {
-      lines.push(...formatRuleForClaude(rule));
-    }
-  }
-
-  if (mediumPriorityRules.length > 0) {
-    lines.push("## Important Guidelines");
-    lines.push("Follow these guidelines when applicable:");
-    lines.push("");
-    for (const rule of mediumPriorityRules) {
-      lines.push(...formatRuleForClaude(rule));
-    }
-  }
-
-  if (lowPriorityRules.length > 0) {
-    lines.push("## Additional Considerations");
-    lines.push("Keep these points in mind when working on this project:");
-    lines.push("");
-    for (const rule of lowPriorityRules) {
+  // Add overview rules
+  if (overviewRules.length > 0) {
+    for (const rule of overviewRules) {
       lines.push(...formatRuleForClaude(rule));
     }
   }
@@ -88,4 +80,25 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
   lines.push("");
 
   return lines;
+}
+
+function generateMemoryFile(rule: ParsedRule): string {
+  const lines: string[] = [];
+  
+  lines.push(`# ${rule.filename}`);
+  lines.push("");
+  
+  if (rule.frontmatter.description) {
+    lines.push(`**Description:** ${rule.frontmatter.description}`);
+    lines.push("");
+  }
+
+  if (rule.frontmatter.globs && rule.frontmatter.globs.length > 0) {
+    lines.push(`**File patterns:** ${rule.frontmatter.globs.join(", ")}`);
+    lines.push("");
+  }
+
+  lines.push(rule.content);
+  
+  return lines.join("\n");
 }

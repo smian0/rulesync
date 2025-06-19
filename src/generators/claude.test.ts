@@ -9,9 +9,9 @@ describe("claude generator", () => {
   const mockRules: ParsedRule[] = [
     {
       frontmatter: {
-        priority: "high",
+        ruleLevel: "overview",
         targets: ["claude"],
-        description: "High priority coding rule",
+        description: "Overview coding rule",
         globs: ["**/*.ts"],
       },
       content: "Use TypeScript for all new code.",
@@ -20,9 +20,9 @@ describe("claude generator", () => {
     },
     {
       frontmatter: {
-        priority: "medium",
+        ruleLevel: "detail",
         targets: ["claude"],
-        description: "Medium priority architecture rule",
+        description: "Detail architecture rule",
         globs: ["**/*.tsx"],
       },
       content: "Follow clean architecture principles.",
@@ -31,9 +31,9 @@ describe("claude generator", () => {
     },
     {
       frontmatter: {
-        priority: "low",
+        ruleLevel: "detail",
         targets: ["claude"],
-        description: "Low priority naming rule",
+        description: "Detail naming rule",
         globs: ["**/*.js"],
       },
       content: "Use camelCase for variables.",
@@ -43,41 +43,42 @@ describe("claude generator", () => {
   ];
 
   it("should generate claude configuration", async () => {
-    const output = await generateClaudeConfig(mockRules, config);
+    const outputs = await generateClaudeConfig(mockRules, config);
 
-    expect(output.tool).toBe("claude");
-    expect(output.filepath).toBe("CLAUDE.md");
-    expect(output.content).toContain("# Claude Code Memory - Project Instructions");
-    expect(output.content).toContain("Generated from rulesync configuration");
-    expect(output.content).toContain("## Critical Rules");
-    expect(output.content).toContain("## Important Guidelines");
-    expect(output.content).toContain("## Additional Considerations");
+    expect(outputs).toHaveLength(3); // 1 main file + 2 detail memory files
+    expect(outputs[0].tool).toBe("claude");
+    expect(outputs[0].filepath).toBe("CLAUDE.md");
+    expect(outputs[0].content).toContain("# Claude Code Memory - Project Instructions");
+    expect(outputs[0].content).toContain("Generated from rulesync configuration");
+    expect(outputs[0].content).toContain("@architecture-rule");
+    expect(outputs[0].content).toContain("@naming-rule");
   });
 
-  it("should sort rules by priority", async () => {
-    const output = await generateClaudeConfig(mockRules, config);
+  it("should separate overview and detail rules", async () => {
+    const outputs = await generateClaudeConfig(mockRules, config);
 
-    // High priority should come before medium, medium before low
-    const highPriorityIndex = output.content.indexOf("typescript-rule");
-    const mediumPriorityIndex = output.content.indexOf("architecture-rule");
-    const lowPriorityIndex = output.content.indexOf("naming-rule");
-
-    expect(highPriorityIndex).toBeLessThan(mediumPriorityIndex);
-    expect(mediumPriorityIndex).toBeLessThan(lowPriorityIndex);
+    // Main CLAUDE.md should contain overview rules and memory references
+    expect(outputs[0].content).toContain("typescript-rule");
+    expect(outputs[0].content).toContain("@architecture-rule");
+    expect(outputs[0].content).toContain("@naming-rule");
+    
+    // Detail rules should be in separate memory files
+    expect(outputs[1].filepath).toBe(".claude/memories/architecture-rule.md");
+    expect(outputs[2].filepath).toBe(".claude/memories/naming-rule.md");
   });
 
   it("should include rule metadata", async () => {
-    const output = await generateClaudeConfig([mockRules[0]], config);
+    const outputs = await generateClaudeConfig([mockRules[0]], config);
 
-    expect(output.content).toContain("**Description:** High priority coding rule");
-    expect(output.content).toContain("**File patterns:** **/*.ts");
-    expect(output.content).toContain("Use TypeScript for all new code.");
+    expect(outputs[0].content).toContain("**Description:** Overview coding rule");
+    expect(outputs[0].content).toContain("**File patterns:** **/*.ts");
+    expect(outputs[0].content).toContain("Use TypeScript for all new code.");
   });
 
   it("should handle rules without description", async () => {
     const ruleWithoutDescription: ParsedRule = {
       frontmatter: {
-        priority: "high",
+        ruleLevel: "overview",
         targets: ["claude"],
         description: "",
         globs: [],
@@ -87,16 +88,16 @@ describe("claude generator", () => {
       filepath: "/test/test-rule.md",
     };
 
-    const output = await generateClaudeConfig([ruleWithoutDescription], config);
+    const outputs = await generateClaudeConfig([ruleWithoutDescription], config);
 
-    expect(output.content).not.toContain("**Description:**");
-    expect(output.content).toContain("Some rule content.");
+    expect(outputs[0].content).not.toContain("**Description:**");
+    expect(outputs[0].content).toContain("Some rule content.");
   });
 
   it("should handle rules without globs", async () => {
     const ruleWithoutGlobs: ParsedRule = {
       frontmatter: {
-        priority: "high",
+        ruleLevel: "overview",
         targets: ["claude"],
         description: "Test rule",
         globs: [],
@@ -106,42 +107,33 @@ describe("claude generator", () => {
       filepath: "/test/test-rule.md",
     };
 
-    const output = await generateClaudeConfig([ruleWithoutGlobs], config);
+    const outputs = await generateClaudeConfig([ruleWithoutGlobs], config);
 
-    expect(output.content).not.toContain("**File patterns:**");
-    expect(output.content).toContain("**Description:** Test rule");
+    expect(outputs[0].content).not.toContain("**File patterns:**");
+    expect(outputs[0].content).toContain("**Description:** Test rule");
   });
 
   it("should handle empty rules array", async () => {
-    const output = await generateClaudeConfig([], config);
+    const outputs = await generateClaudeConfig([], config);
 
-    expect(output.content).toContain("# Claude Code Memory - Project Instructions");
-    expect(output.content).not.toContain("## Critical Rules");
-    expect(output.content).not.toContain("## Important Guidelines");
-    expect(output.content).not.toContain("## Additional Considerations");
+    expect(outputs).toHaveLength(1);
+    expect(outputs[0].content).toContain("# Claude Code Memory - Project Instructions");
+    expect(outputs[0].content).not.toContain("@");
   });
 
-  it("should group rules correctly by priority", async () => {
-    const output = await generateClaudeConfig(mockRules, config);
+  it("should generate memory files for detail rules", async () => {
+    const outputs = await generateClaudeConfig(mockRules, config);
 
-    // Check that high priority rules appear under Critical Rules
-    const criticalSection = output.content.substring(
-      output.content.indexOf("## Critical Rules"),
-      output.content.indexOf("## Important Guidelines")
-    );
-    expect(criticalSection).toContain("typescript-rule");
-
-    // Check that medium priority rules appear under Important Guidelines
-    const importantSection = output.content.substring(
-      output.content.indexOf("## Important Guidelines"),
-      output.content.indexOf("## Additional Considerations")
-    );
-    expect(importantSection).toContain("architecture-rule");
-
-    // Check that low priority rules appear under Additional Considerations
-    const additionalSection = output.content.substring(
-      output.content.indexOf("## Additional Considerations")
-    );
-    expect(additionalSection).toContain("naming-rule");
+    // Should have memory files for detail rules
+    const architectureMemory = outputs.find(o => o.filepath.includes("architecture-rule.md"));
+    const namingMemory = outputs.find(o => o.filepath.includes("naming-rule.md"));
+    
+    expect(architectureMemory).toBeDefined();
+    expect(architectureMemory?.content).toContain("# architecture-rule");
+    expect(architectureMemory?.content).toContain("Follow clean architecture principles.");
+    
+    expect(namingMemory).toBeDefined();
+    expect(namingMemory?.content).toContain("# naming-rule");
+    expect(namingMemory?.content).toContain("Use camelCase for variables.");
   });
 });

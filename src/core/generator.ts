@@ -50,7 +50,7 @@ async function generateForTool(
     case "cline":
       return generateClineConfig(rules, config);
     case "claude":
-      return [await generateClaudeConfig(rules, config)];
+      return await generateClaudeConfig(rules, config);
     default:
       console.warn(`Unknown tool: ${tool}`);
       return null;

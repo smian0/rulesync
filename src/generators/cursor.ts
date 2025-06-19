@@ -30,7 +30,18 @@ function generateCursorMarkdown(rule: ParsedRule): string {
   if (rule.frontmatter.globs.length > 0) {
     lines.push(`globs: [${rule.frontmatter.globs.map((g) => `"${g}"`).join(", ")}]`);
   }
-  lines.push(`alwaysApply: ${rule.frontmatter.priority === "high"}`);
+  
+  // Determine ruletype based on ruleLevel and globs
+  let ruletype: string;
+  if (rule.frontmatter.ruleLevel === "overview") {
+    ruletype = "always";
+  } else if (rule.frontmatter.ruleLevel === "detail" && rule.frontmatter.globs.length === 0) {
+    ruletype = "agentrequested";
+  } else {
+    ruletype = "autoattached";
+  }
+  
+  lines.push(`ruletype: ${ruletype}`);
   lines.push("---");
   lines.push("");
 

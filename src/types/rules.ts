@@ -1,9 +1,9 @@
-export type Priority = "high" | "medium" | "low";
+export type RuleLevel = "overview" | "detail";
 
 export type ToolTarget = "copilot" | "cursor" | "cline" | "claude";
 
 export type RuleFrontmatter = {
-  priority: Priority;
+  ruleLevel: RuleLevel;
   targets: ToolTarget[] | ["*"];
   description: string;
   globs: string[];

@@ -18,9 +18,9 @@ describe("copilot generator", () => {
   const mockRules: ParsedRule[] = [
     {
       frontmatter: {
-        priority: "high",
+        ruleLevel: "overview",
         targets: ["copilot"],
-        description: "High priority coding rule",
+        description: "Overview coding rule",
         globs: ["**/*.ts"],
       },
       content: "Use TypeScript for all new code.",
@@ -29,9 +29,9 @@ describe("copilot generator", () => {
     },
     {
       frontmatter: {
-        priority: "low",
+        ruleLevel: "detail",
         targets: ["copilot"],
-        description: "Low priority naming rule",
+        description: "Detail naming rule",
         globs: ["**/*.js"],
       },
       content: "Use camelCase for variables.",
@@ -52,11 +52,11 @@ describe("copilot generator", () => {
   it("should include frontmatter with description and applyTo", async () => {
     const outputs = await generateCopilotConfig(mockRules, mockConfig);
 
-    expect(outputs[0].content).toContain('description: "High priority coding rule"');
+    expect(outputs[0].content).toContain('description: "Overview coding rule"');
     expect(outputs[0].content).toContain('applyTo: "**/*.ts"');
     expect(outputs[0].content).toContain("Use TypeScript for all new code.");
     
-    expect(outputs[1].content).toContain('description: "Low priority naming rule"');
+    expect(outputs[1].content).toContain('description: "Detail naming rule"');
     expect(outputs[1].content).toContain('applyTo: "**/*.js"');
     expect(outputs[1].content).toContain("Use camelCase for variables.");
   });
@@ -65,7 +65,7 @@ describe("copilot generator", () => {
     const rulesWithoutGlobs: ParsedRule[] = [
       {
         frontmatter: {
-          priority: "medium",
+          ruleLevel: "overview",
           targets: ["copilot"],
           description: "General rule",
           globs: [],

@@ -44,9 +44,9 @@ function validateFrontmatter(data: unknown, filepath: string): void {
 
   const obj = data as Record<string, unknown>;
 
-  // Validate priority
-  if (!obj.priority || !["high", "low"].includes(obj.priority as string)) {
-    throw new Error(`Invalid priority in ${filepath}: must be "high" or "low"`);
+  // Validate ruleLevel
+  if (!obj.ruleLevel || !["overview", "detail"].includes(obj.ruleLevel as string)) {
+    throw new Error(`Invalid ruleLevel in ${filepath}: must be "overview" or "detail"`);
   }
 
   // Validate targets

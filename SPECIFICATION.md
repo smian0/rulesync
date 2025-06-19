@@ -68,11 +68,12 @@ https://docs.cline.bot/features/cline-rules
 
 https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memories
 
-- **出力先**: `./CLAUDE.md` (プロジェクトメモリ), `~/.claude/CLAUDE.md` (ユーザーメモリ)
+- **出力先**: `./CLAUDE.md` (overview用), `.claude/memories/*.md` (detail用)
 - **形式**: プレーンMarkdown形式
 - **仕様詳細**:
-  - プロジェクトメモリ（`./CLAUDE.md`）: チーム共有のプロジェクト指示
-  - ユーザーメモリ（`~/.claude/CLAUDE.md`）: 全プロジェクト共通の個人設定
+  - Overview ルール: `./CLAUDE.md` に配置（プロジェクト全体の概要・方針）
+  - Detail ルール: `.claude/memories/*.md` に個別ファイルとして配置
+  - CLAUDE.mdの先頭に `@filename` 参照でdetailファイルを列挙
   - `@path/to/import` 構文でメモリのインポートが可能
   - 現在のディレクトリからルートに向かって再帰的に読み込み
   - 最大5ホップまでの再帰インポートをサポート
@@ -81,7 +82,6 @@ https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memori
   - `/init` でコードベース用のCLAUDE.mdをブートストラップ
   - 構造化されたMarkdownと箇条書きで整理
   - 説明的な見出しでメモリを分類
-  - root memoryは `./CLAUDE.md` child memoriesは `.claude/memories/*.md` に配置する
 
 ### 3. CLI コマンド
 
@@ -124,8 +124,8 @@ rulesync validate
 
 ```markdown
 ---
-priority: high|medium|low
-targets: ["*"] # または [copilot, cursor, cline]
+ruleLevel: overview|detail
+targets: ["*"] # または [copilot, cursor, cline, claudecode]
 description: "ルールの簡潔な説明"
 globs: ["**/*.ts", "**/*.js"]
 ---
@@ -134,6 +134,18 @@ globs: ["**/*.ts", "**/*.js"]
 
 ルールの詳細説明...
 ```
+
+#### ruleLevel について
+- **overview**: プロジェクト全体の概要・方針（1ファイルのみ許可）
+- **detail**: 具体的な実装ルール・詳細ガイドライン（複数ファイル可能）
+
+#### 各ツールでの ruleLevel 対応
+- **Claude Code**: 
+  - overview → `CLAUDE.md` に配置
+  - detail → `.claude/memories/*.md` に配置、CLAUDE.mdの先頭に `@filename` 参照を列挙
+- **Cursor**: 
+  - overview → `ruletype: always`
+  - detail → `ruletype: autoattached`（globsが空の場合は `ruletype: agentrequested`）
 
 ## 技術仕様
 

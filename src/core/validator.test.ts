@@ -12,7 +12,7 @@ const createMockRule = (overrides: Partial<ParsedRule> = {}): ParsedRule => ({
   filepath: "/path/to/test-rule.md",
   frontmatter: {
     targets: ["*"],
-    priority: "high",
+    ruleLevel: "overview",
     description: "This is a test rule description",
     globs: ["**/*.ts"],
   },
@@ -62,7 +62,7 @@ describe("validateRules", () => {
       createMockRule({
         frontmatter: {
           targets: ["*"],
-          priority: "high",
+          ruleLevel: "overview",
           description: "Short",
           globs: ["**/*.ts"],
         },
@@ -80,7 +80,7 @@ describe("validateRules", () => {
       createMockRule({
         frontmatter: {
           targets: ["*"],
-          priority: "high",
+          ruleLevel: "overview",
           description: "This is a test rule description",
           globs: [],
         },
@@ -110,7 +110,7 @@ describe("validateRules", () => {
         content: "",
         frontmatter: {
           targets: ["*"],
-          priority: "high",
+          ruleLevel: "overview",
           description: "Bad",
           globs: [],
         },
@@ -138,7 +138,7 @@ describe("validateRules", () => {
       createMockRule({
         frontmatter: {
           targets: ["claude"],
-          priority: "medium",
+          ruleLevel: "detail",
           description: "Claude specific rule",
           globs: ["**/*.md"],
         },
@@ -157,7 +157,7 @@ describe("validateRules", () => {
       createMockRule({
         frontmatter: {
           targets: ["copilot", "claude"],
-          priority: "high",
+          ruleLevel: "overview",
           description: "Rule for both copilot and claude",
           globs: ["**/*.ts", "**/*.js"],
         },

@@ -20,6 +20,12 @@ export async function validateRules(rules: ParsedRule[]): Promise<ValidationResu
     filenames.add(rule.filename);
   }
 
+  // Check for multiple overview rules
+  const overviewRules = rules.filter(rule => rule.frontmatter.ruleLevel === "overview");
+  if (overviewRules.length > 1) {
+    errors.push(`Multiple overview rules found: ${overviewRules.map(r => r.filename).join(", ")}. Only one overview rule is allowed.`);
+  }
+
   // Validate individual rules
   for (const rule of rules) {
     const ruleValidation = await validateRule(rule);

@@ -16,26 +16,26 @@ const mockConfig: Config = {
 
 const mockRules: ParsedRule[] = [
   {
-    filename: "high-priority.md",
-    filepath: "/path/to/high-priority.md",
+    filename: "overview-rule.md",
+    filepath: "/path/to/overview-rule.md",
     frontmatter: {
       targets: ["*"],
-      priority: "high",
-      description: "High priority rule",
+      ruleLevel: "overview",
+      description: "Overview rule",
       globs: ["**/*.ts", "**/*.js"],
     },
-    content: "This is a high priority rule content",
+    content: "This is an overview rule content",
   },
   {
-    filename: "low-priority.md",
-    filepath: "/path/to/low-priority.md",
+    filename: "detail-rule.md",
+    filepath: "/path/to/detail-rule.md",
     frontmatter: {
       targets: ["cursor"],
-      priority: "low",
-      description: "Low priority rule",
+      ruleLevel: "detail",
+      description: "Detail rule",
       globs: ["**/*.md"],
     },
-    content: "This is a low priority rule content",
+    content: "This is a detail rule content",
   },
 ];
 
@@ -45,29 +45,29 @@ describe("generateCursorConfig", () => {
 
     expect(results).toHaveLength(2);
     expect(results[0].tool).toBe("cursor");
-    expect(results[0].filepath).toBe(".cursor/rules/high-priority.md");
-    expect(results[0].content).toContain("High priority rule");
-    expect(results[1].filepath).toBe(".cursor/rules/low-priority.md");
-    expect(results[1].content).toContain("Low priority rule");
+    expect(results[0].filepath).toBe(".cursor/rules/overview-rule.md");
+    expect(results[0].content).toContain("Overview rule");
+    expect(results[1].filepath).toBe(".cursor/rules/detail-rule.md");
+    expect(results[1].content).toContain("Detail rule");
   });
 
   it("should include frontmatter with description and globs", async () => {
     const results = await generateCursorConfig(mockRules, mockConfig);
     
-    expect(results[0].content).toContain("description: High priority rule");
+    expect(results[0].content).toContain("description: Overview rule");
     expect(results[0].content).toContain('globs: ["**/*.ts", "**/*.js"]');
-    expect(results[0].content).toContain("alwaysApply: true");
+    expect(results[0].content).toContain("ruletype: always");
     
-    expect(results[1].content).toContain("description: Low priority rule");
+    expect(results[1].content).toContain("description: Detail rule");
     expect(results[1].content).toContain('globs: ["**/*.md"]');
-    expect(results[1].content).toContain("alwaysApply: false");
+    expect(results[1].content).toContain("ruletype: autoattached");
   });
 
   it("should include rule content", async () => {
     const results = await generateCursorConfig(mockRules, mockConfig);
     
-    expect(results[0].content).toContain("This is a high priority rule content");
-    expect(results[1].content).toContain("This is a low priority rule content");
+    expect(results[0].content).toContain("This is an overview rule content");
+    expect(results[1].content).toContain("This is a detail rule content");
   });
 
   it("should handle rules without globs", async () => {
@@ -77,7 +77,7 @@ describe("generateCursorConfig", () => {
         filepath: "/path/to/no-globs.md",
         frontmatter: {
           targets: ["cursor"],
-          priority: "medium",
+          ruleLevel: "overview",
           description: "Rule without globs",
           globs: [],
         },
@@ -90,7 +90,7 @@ describe("generateCursorConfig", () => {
     expect(results).toHaveLength(1);
     expect(results[0].content).toContain("description: Rule without globs");
     expect(results[0].content).not.toContain("globs:");
-    expect(results[0].content).toContain("alwaysApply: false");
+    expect(results[0].content).toContain("ruletype: always");
   });
 
   it("should handle empty rules array", async () => {
