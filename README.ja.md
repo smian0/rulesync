@@ -9,7 +9,7 @@
 
 ## 対応ツール
 
-- **GitHub Copilot Custom Instructions** (`.github/instructions/*.instructions.md`)
+- **GitHub Copilot Custom Instructions** (`.github/copilot-instructions.md` + `.github/instructions/*.instructions.md`)
 - **Cursor Project Rules** (`.cursor/rules/*.mdc`) 
 - **Cline Rules** (`.clinerules/*.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
