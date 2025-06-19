@@ -1,0 +1,287 @@
+# rulesync
+
+[![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
+[![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
+
+統一されたAIルールファイル（`.rulesync/*.md`）から、様々なAI開発ツール用の設定ファイルを自動生成するNode.js CLIツールです。
+
+[English](./README.md) | **日本語**
+
+## 対応ツール
+
+- **GitHub Copilot Custom Instructions** (`.github/instructions/*.instructions.md`)
+- **Cursor Project Rules** (`.cursor/rules/*.mdc`) 
+- **Cline Rules** (`.clinerules/*.md`)
+- **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
+- **Roo Code Rules** (`.roo/rules/*.md`)
+
+## インストール
+
+```bash
+npm install -g rulesync
+# または
+pnpm add -g rulesync
+# または  
+yarn global add rulesync
+```
+
+## 使い始める
+
+### クイックスタート
+
+1. **rulesyncをグローバルにインストール:**
+   ```bash
+   npm install -g rulesync
+   ```
+
+2. **プロジェクトを初期化:**
+   ```bash
+   rulesync init
+   ```
+
+3. **`.rulesync/`ディレクトリの生成されたルールファイル**をプロジェクトのニーズに合わせて編集します
+
+4. **ツール固有の設定ファイルを生成:**
+   ```bash
+   rulesync generate
+   ```
+
+5. **オプション: 生成されたファイルを.gitignoreに追加:**
+   ```bash
+   rulesync gitignore
+   ```
+
+以上です！AIコーディングアシスタントが生成された設定ファイルを自動的に使用するようになります。
+
+## rulesyncを使う理由
+
+### 🔧 **ツールの柔軟性**
+チームメンバーは好みのAIコーディングツールを自由に選択できます。GitHub Copilot、Cursor、Cline、Claude Codeのいずれであっても、各開発者は生産性を最大化するツールを使用できます。
+
+### 📈 **将来を見据えた開発**
+AI開発ツールは新しいツールが頻繁に登場し、急速に進化しています。rulesyncがあれば、ツールを切り替える際にルールを一から再定義する必要がありません。
+
+### 🎯 **マルチツールワークフロー**
+複数のAIツールを組み合わせたハイブリッド開発ワークフローを可能にします：
+- GitHub Copilot：コード補完
+- Cursor：リファクタリング
+- Claude Code：アーキテクチャ設計
+- Cline：デバッグ支援
+
+### 🔓 **ベンダーロックインなし**
+ベンダーロックインを完全に回避できます。rulesyncの使用を停止することを決定した場合でも、生成されたルールファイル（`.github/instructions/`、`.cursor/rules/`、`.clinerules/`、`CLAUDE.md`など）をそのまま使い続けることができます。
+
+### 🎯 **ツール間の一貫性**
+すべてのAIツールに一貫したルールを適用し、チーム全体のコード品質と開発体験を向上させます。
+
+## Claude Code統合
+
+### カスタムスラッシュコマンドの作成
+
+Claude Codeの組み込み`/init`コマンドを使用する代わりに、rulesync専用のカスタムスラッシュコマンドを作成することをお勧めします。
+
+[Claude Codeスラッシュコマンドドキュメント](https://docs.anthropic.com/en/docs/claude-code/slash-commands)を参照し、以下のカスタムコマンドを追加してください：
+
+**`.claude/commands/init-rulesync.md`**
+
+```markdown
+このプロジェクトの内容を確認し、必要に応じて.rulesync/*.mdファイルを更新してください。
+
+手順:
+1. プロジェクト構造とコードベースを分析
+2. 既存の.rulesync/ファイルを確認
+3. プロジェクトの技術スタック、アーキテクチャ、コーディング規約を考慮
+4. 不足している要素や改善点が見つかった場合は.rulesync/*.mdファイルを更新
+5. 必要に応じてrulesync generateを実行
+
+考慮すべきプロジェクトの特徴:
+- 技術スタック
+- アーキテクチャパターン
+- コーディング規約
+- セキュリティ要件
+- パフォーマンスの考慮事項
+```
+
+### 統合のメリット
+
+- **プロジェクト固有の初期化**: 各プロジェクトに最適化されたルール設定
+- **自動ルール更新**: プロジェクトの変更に応じてルールが自動的に適応
+- **チーム標準化**: すべてのメンバーが同じルールセットを使用
+- **継続的改善**: プロジェクトの成長とともにルールが進化
+
+## 使用方法
+
+### 1. 初期化
+
+```bash
+rulesync init
+```
+
+これにより、サンプルルールファイルを含む`.rulesync/`ディレクトリが作成されます。
+
+### 2. ルールファイルの編集
+
+`.rulesync/`ディレクトリ内の各Markdownファイルでメタデータをフロントマターで定義します。詳細な例については、下記の[ファイル例](#ファイル例)セクションを参照してください。
+
+### ルールレベル
+
+rulesyncは2レベルのルールシステムを使用します：
+
+- **root: true**: プロジェクト全体の概要とポリシー
+  - プロジェクトごとに**1つ**のrootファイルのみ許可
+  - 高レベルのガイドラインとプロジェクトコンテキストを含む
+- **root: false**: 具体的な実装ルールと詳細なガイドライン
+  - 複数の非rootファイルが許可
+  - 具体的なコーディングルール、命名規約などを含む
+
+#### ツール固有の動作
+
+各AIツールはルールレベルを異なって処理します：
+
+| ツール | ルートルール | 非ルートルール | 特別な動作 |
+|------|------------|----------------|------------------|
+| **Claude Code** | `./CLAUDE.md` | `.claude/memories/*.md` | CLAUDE.mdが詳細ファイルへの`@filename`参照を含む |
+| **Cursor** | `ruletype: always` | `ruletype: autoattached` | globsのない詳細ルールは`ruletype: agentrequested`を使用 |
+| **GitHub Copilot** | 標準フォーマット | 標準フォーマット | すべてのルールがフロントマター付きの同じフォーマットを使用 |
+| **Cline** | 標準フォーマット | 標準フォーマット | すべてのルールがプレーンMarkdownフォーマットを使用 |
+| **Roo Code** | 標準フォーマット | 標準フォーマット | すべてのルールが説明ヘッダー付きのプレーンMarkdownフォーマットを使用 |
+
+### 3. 設定ファイルの生成
+
+```bash
+# すべてのツール用に生成
+rulesync generate
+
+# 特定のツール用に生成
+rulesync generate --copilot
+rulesync generate --cursor  
+rulesync generate --cline
+rulesync generate --claude
+rulesync generate --roo
+
+# クリーンビルド（既存ファイルを最初に削除）
+rulesync generate --delete
+
+# 特定ツール用のクリーンビルド
+rulesync generate --copilot --cursor --delete
+
+# 詳細出力
+rulesync generate --verbose
+rulesync generate --delete --verbose
+```
+
+#### 生成オプション
+
+- `--delete`: 新しいファイルを作成する前に既存の生成済みファイルをすべて削除
+- `--verbose`: 生成プロセス中に詳細出力を表示
+- `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: 指定されたツールのみ生成
+
+### 4. その他のコマンド
+
+```bash
+# サンプルファイルでプロジェクトを初期化
+rulesync init
+
+# ルールファイルを検証
+rulesync validate
+
+# 現在のステータスを確認  
+rulesync status
+
+# ファイルを監視して自動生成
+rulesync watch
+
+# 生成されたファイルを.gitignoreに追加
+rulesync gitignore
+```
+
+## 設定ファイル構造
+
+```
+.rulesync/
+├── overview.md          # プロジェクト概要 (root: true, 1つのみ)
+├── coding-rules.md      # コーディングルール (root: false)
+├── naming-conventions.md # 命名規約 (root: false)
+├── architecture.md      # アーキテクチャガイドライン (root: false)  
+├── security.md          # セキュリティルール (root: false)
+└── custom.md           # プロジェクト固有ルール (root: false)
+```
+
+### フロントマタースキーマ
+
+各ルールファイルには以下のフィールドを含むフロントマターが必要です：
+
+```yaml
+---
+root: true | false               # 必須: ルールレベル (概要の場合true、詳細の場合false)
+targets: ["*"]                   # 必須: ターゲットツール (* = すべて、または特定のツール)
+description: "簡潔な説明"        # 必須: ルールの説明
+globs: ["**/*.ts", "**/*.js"]    # 必須: ファイルパターン (空の配列可)
+---
+```
+
+### ファイル例
+
+**ルートファイル** (`.rulesync/overview.md`):
+```markdown
+---
+root: true
+targets: ["*"]
+description: "プロジェクト概要と開発思想"
+globs: ["src/**/*.ts"]
+---
+
+# プロジェクト開発ガイドライン
+
+このプロジェクトはクリーンアーキテクチャの原則に従ったTypeScript-firstの開発を行っています。
+```
+
+**非ルートファイル** (`.rulesync/coding-rules.md`):
+```markdown
+---
+root: false
+targets: ["copilot", "cursor", "roo"]
+description: "TypeScriptコーディング標準"
+globs: ["**/*.ts", "**/*.tsx"]
+---
+
+# TypeScriptコーディングルール
+
+- 厳密なTypeScript設定を使用
+- オブジェクト形状にはtypeよりinterfaceを優先
+- 意味のある変数名を使用
+```
+
+## 生成される設定ファイル
+
+| ツール | 出力パス | フォーマット | ルールレベル処理 |
+|------|------------|--------|-------------------|
+| **GitHub Copilot** | `.github/instructions/*.instructions.md` | フロントマター + Markdown | 両レベルとも同じフォーマットを使用 |
+| **Cursor** | `.cursor/rules/*.mdc` | MDC (YAMLヘッダー + Markdown) | ルート: `ruletype: always`<br>非ルート: `ruletype: autoattached`<br>globsなしの非ルート: `ruletype: agentrequested` |
+| **Cline** | `.clinerules/*.md` | プレーンMarkdown | 両レベルとも同じフォーマットを使用 |
+| **Claude Code** | `./CLAUDE.md` (ルート)<br>`.claude/memories/*.md` (非ルート) | プレーンMarkdown | ルートはCLAUDE.mdに移動<br>非ルートは別メモリファイルに移動<br>CLAUDE.mdは`@filename`参照を含む |
+| **Roo Code** | `.roo/rules/*.md` | プレーンMarkdown | 両レベルとも説明ヘッダー付きの同じフォーマットを使用 |
+
+## バリデーション
+
+rulesyncはルールファイルを検証し、有用なエラーメッセージを提供します：
+
+```bash
+rulesync validate
+```
+
+一般的なバリデーションルール：
+- プロジェクトごとに1つのルートファイル（root: true）のみ許可
+- すべてのフロントマターフィールドが必須で適切にフォーマットされている
+- ファイルパターン（globs）が有効な構文を使用
+- ターゲットツールが認識される値である
+
+## ライセンス
+
+MIT License
+
+## 貢献
+
+Issues と Pull Requests を歓迎します！
+
+開発環境の設定と貢献ガイドラインについては、[CONTRIBUTING.ja.md](./CONTRIBUTING.ja.md)を参照してください。
