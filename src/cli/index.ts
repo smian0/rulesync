@@ -29,6 +29,7 @@ program
   .option("--cursor", "Generate only for Cursor")
   .option("--cline", "Generate only for Cline")
   .option("--claude", "Generate only for Claude Code")
+  .option("--delete", "Delete all existing files in output directories before generating")
   .option("-v, --verbose", "Verbose output")
   .action(async (options) => {
     const tools: ToolTarget[] = [];
@@ -37,8 +38,9 @@ program
     if (options.cline) tools.push("cline");
     if (options.claude) tools.push("claude");
 
-    const generateOptions: { verbose?: boolean; tools?: ToolTarget[] } = {
+    const generateOptions: { verbose?: boolean; tools?: ToolTarget[]; delete?: boolean } = {
       verbose: options.verbose,
+      delete: options.delete,
     };
 
     if (tools.length > 0) {

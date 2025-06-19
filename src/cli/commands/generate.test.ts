@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
-import { fileExists, getDefaultConfig, writeFileContent } from "../../utils/index.js";
+import { fileExists, getDefaultConfig, removeDirectory, writeFileContent } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
 
 vi.mock("../../core/index.js");
@@ -11,6 +11,7 @@ const mockParseRulesFromDirectory = vi.mocked(parseRulesFromDirectory);
 const mockFileExists = vi.mocked(fileExists);
 const mockGetDefaultConfig = vi.mocked(getDefaultConfig);
 const mockWriteFileContent = vi.mocked(writeFileContent);
+const mockRemoveDirectory = vi.mocked(removeDirectory);
 
 const mockConfig = {
   aiRulesDir: ".rulesync",
@@ -18,8 +19,9 @@ const mockConfig = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
+    claude: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline"],
+  defaultTargets: ["copilot", "cursor", "cline", "claude"],
   watchEnabled: false,
 } as const;
 
@@ -53,6 +55,7 @@ describe("generateCommand", () => {
     mockParseRulesFromDirectory.mockResolvedValue(mockRules);
     mockGenerateConfigurations.mockResolvedValue(mockOutputs);
     mockWriteFileContent.mockResolvedValue();
+    mockRemoveDirectory.mockResolvedValue();
 
     // Mock console methods
     vi.spyOn(console, "log").mockImplementation(() => {});
@@ -121,5 +124,30 @@ describe("generateCommand", () => {
       "❌ Failed to generate configurations:",
       expect.any(Error)
     );
+  });
+
+  it("should delete output directories when --delete option is used", async () => {
+    await generateCommand({ delete: true });
+
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".github/instructions");
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".cursor/rules");
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".clinerules");
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".");
+  });
+
+  it("should delete only specified tool directories when --delete option is used with specific tools", async () => {
+    await generateCommand({ delete: true, tools: ["copilot", "cursor"] });
+
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".github/instructions");
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".cursor/rules");
+    expect(mockRemoveDirectory).not.toHaveBeenCalledWith(".clinerules");
+    expect(mockRemoveDirectory).not.toHaveBeenCalledWith(".");
+  });
+
+  it("should show verbose output when deleting directories", async () => {
+    await generateCommand({ delete: true, verbose: true });
+
+    expect(console.log).toHaveBeenCalledWith("Deleting existing output directories...");
+    expect(console.log).toHaveBeenCalledWith("Deleted existing output directories");
   });
 });

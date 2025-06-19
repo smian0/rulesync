@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 
 export async function ensureDir(dirPath: string): Promise<void> {
@@ -33,5 +33,15 @@ export async function fileExists(filepath: string): Promise<boolean> {
     return true;
   } catch {
     return false;
+  }
+}
+
+export async function removeDirectory(dirPath: string): Promise<void> {
+  try {
+    if (await fileExists(dirPath)) {
+      await rm(dirPath, { recursive: true, force: true });
+    }
+  } catch (error) {
+    console.warn(`Failed to remove directory ${dirPath}:`, error);
   }
 }

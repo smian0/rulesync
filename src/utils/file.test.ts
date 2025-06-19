@@ -1,6 +1,6 @@
-import { mkdir, readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ensureDir, fileExists, findFiles, readFileContent, writeFileContent } from "./file.js";
+import { ensureDir, fileExists, findFiles, readFileContent, removeDirectory, writeFileContent } from "./file.js";
 
 vi.mock("node:fs/promises");
 
@@ -9,6 +9,7 @@ const mockMkdir = vi.mocked(mkdir);
 const mockReadFile = vi.mocked(readFile);
 const mockWriteFile = vi.mocked(writeFile);
 const mockReaddir = vi.mocked(readdir);
+const mockRm = vi.mocked(rm);
 
 describe("file utilities", () => {
   beforeEach(() => {
@@ -127,6 +128,44 @@ describe("file utilities", () => {
 
       expect(mockStat).toHaveBeenCalledWith("/path/to/nonexistent.txt");
       expect(result).toBe(false);
+    });
+  });
+
+  describe("removeDirectory", () => {
+    it("should remove directory if it exists", async () => {
+      mockStat.mockResolvedValue({} as never);
+      mockRm.mockResolvedValue(undefined);
+
+      await removeDirectory("/path/to/dir");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to/dir");
+      expect(mockRm).toHaveBeenCalledWith("/path/to/dir", { recursive: true, force: true });
+    });
+
+    it("should do nothing if directory does not exist", async () => {
+      mockStat.mockRejectedValue(new Error("Directory not found"));
+
+      await removeDirectory("/path/to/nonexistent");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to/nonexistent");
+      expect(mockRm).not.toHaveBeenCalled();
+    });
+
+    it("should handle removal errors gracefully", async () => {
+      mockStat.mockResolvedValue({} as never);
+      mockRm.mockRejectedValue(new Error("Permission denied"));
+      
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      await removeDirectory("/path/to/dir");
+
+      expect(mockRm).toHaveBeenCalledWith("/path/to/dir", { recursive: true, force: true });
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to remove directory /path/to/dir:",
+        expect.any(Error)
+      );
+      
+      consoleSpy.mockRestore();
     });
   });
 });
