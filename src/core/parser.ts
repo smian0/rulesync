@@ -54,7 +54,7 @@ function validateFrontmatter(data: unknown, filepath: string): void {
     throw new Error(`Invalid targets in ${filepath}: must be an array`);
   }
 
-  const validTargets = ["copilot", "cursor", "cline", "*"];
+  const validTargets = ["copilot", "cursor", "cline", "claude", "roo", "*"];
   for (const target of obj.targets) {
     if (typeof target !== "string" || !validTargets.includes(target)) {
       throw new Error(

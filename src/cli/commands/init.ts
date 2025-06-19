@@ -23,7 +23,7 @@ async function createSampleFiles(aiRulesDir: string): Promise<void> {
     {
       filename: "coding-rules.md",
       content: `---
-priority: high
+root: true
 targets: ["*"]
 description: "General coding standards and best practices"
 globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
@@ -50,7 +50,7 @@ globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
     {
       filename: "naming-conventions.md",
       content: `---
-priority: high
+root: false
 targets: ["*"]
 description: "Naming conventions for variables, functions, and files"
 globs: ["**/*.ts", "**/*.js"]
@@ -76,8 +76,8 @@ globs: ["**/*.ts", "**/*.js"]
     {
       filename: "architecture.md",
       content: `---
-priority: low
-targets: [copilot, cursor]
+root: false
+targets: ["copilot", "cursor"]
 description: "Architectural patterns and project structure guidelines"
 globs: ["src/**/*.ts"]
 ---
