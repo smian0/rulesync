@@ -31,8 +31,8 @@ rulesync is a Node.js CLI tool that generates configuration files for various AI
 
 ### Input Format
 Rule files in `.rulesync/` use the following frontmatter:
-- `priority`: high|low
-- `targets`: ["*"] or [copilot, cursor, cline] - "*" applies to all tools
+- `priority`: high|medium|low
+- `targets`: ["*"] or [copilot, cursor, cline, claudecode] - "*" applies to all tools
 - `description`: Brief description of the rule
 - `globs`: File patterns where rule applies (e.g., ["**/*.ts", "**/*.js"])
 
