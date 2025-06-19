@@ -1,4 +1,5 @@
 export * from "./generate.js";
+export * from "./gitignore.js";
 export * from "./init.js";
 export * from "./status.js";
 export * from "./validate.js";
