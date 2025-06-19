@@ -35,10 +35,12 @@ export async function generateClaudeConfig(
 function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule[]): string {
   const lines: string[] = [];
 
-  // Add references to memory files at the top
+  // Add introductory text and references to memory files at the top
   if (detailRules.length > 0) {
+    lines.push("Please also reference the following documents as needed:");
+    lines.push("");
     for (const rule of detailRules) {
-      lines.push(`@${rule.filename}`);
+      lines.push(`@.claude/memories/${rule.filename}.md`);
     }
     lines.push("");
   }
@@ -85,10 +87,6 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
 function generateMemoryFile(rule: ParsedRule): string {
   const lines: string[] = [];
 
-  lines.push("Please also refer to the following files as needed:");
-  lines.push("");
-  lines.push("---");
-  lines.push("");
   lines.push(`# ${rule.filename}`);
   lines.push("");
 
