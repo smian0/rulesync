@@ -22,5 +22,5 @@ export async function generateClineConfig(
 }
 
 function generateClineMarkdown(rule: ParsedRule): string {
-  return rule.content;
+  return rule.content.trim();
 }

@@ -22,10 +22,5 @@ export async function generateRooConfig(
 }
 
 function generateRooMarkdown(rule: ParsedRule): string {
-  const lines: string[] = [];
-
-  // Add content
-  lines.push(rule.content);
-
-  return lines.join("\n");
+  return rule.content.trim();
 }

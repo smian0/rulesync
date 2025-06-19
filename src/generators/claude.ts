@@ -75,5 +75,5 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
 }
 
 function generateMemoryFile(rule: ParsedRule): string {
-  return rule.content;
+  return rule.content.trim();
 }
