@@ -20,7 +20,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/overview-rule.md",
     frontmatter: {
       targets: ["*"],
-      ruleLevel: "overview",
+      root: true,
       description: "Overview rule",
       globs: ["**/*.ts", "**/*.js"],
     },
@@ -31,7 +31,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/detail-rule.md",
     frontmatter: {
       targets: ["cursor"],
-      ruleLevel: "detail",
+      root: false,
       description: "Detail rule",
       globs: ["**/*.md"],
     },
@@ -77,7 +77,7 @@ describe("generateCursorConfig", () => {
         filepath: "/path/to/no-globs.md",
         frontmatter: {
           targets: ["cursor"],
-          ruleLevel: "overview",
+          root: true,
           description: "Rule without globs",
           globs: [],
         },

@@ -31,11 +31,11 @@ function generateCursorMarkdown(rule: ParsedRule): string {
     lines.push(`globs: [${rule.frontmatter.globs.map((g) => `"${g}"`).join(", ")}]`);
   }
 
-  // Determine ruletype based on ruleLevel and globs
+  // Determine ruletype based on root and globs
   let ruletype: string;
-  if (rule.frontmatter.ruleLevel === "overview") {
+  if (rule.frontmatter.root === true) {
     ruletype = "always";
-  } else if (rule.frontmatter.ruleLevel === "detail" && rule.frontmatter.globs.length === 0) {
+  } else if (rule.frontmatter.root === false && rule.frontmatter.globs.length === 0) {
     ruletype = "agentrequested";
   } else {
     ruletype = "autoattached";

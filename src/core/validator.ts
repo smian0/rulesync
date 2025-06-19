@@ -20,11 +20,11 @@ export async function validateRules(rules: ParsedRule[]): Promise<ValidationResu
     filenames.add(rule.filename);
   }
 
-  // Check for multiple overview rules
-  const overviewRules = rules.filter((rule) => rule.frontmatter.ruleLevel === "overview");
-  if (overviewRules.length > 1) {
+  // Check for multiple root rules
+  const rootRules = rules.filter((rule) => rule.frontmatter.root === true);
+  if (rootRules.length > 1) {
     errors.push(
-      `Multiple overview rules found: ${overviewRules.map((r) => r.filename).join(", ")}. Only one overview rule is allowed.`
+      `Multiple root rules found: ${rootRules.map((r) => r.filename).join(", ")}. Only one root rule is allowed.`
     );
   }
 

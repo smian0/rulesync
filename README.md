@@ -38,7 +38,7 @@ Define metadata in front matter for each Markdown file:
 
 ```markdown
 ---
-ruleLevel: overview # or detail
+root: true # or false
 targets: ["*"] # or [copilot, cursor, cline, claudecode]
 description: "TypeScript coding rules"
 globs: ["**/*.ts", "**/*.tsx"]

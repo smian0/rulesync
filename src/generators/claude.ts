@@ -7,12 +7,12 @@ export async function generateClaudeConfig(
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 
-  // Separate overview and detail rules
-  const overviewRules = rules.filter((r) => r.frontmatter.ruleLevel === "overview");
-  const detailRules = rules.filter((r) => r.frontmatter.ruleLevel === "detail");
+  // Separate root and non-root rules
+  const rootRules = rules.filter((r) => r.frontmatter.root === true);
+  const detailRules = rules.filter((r) => r.frontmatter.root === false);
 
-  // Generate CLAUDE.md with overview rule and references to detail files
-  const claudeMdContent = generateClaudeMarkdown(overviewRules, detailRules);
+  // Generate CLAUDE.md with root rule and references to detail files
+  const claudeMdContent = generateClaudeMarkdown(rootRules, detailRules);
   outputs.push({
     tool: "claude",
     filepath: join(config.outputPaths.claude, "CLAUDE.md"),
@@ -32,7 +32,7 @@ export async function generateClaudeConfig(
   return outputs;
 }
 
-function generateClaudeMarkdown(overviewRules: ParsedRule[], detailRules: ParsedRule[]): string {
+function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule[]): string {
   const lines: string[] = [];
 
   // Add references to memory files at the top
@@ -50,9 +50,9 @@ function generateClaudeMarkdown(overviewRules: ParsedRule[], detailRules: Parsed
   );
   lines.push("");
 
-  // Add overview rules
-  if (overviewRules.length > 0) {
-    for (const rule of overviewRules) {
+  // Add root rules
+  if (rootRules.length > 0) {
+    for (const rule of rootRules) {
       lines.push(...formatRuleForClaude(rule));
     }
   }

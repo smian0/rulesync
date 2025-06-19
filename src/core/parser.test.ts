@@ -22,7 +22,7 @@ describe("parser", () => {
   describe("parseRuleFile", () => {
     it("should parse valid rule file", async () => {
       const ruleContent = `---
-ruleLevel: overview
+root: true
 targets: ["copilot", "cursor"]
 description: "Test rule"
 globs: ["**/*.ts"]
@@ -38,7 +38,7 @@ This is a test rule content.
 
       const rule = await parseRuleFile(filepath);
 
-      expect(rule.frontmatter.ruleLevel).toBe("overview");
+      expect(rule.frontmatter.root).toBe(true);
       expect(rule.frontmatter.targets).toEqual(["copilot", "cursor"]);
       expect(rule.frontmatter.description).toBe("Test rule");
       expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
@@ -49,7 +49,7 @@ This is a test rule content.
 
     it("should handle wildcard targets", async () => {
       const ruleContent = `---
-ruleLevel: detail
+root: false
 targets: ["*"]
 description: "Test rule with wildcard"
 globs: ["**/*.js"]
@@ -66,9 +66,9 @@ globs: ["**/*.js"]
       expect(rule.frontmatter.targets).toEqual(["*"]);
     });
 
-    it("should throw error for invalid ruleLevel", async () => {
+    it("should throw error for invalid root", async () => {
       const ruleContent = `---
-ruleLevel: medium
+root: invalid
 targets: ["copilot"]
 description: "Test rule"
 globs: ["**/*.ts"]
@@ -80,7 +80,7 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "invalid-rule.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid ruleLevel");
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid root");
     });
 
     it("should throw error for invalid targets", async () => {
@@ -97,12 +97,12 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "invalid-targets.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid ruleLevel");
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid root");
     });
 
     it("should throw error for missing description", async () => {
       const ruleContent = `---
-ruleLevel: overview
+root: true
 targets: ["copilot"]
 globs: ["**/*.ts"]
 ---

@@ -9,7 +9,7 @@ describe("claude generator", () => {
   const mockRules: ParsedRule[] = [
     {
       frontmatter: {
-        ruleLevel: "overview",
+        root: true,
         targets: ["claude"],
         description: "Overview coding rule",
         globs: ["**/*.ts"],
@@ -20,7 +20,7 @@ describe("claude generator", () => {
     },
     {
       frontmatter: {
-        ruleLevel: "detail",
+        root: false,
         targets: ["claude"],
         description: "Detail architecture rule",
         globs: ["**/*.tsx"],
@@ -31,7 +31,7 @@ describe("claude generator", () => {
     },
     {
       frontmatter: {
-        ruleLevel: "detail",
+        root: false,
         targets: ["claude"],
         description: "Detail naming rule",
         globs: ["**/*.js"],
@@ -78,7 +78,7 @@ describe("claude generator", () => {
   it("should handle rules without description", async () => {
     const ruleWithoutDescription: ParsedRule = {
       frontmatter: {
-        ruleLevel: "overview",
+        root: true,
         targets: ["claude"],
         description: "",
         globs: [],
@@ -97,7 +97,7 @@ describe("claude generator", () => {
   it("should handle rules without globs", async () => {
     const ruleWithoutGlobs: ParsedRule = {
       frontmatter: {
-        ruleLevel: "overview",
+        root: true,
         targets: ["claude"],
         description: "Test rule",
         globs: [],

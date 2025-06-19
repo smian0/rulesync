@@ -36,7 +36,7 @@ const mockRules = [
     filepath: ".rulesync/test.md",
     frontmatter: {
       targets: ["*"],
-      ruleLevel: "overview",
+      root: true,
       description: "Test rule",
       globs: ["**/*.ts"],
     },

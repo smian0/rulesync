@@ -44,9 +44,9 @@ function validateFrontmatter(data: unknown, filepath: string): void {
 
   const obj = data as Record<string, unknown>;
 
-  // Validate ruleLevel
-  if (!obj.ruleLevel || !["overview", "detail"].includes(obj.ruleLevel as string)) {
-    throw new Error(`Invalid ruleLevel in ${filepath}: must be "overview" or "detail"`);
+  // Validate root
+  if (typeof obj.root !== "boolean") {
+    throw new Error(`Invalid root in ${filepath}: must be a boolean`);
   }
 
   // Validate targets

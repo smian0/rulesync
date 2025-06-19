@@ -20,7 +20,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/security.md",
     frontmatter: {
       targets: ["*"],
-      ruleLevel: "overview",
+      root: true,
       description: "Security best practices",
       globs: ["**/*.ts", "**/*.js"],
     },
@@ -31,7 +31,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/styling.md",
     frontmatter: {
       targets: ["cline"],
-      ruleLevel: "detail",
+      root: false,
       description: "Code styling guidelines",
       globs: ["**/*.css"],
     },
@@ -77,7 +77,7 @@ describe("generateClineConfig", () => {
         filepath: "/path/to/general.md",
         frontmatter: {
           targets: ["*"],
-          ruleLevel: "overview",
+          root: true,
           description: "General guidelines",
           globs: [],
         },

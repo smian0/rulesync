@@ -18,7 +18,7 @@ describe("copilot generator", () => {
   const mockRules: ParsedRule[] = [
     {
       frontmatter: {
-        ruleLevel: "overview",
+        root: true,
         targets: ["copilot"],
         description: "Overview coding rule",
         globs: ["**/*.ts"],
@@ -29,7 +29,7 @@ describe("copilot generator", () => {
     },
     {
       frontmatter: {
-        ruleLevel: "detail",
+        root: false,
         targets: ["copilot"],
         description: "Detail naming rule",
         globs: ["**/*.js"],
@@ -65,7 +65,7 @@ describe("copilot generator", () => {
     const rulesWithoutGlobs: ParsedRule[] = [
       {
         frontmatter: {
-          ruleLevel: "overview",
+          root: true,
           targets: ["copilot"],
           description: "General rule",
           globs: [],

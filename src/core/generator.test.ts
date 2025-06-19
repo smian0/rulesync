@@ -20,7 +20,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/test-rule.md",
     frontmatter: {
       targets: ["*"],
-      ruleLevel: "overview",
+      root: true,
       description: "Test rule",
       globs: ["**/*.ts"],
     },
@@ -31,7 +31,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/copilot-only.md",
     frontmatter: {
       targets: ["copilot"],
-      ruleLevel: "detail",
+      root: false,
       description: "Copilot only rule",
       globs: ["**/*.js"],
     },
@@ -42,7 +42,7 @@ const mockRules: ParsedRule[] = [
     filepath: "/path/to/claude-only.md",
     frontmatter: {
       targets: ["claude"],
-      ruleLevel: "detail",
+      root: false,
       description: "Claude only rule",
       globs: ["**/*.tsx"],
     },
