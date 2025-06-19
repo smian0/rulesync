@@ -1,6 +1,6 @@
 {
 	"name": "rulesync",
-	"version": "0.10.0",
+	"version": "0.12.0",
 	"description": "Unified AI rules management CLI tool that generates configuration files for various AI development tools",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
