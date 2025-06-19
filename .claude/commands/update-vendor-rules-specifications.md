@@ -1,2 +1,2 @@
-1. `.rulesync/vendor-rules-specifications.md` を見て、各AIコーディングツールのルールファイルの仕様を確認する。
-2. 現場の仕様書から変更があれば、ファイルを更新して反映する。
+1. Review `.rulesync/vendor-rules-specifications.md` to check the rule file specifications for each AI coding tool.
+2. If there are changes from the actual specifications, update and reflect them in the file.

@@ -1,4 +1,4 @@
-以下に日本語で書かれている文書があれば、英語に変換して更新する。
+Convert any documents written in Japanese to English and update them in the following locations:
 
 - README.md
 - CONTRIBUTING.md

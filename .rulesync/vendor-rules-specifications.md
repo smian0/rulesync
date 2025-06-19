@@ -1,7 +1,7 @@
 ---
 root: false
 targets: ['*']
-description: "各ベンダーのAIルール仕様書"
+description: "AI rule specifications for each vendor"
 globs: []
 ---
 
@@ -11,56 +11,56 @@ globs: []
 
 https://code.visualstudio.com/docs/copilot/copilot-customization#_use-instructionsmd-files
 
-### 概要
-VS CodeのGitHub Copilotにカスタム指示を提供する仕組み。チャットリクエストに自動的に適用される。
+### Overview
+A mechanism to provide custom instructions to GitHub Copilot in VS Code. Automatically applied to chat requests.
 
-### ファイル形式
-- **ワークスペース用**: `.github/copilot-instructions.md`
-  - 全てのチャットリクエストに自動適用
-  - `github.copilot.chat.codeGeneration.useInstructionFiles`設定が必要
-- **プロジェクト用**: `.github/instructions/*.instructions.md`
-  - globパターンでファイル適用範囲を指定可能
-  - 他のinstructionファイルを参照可能
+### File Format
+- **Workspace**: `.github/copilot-instructions.md`
+  - Automatically applied to all chat requests
+  - Requires `github.copilot.chat.codeGeneration.useInstructionFiles` setting
+- **Project**: `.github/instructions/*.instructions.md`
+  - Can specify file application scope with glob patterns
+  - Can reference other instruction files
 
-### ファイル構造
+### File Structure
 ```markdown
 ---
 description: "Brief file description"
 applyTo: "**"  # Glob pattern
 ---
 
-自然言語による指示内容
+Natural language instruction content
 ```
 
-### 特徴
-- 複数ファイルの指示を組み合わせて使用
-- `${workspaceFolder}`などの変数をサポート
-- コード補完では使用されない（チャットのみ）
+### Features
+- Combine instructions from multiple files
+- Support variables like `${workspaceFolder}`
+- Not used in code completion (chat only)
 
-### ベストプラクティス
-- 指示は短く具体的に
-- 外部リソースへの参照は避ける
-- 機能別に複数ファイルに分割
+### Best Practices
+- Keep instructions short and specific
+- Avoid references to external resources
+- Split into multiple files by functionality
 
 ## Cursor Project Rules
 
 https://docs.cursor.com/context/rules
 
-### 概要
-CursorのAIモデルにプロジェクト固有のルールやコンテキストを提供する仕組み。
+### Overview
+A mechanism to provide project-specific rules and context to Cursor's AI model.
 
-### ファイル形式
-- **配置場所**: `.cursor/rules/`ディレクトリ
-- **拡張子**: `.mdc`（Markdown with Context）
-- サブディレクトリにネストした`.cursor/rules`も可能
+### File Format
+- **Location**: `.cursor/rules/` directory
+- **Extension**: `.mdc` (Markdown with Context)
+- Nested `.cursor/rules` in subdirectories is also possible
 
-### ルール種別
-1. **Always**: 常にモデルコンテキストに含まれる
-2. **Auto Attached**: globパターンに一致するファイルが参照された時に適用
-3. **Agent Requested**: AIが必要と判断した時に適用（description必須）
-4. **Manual**: `@ruleName`で明示的に参照した時のみ適用
+### Rule Types
+1. **Always**: Always included in model context
+2. **Auto Attached**: Applied when files matching glob pattern are referenced
+3. **Agent Requested**: Applied when AI determines it's needed (description required)
+4. **Manual**: Applied only when explicitly referenced with `@ruleName`
 
-### ファイル構造
+### File Structure
 ```markdown
 ---
 description: "RPC Service boilerplate"
@@ -74,15 +74,15 @@ alwaysApply: false
 @service-template.ts
 ```
 
-### 特徴
-- `@filename`で追加ファイルを参照可能
-- プロジェクト全体・サブディレクトリ固有のルールをサポート
-- ドメイン知識の記録、ワークフロー自動化、コーディング標準化に活用
+### Features
+- Can reference additional files with `@filename`
+- Support project-wide and subdirectory-specific rules
+- Used for recording domain knowledge, workflow automation, and coding standardization
 
-### ベストプラクティス
-- ルールは簡潔に（500行以下推奨）
-- 大きな概念は複数ルールに分割
-- 具体例を含める
+### Best Practices
+- Keep rules concise (500 lines or less recommended)
+- Split large concepts into multiple rules
+- Include specific examples
 
 ## Cline Rules
 
@@ -122,6 +122,10 @@ Clineプロジェクトやコンバセーションに「システムレベルの
 - 分かりやすいファイル名を使用
 - アクティブな`.clinerules/`フォルダのgit-ignoreを検討
 - ルール組み合わせ用のチームスクリプトを作成
+
+## Roo Code Rules
+
+https://docs.roocode.com/features/custom-instructions
 
 ## Claude Code Memories
 
