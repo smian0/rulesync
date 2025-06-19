@@ -231,7 +231,7 @@ To add support for a new AI tool:
 4. **Add CLI option**: Update `src/cli/index.ts`
 5. **Update types**: Add to `ToolTarget` in `src/types/rules.ts`
 6. **Add tests**: Create `src/generators/newtool.test.ts`
-7. **Update docs**: Add to README.md and SPECIFICATION.md
+7. **Update docs**: Add to README.md
 
 ### Generator Interface Pattern
 
@@ -261,7 +261,7 @@ export async function generateNewToolConfig(
 
 - Update README.md for user-facing changes
 - Add JSDoc comments for new functions/classes
-- Update SPECIFICATION.md for API changes
+- Update README.md for API changes
 - Include examples in documentation
 
 ## Security

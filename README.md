@@ -209,4 +209,3 @@ MIT License
 Issues and Pull Requests are welcome!
 
 For development setup and contribution guidelines, see [CONTRIBUTING.md](./CONTRIBUTING.md).
-For detailed technical specifications, see [SPECIFICATION.md](./SPECIFICATION.md).
