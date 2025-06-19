@@ -77,7 +77,8 @@ rulesync/
 │   │   ├── copilot.ts     # GitHub Copilot Custom Instructions
 │   │   ├── cursor.ts      # Cursor Project Rules (MDC format)
 │   │   ├── cline.ts       # Cline Rules
-│   │   └── claude.ts      # Claude Code Memory (CLAUDE.md + memories)
+│   │   ├── claude.ts      # Claude Code Memory (CLAUDE.md + memories)
+│   │   └── roo.ts         # Roo Code Rules
 │   ├── types/              # TypeScript type definitions
 │   │   ├── config.ts      # Configuration types
 │   │   └── rules.ts       # Rule and frontmatter types

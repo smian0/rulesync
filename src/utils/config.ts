@@ -8,9 +8,10 @@ export function getDefaultConfig(): Config {
       cursor: ".cursor/rules",
       cline: ".clinerules",
       claude: ".",
+      roo: ".roo/rules",
     },
     watchEnabled: false,
-    defaultTargets: ["copilot", "cursor", "cline", "claude"],
+    defaultTargets: ["copilot", "cursor", "cline", "claude", "roo"],
   };
 }
 

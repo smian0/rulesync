@@ -11,6 +11,7 @@ A Node.js CLI tool that automatically generates configuration files for various 
 - **Cursor Project Rules** (`.cursor/rules/*.mdc`) 
 - **Cline Rules** (`.clinerules/*.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
+- **Roo Code Rules** (`.roo/rules/*.md`)
 
 ## Installation
 
@@ -165,7 +166,7 @@ Define metadata in front matter for each Markdown file:
 ```markdown
 ---
 root: true # or false
-targets: ["*"] # or [copilot, cursor, cline, claudecode]
+targets: ["*"] # or [copilot, cursor, cline, claude, roo]
 description: "TypeScript coding rules"
 globs: ["**/*.ts", "**/*.tsx"]
 ---
@@ -197,6 +198,7 @@ Each AI tool handles rule levels differently:
 | **Cursor** | `ruletype: always` | `ruletype: autoattached` | Detail rules without globs use `ruletype: agentrequested` |
 | **GitHub Copilot** | Standard format | Standard format | All rules use same format with frontmatter |
 | **Cline** | Standard format | Standard format | All rules use plain Markdown format |
+| **Roo Code** | Standard format | Standard format | All rules use plain Markdown format with description header |
 
 ### 3. Generate Configuration Files
 
@@ -209,6 +211,7 @@ rulesync generate --copilot
 rulesync generate --cursor  
 rulesync generate --cline
 rulesync generate --claude
+rulesync generate --roo
 
 # Clean build (delete existing files first)
 rulesync generate --delete
@@ -225,7 +228,7 @@ rulesync generate --delete --verbose
 
 - `--delete`: Remove all existing generated files before creating new ones
 - `--verbose`: Show detailed output during generation process
-- `--copilot`, `--cursor`, `--cline`, `--claude`: Generate only for specified tools
+- `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: Generate only for specified tools
 
 ### 4. Other Commands
 
@@ -291,7 +294,7 @@ This project follows TypeScript-first development with clean architecture princi
 ```markdown
 ---
 root: false
-targets: ["copilot", "cursor"]
+targets: ["copilot", "cursor", "roo"]
 description: "TypeScript coding standards"
 globs: ["**/*.ts", "**/*.tsx"]
 ---
@@ -311,6 +314,7 @@ globs: ["**/*.ts", "**/*.tsx"]
 | **Cursor** | `.cursor/rules/*.mdc` | MDC (YAML header + Markdown) | Root: `ruletype: always`<br>Non-root: `ruletype: autoattached`<br>Non-root without globs: `ruletype: agentrequested` |
 | **Cline** | `.clinerules/*.md` | Plain Markdown | Both levels use same format |
 | **Claude Code** | `./CLAUDE.md` (root)<br>`.claude/memories/*.md` (non-root) | Plain Markdown | Root goes to CLAUDE.md<br>Non-root go to separate memory files<br>CLAUDE.md includes `@filename` references |
+| **Roo Code** | `.roo/rules/*.md` | Plain Markdown | Both levels use same format with description header |
 
 ## Validation
 
