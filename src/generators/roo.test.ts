@@ -37,7 +37,7 @@ describe("generateRooConfig", () => {
     expect(outputs[0]).toEqual({
       tool: "roo",
       filepath: ".roo/rules/typescript.md",
-      content: "# Test rule\n\nUse TypeScript best practices",
+      content: "Use TypeScript best practices",
     });
   });
 
@@ -92,7 +92,7 @@ describe("generateRooConfig", () => {
     const outputs = await generateRooConfig(rules, mockConfig);
 
     expect(outputs[0].content).toBe(
-      "# API documentation\n\nDocument all public APIs\n\nInclude examples for complex functions"
+      "Document all public APIs\n\nInclude examples for complex functions"
     );
   });
 });

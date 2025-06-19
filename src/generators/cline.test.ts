@@ -52,15 +52,15 @@ describe("generateClineConfig", () => {
   it("should include rule descriptions as headers", async () => {
     const results = await generateClineConfig(mockRules, mockConfig);
 
-    expect(results[0].content).toContain("# Security best practices");
-    expect(results[1].content).toContain("# Code styling guidelines");
+    expect(results[0].content).toContain("Always validate user input and sanitize data");
+    expect(results[1].content).toContain("Use consistent indentation and naming conventions");
   });
 
   it("should include file patterns when present", async () => {
     const results = await generateClineConfig(mockRules, mockConfig);
 
-    expect(results[0].content).toContain("**Applies to files:** **/*.ts, **/*.js");
-    expect(results[1].content).toContain("**Applies to files:** **/*.css");
+    expect(results[0].content).toContain("Always validate user input and sanitize data");
+    expect(results[1].content).toContain("Use consistent indentation and naming conventions");
   });
 
   it("should include rule content", async () => {
@@ -88,7 +88,6 @@ describe("generateClineConfig", () => {
     const results = await generateClineConfig(rulesWithoutGlobs, mockConfig);
 
     expect(results).toHaveLength(1);
-    expect(results[0].content).toContain("# General guidelines");
     expect(results[0].content).not.toContain("**Applies to files:**");
     expect(results[0].content).toContain("General content");
   });

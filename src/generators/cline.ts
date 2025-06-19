@@ -22,17 +22,5 @@ export async function generateClineConfig(
 }
 
 function generateClineMarkdown(rule: ParsedRule): string {
-  const lines: string[] = [];
-
-  lines.push(`# ${rule.frontmatter.description}`);
-  lines.push("");
-
-  if (rule.frontmatter.globs.length > 0) {
-    lines.push(`**Applies to files:** ${rule.frontmatter.globs.join(", ")}`);
-    lines.push("");
-  }
-
-  lines.push(rule.content);
-
-  return lines.join("\n");
+  return rule.content;
 }

@@ -58,7 +58,7 @@ describe("claude generator", () => {
     const outputs = await generateClaudeConfig(mockRules, config);
 
     // Main CLAUDE.md should contain overview rules and memory references
-    expect(outputs[0].content).toContain("typescript-rule");
+    expect(outputs[0].content).toContain("Overview coding rule");
     expect(outputs[0].content).toContain("@.claude/memories/architecture-rule.md");
     expect(outputs[0].content).toContain("@.claude/memories/naming-rule.md");
 
@@ -70,8 +70,7 @@ describe("claude generator", () => {
   it("should include rule metadata", async () => {
     const outputs = await generateClaudeConfig([mockRules[0]], config);
 
-    expect(outputs[0].content).toContain("**Description:** Overview coding rule");
-    expect(outputs[0].content).toContain("**File patterns:** **/*.ts");
+    expect(outputs[0].content).toContain("### Overview coding rule");
     expect(outputs[0].content).toContain("Use TypeScript for all new code.");
   });
 
@@ -110,7 +109,7 @@ describe("claude generator", () => {
     const outputs = await generateClaudeConfig([ruleWithoutGlobs], config);
 
     expect(outputs[0].content).not.toContain("**File patterns:**");
-    expect(outputs[0].content).toContain("**Description:** Test rule");
+    expect(outputs[0].content).toContain("### Test rule");
   });
 
   it("should handle empty rules array", async () => {
@@ -129,11 +128,9 @@ describe("claude generator", () => {
     const namingMemory = outputs.find((o) => o.filepath.includes("naming-rule.md"));
 
     expect(architectureMemory).toBeDefined();
-    expect(architectureMemory?.content).toContain("# architecture-rule");
     expect(architectureMemory?.content).toContain("Follow clean architecture principles.");
 
     expect(namingMemory).toBeDefined();
-    expect(namingMemory?.content).toContain("# naming-rule");
     expect(namingMemory?.content).toContain("Use camelCase for variables.");
   });
 });

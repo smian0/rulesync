@@ -65,18 +65,8 @@ function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule
 function formatRuleForClaude(rule: ParsedRule): string[] {
   const lines: string[] = [];
 
-  lines.push(`### ${rule.filename}`);
+  lines.push(`### ${rule.frontmatter.description}`);
   lines.push("");
-
-  if (rule.frontmatter.description) {
-    lines.push(`**Description:** ${rule.frontmatter.description}`);
-    lines.push("");
-  }
-
-  if (rule.frontmatter.globs && rule.frontmatter.globs.length > 0) {
-    lines.push(`**File patterns:** ${rule.frontmatter.globs.join(", ")}`);
-    lines.push("");
-  }
 
   lines.push(rule.content);
   lines.push("");
@@ -85,22 +75,5 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
 }
 
 function generateMemoryFile(rule: ParsedRule): string {
-  const lines: string[] = [];
-
-  lines.push(`# ${rule.filename}`);
-  lines.push("");
-
-  if (rule.frontmatter.description) {
-    lines.push(`**Description:** ${rule.frontmatter.description}`);
-    lines.push("");
-  }
-
-  if (rule.frontmatter.globs && rule.frontmatter.globs.length > 0) {
-    lines.push(`**File patterns:** ${rule.frontmatter.globs.join(", ")}`);
-    lines.push("");
-  }
-
-  lines.push(rule.content);
-
-  return lines.join("\n");
+  return rule.content;
 }
