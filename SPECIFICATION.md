@@ -81,6 +81,7 @@ https://docs.anthropic.com/en/docs/claude-code/memory#how-claude-looks-up-memori
   - `/init` でコードベース用のCLAUDE.mdをブートストラップ
   - 構造化されたMarkdownと箇条書きで整理
   - 説明的な見出しでメモリを分類
+  - root memoryは `./CLAUDE.md` child memoriesは `.claude/memories/*.md` に配置する
 
 ### 3. CLI コマンド
 
