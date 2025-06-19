@@ -1,5 +1,5 @@
 ---
-ruleLevel: detail
+root: false
 targets: ['*']
 description: "overview"
 globs: ["src/**/*.ts"]
