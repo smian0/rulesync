@@ -53,24 +53,58 @@ pnpm check
 pnpm secretlint
 ```
 
-## Project Structure
+## Project Architecture
+
+### Core Structure
 
 ```
-src/
-├── cli/                 # CLI interface and commands
-│   ├── commands/       # Individual command implementations
-│   └── index.ts        # CLI entry point
-├── core/               # Core functionality
-│   ├── parser.ts       # Rule file parsing
-│   ├── generator.ts    # Configuration generation orchestration
-│   └── validator.ts    # Rule validation
-├── generators/         # Tool-specific generators
-│   ├── copilot.ts     # GitHub Copilot generator
-│   ├── cursor.ts      # Cursor IDE generator
-│   └── cline.ts       # Cline generator
-├── types/             # TypeScript type definitions
-└── utils/             # Utility functions
+rulesync/
+├── src/
+│   ├── cli/
+│   │   ├── commands/        # CLI command implementations
+│   │   │   ├── init.ts      # Initialize project
+│   │   │   ├── generate.ts  # Generate configurations
+│   │   │   ├── watch.ts     # File watching
+│   │   │   ├── status.ts    # Project status
+│   │   │   ├── validate.ts  # Rule validation
+│   │   │   └── gitignore.ts # .gitignore management
+│   │   └── index.ts        # CLI entry point (Commander.js)
+│   ├── core/
+│   │   ├── parser.ts       # Parse .rulesync/*.md files
+│   │   ├── generator.ts    # Orchestrate generation
+│   │   └── validator.ts    # Validate rule structure
+│   ├── generators/         # Tool-specific generators
+│   │   ├── copilot.ts     # GitHub Copilot Custom Instructions
+│   │   ├── cursor.ts      # Cursor Project Rules (MDC format)
+│   │   ├── cline.ts       # Cline Rules
+│   │   └── claude.ts      # Claude Code Memory (CLAUDE.md + memories)
+│   ├── types/              # TypeScript type definitions
+│   │   ├── config.ts      # Configuration types
+│   │   └── rules.ts       # Rule and frontmatter types
+│   └── utils/
+│       ├── file.ts         # File operations (read/write/delete)
+│       └── config.ts       # Configuration management
+├── dist/                   # Build output (CJS + ESM)
+└── tests/                  # Test files (*.test.ts)
 ```
+
+### Key Dependencies
+
+- **Commander.js**: CLI framework for command-line interface
+- **gray-matter**: Frontmatter parsing for Markdown files
+- **chokidar**: File watching for `watch` command
+- **tsup**: Build system (outputs both CJS and ESM)
+- **tsx**: TypeScript execution for development
+- **Biome**: Unified linter and formatter
+- **Vitest**: Testing framework with coverage
+
+### Build System
+
+- **Target**: Node.js 20.0.0+ (recommended: 24.0.0+)
+- **TypeScript**: Strict mode with `@tsconfig/node24`
+- **Output**: Both CommonJS (`dist/index.js`) and ESM (`dist/index.mjs`)
+- **Binary**: `dist/index.js` (executable entry point)
+- **Types**: Included in build output
 
 ## How to Contribute
 
@@ -147,21 +181,80 @@ The style is automatically enforced by our CI pipeline and pre-commit hooks.
 
 ## Testing
 
+The project uses Vitest for testing with comprehensive coverage (currently 69.46%):
+
+### Test Structure
+
+- **Unit tests**: Individual function testing
+- **Integration tests**: Command and generator testing  
+- **Mocking**: Uses Vitest's built-in mocking capabilities
+- **Coverage target**: 80%+
+
+### Writing Tests
+
 - Write tests for new features and bug fixes
 - Use descriptive test names
-- Test both success and error cases
+- Test both success and error cases  
 - Keep tests focused and isolated
+- Follow the pattern: `src/module.ts` → `src/module.test.ts`
 
-Run tests:
+### Running Tests
+
 ```bash
-# All tests
+# All tests (77 tests currently)
 pnpm test
 
-# Watch mode
+# Watch mode for development
 pnpm test:watch
 
-# With coverage
+# Generate coverage report
 pnpm test:coverage
+
+# Run specific test file
+pnpm test src/generators/copilot.test.ts
+```
+
+### Test Coverage by Module
+
+- **utils**: 100% (fully covered)
+- **generators**: 97.25% (nearly complete)
+- **core**: 83.12% (good coverage)
+- **cli/commands**: 36.39% (needs improvement)
+
+## Adding New AI Tools
+
+To add support for a new AI tool:
+
+1. **Create generator**: Add `src/generators/newtool.ts`
+2. **Implement interface**: Export async function following the pattern
+3. **Add to core**: Update `src/core/generator.ts` 
+4. **Add CLI option**: Update `src/cli/index.ts`
+5. **Update types**: Add to `ToolTarget` in `src/types/rules.ts`
+6. **Add tests**: Create `src/generators/newtool.test.ts`
+7. **Update docs**: Add to README.md and SPECIFICATION.md
+
+### Generator Interface Pattern
+
+```typescript
+export async function generateNewToolConfig(
+  rules: ParsedRule[],
+  config: Config
+): Promise<GeneratedOutput[]> {
+  const outputs: GeneratedOutput[] = [];
+  
+  for (const rule of rules) {
+    const content = generateNewToolMarkdown(rule);
+    const filepath = join(config.outputPaths.newtool, `${rule.filename}.ext`);
+    
+    outputs.push({
+      tool: "newtool",
+      filepath,
+      content,
+    });
+  }
+  
+  return outputs;
+}
 ```
 
 ## Documentation
