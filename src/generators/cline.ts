@@ -4,57 +4,35 @@ import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 export async function generateClineConfig(
   rules: ParsedRule[],
   config: Config
-): Promise<GeneratedOutput> {
-  const sortedRules = rules.sort((a, b) => {
-    if (a.frontmatter.priority !== b.frontmatter.priority) {
-      return a.frontmatter.priority === "high" ? -1 : 1;
-    }
-    return a.filename.localeCompare(b.filename);
-  });
+): Promise<GeneratedOutput[]> {
+  const outputs: GeneratedOutput[] = [];
 
-  const content = generateClineMarkdown(sortedRules);
-  const filepath = join(config.outputPaths.cline, "01-rulesync.md");
+  for (const rule of rules) {
+    const content = generateClineMarkdown(rule);
+    const filepath = join(config.outputPaths.cline, `${rule.filename}`);
 
-  return {
-    tool: "cline",
-    filepath,
-    content,
-  };
+    outputs.push({
+      tool: "cline",
+      filepath,
+      content,
+    });
+  }
+
+  return outputs;
 }
 
-function generateClineMarkdown(rules: ParsedRule[]): string {
+function generateClineMarkdown(rule: ParsedRule): string {
   const lines: string[] = [];
 
-  lines.push("# Cline AI Assistant Rules");
-  lines.push("");
-  lines.push("Configuration rules for Cline AI Assistant. Generated from rulesync configuration.");
-  lines.push("");
-  lines.push("These rules provide project-specific guidance for AI-assisted development.");
+  lines.push(`# ${rule.frontmatter.description}`);
   lines.push("");
 
-  // Group by priority for better organization
-  const highPriorityRules = rules.filter((r) => r.frontmatter.priority === "high");
-  const lowPriorityRules = rules.filter((r) => r.frontmatter.priority === "low");
-
-  if (highPriorityRules.length > 0) {
-    lines.push("## High Priority Guidelines");
+  if (rule.frontmatter.globs.length > 0) {
+    lines.push(`**Applies to files:** ${rule.frontmatter.globs.join(", ")}`);
     lines.push("");
-    lines.push("These are critical rules that should always be followed:");
-    lines.push("");
-    for (const rule of highPriorityRules) {
-      lines.push(...formatRuleForCline(rule));
-    }
   }
 
-  if (lowPriorityRules.length > 0) {
-    lines.push("## Standard Guidelines");
-    lines.push("");
-    lines.push("These are recommended practices for this project:");
-    lines.push("");
-    for (const rule of lowPriorityRules) {
-      lines.push(...formatRuleForCline(rule));
-    }
-  }
+  lines.push(rule.content);
 
   return lines.join("\n");
 }
