@@ -34,7 +34,6 @@ function generateCopilotMarkdown(rule: ParsedRule): string {
     lines.push('applyTo: "**"');
   }
   lines.push("---");
-  lines.push("");
 
   lines.push(rule.content);
 

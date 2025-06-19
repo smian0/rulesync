@@ -43,7 +43,6 @@ function generateCursorMarkdown(rule: ParsedRule): string {
 
   lines.push(`ruletype: ${ruletype}`);
   lines.push("---");
-  lines.push("");
 
   lines.push(rule.content);
 
