@@ -34,7 +34,7 @@ yarn global add rulesync
 2. **Create an overview file** (`.rulesync/overview.md`):
    ```markdown
    ---
-   ruleLevel: overview
+   root: true
    targets: ["*"]
    description: "Project overview and development philosophy"
    globs: ["src/**/*.ts", "src/**/*.js"]
@@ -54,7 +54,7 @@ yarn global add rulesync
 3. **Create detail rules** (`.rulesync/coding-rules.md`):
    ```markdown
    ---
-   ruleLevel: detail
+   root: false
    targets: ["copilot", "cursor", "cline"]
    description: "TypeScript coding standards and best practices"
    globs: ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.jsx"]
@@ -180,19 +180,19 @@ globs: ["**/*.ts", "**/*.tsx"]
 
 rulesync uses a two-level rule system:
 
-- **overview**: Project-wide overview and policies
-  - Only **one** overview file is allowed per project
+- **root: true**: Project-wide overview and policies
+  - Only **one** root file is allowed per project
   - Contains high-level guidelines and project context
-- **detail**: Specific implementation rules and detailed guidelines
-  - Multiple detail files are allowed
+- **root: false**: Specific implementation rules and detailed guidelines
+  - Multiple non-root files are allowed
   - Contains specific coding rules, naming conventions, etc.
 
 #### Tool-Specific Behavior
 
 Each AI tool handles rule levels differently:
 
-| Tool | Overview Rules | Detail Rules | Special Behavior |
-|------|---------------|--------------|------------------|
+| Tool | Root Rules | Non-Root Rules | Special Behavior |
+|------|------------|----------------|------------------|
 | **Claude Code** | `./CLAUDE.md` | `.claude/memories/*.md` | CLAUDE.md includes `@filename` references to detail files |
 | **Cursor** | `ruletype: always` | `ruletype: autoattached` | Detail rules without globs use `ruletype: agentrequested` |
 | **GitHub Copilot** | Standard format | Standard format | All rules use same format with frontmatter |
@@ -250,12 +250,12 @@ rulesync gitignore
 
 ```
 .rulesync/
-├── overview.md          # Project overview (required, only one)
-├── coding-rules.md      # Coding rules (detail)
-├── naming-conventions.md # Naming conventions (detail)
-├── architecture.md      # Architecture guidelines (detail)  
-├── security.md          # Security rules (detail)
-└── custom.md           # Project-specific rules (detail)
+├── overview.md          # Project overview (root: true, only one)
+├── coding-rules.md      # Coding rules (root: false)
+├── naming-conventions.md # Naming conventions (root: false)
+├── architecture.md      # Architecture guidelines (root: false)  
+├── security.md          # Security rules (root: false)
+└── custom.md           # Project-specific rules (root: false)
 ```
 
 ### Frontmatter Schema
@@ -264,19 +264,19 @@ Each rule file must include frontmatter with the following fields:
 
 ```yaml
 ---
-ruleLevel: overview | detail  # Required: Rule level
-targets: ["*"]               # Required: Target tools (* = all, or specific tools)
-description: "Brief description"  # Required: Rule description
+root: true | false               # Required: Rule level (true for overview, false for details)
+targets: ["*"]                   # Required: Target tools (* = all, or specific tools)
+description: "Brief description" # Required: Rule description
 globs: ["**/*.ts", "**/*.js"]    # Required: File patterns (can be empty array)
 ---
 ```
 
 ### Example Files
 
-**Overview file** (`.rulesync/overview.md`):
+**Root file** (`.rulesync/overview.md`):
 ```markdown
 ---
-ruleLevel: overview
+root: true
 targets: ["*"]
 description: "Project overview and development philosophy"
 globs: ["src/**/*.ts"]
@@ -287,10 +287,10 @@ globs: ["src/**/*.ts"]
 This project follows TypeScript-first development with clean architecture principles.
 ```
 
-**Detail file** (`.rulesync/coding-rules.md`):
+**Non-root file** (`.rulesync/coding-rules.md`):
 ```markdown
 ---
-ruleLevel: detail
+root: false
 targets: ["copilot", "cursor"]
 description: "TypeScript coding standards"
 globs: ["**/*.ts", "**/*.tsx"]
@@ -308,9 +308,9 @@ globs: ["**/*.ts", "**/*.tsx"]
 | Tool | Output Path | Format | Rule Level Handling |
 |------|------------|--------|-------------------|
 | **GitHub Copilot** | `.github/instructions/*.instructions.md` | Front Matter + Markdown | Both levels use same format |
-| **Cursor** | `.cursor/rules/*.md` | MDC (YAML header + Markdown) | Overview: `ruletype: always`<br>Detail: `ruletype: autoattached`<br>Detail without globs: `ruletype: agentrequested` |
+| **Cursor** | `.cursor/rules/*.md` | MDC (YAML header + Markdown) | Root: `ruletype: always`<br>Non-root: `ruletype: autoattached`<br>Non-root without globs: `ruletype: agentrequested` |
 | **Cline** | `.clinerules/*.md` | Plain Markdown | Both levels use same format |
-| **Claude Code** | `./CLAUDE.md` (overview)<br>`.claude/memories/*.md` (detail) | Plain Markdown | Overview goes to CLAUDE.md<br>Details go to separate memory files<br>CLAUDE.md includes `@filename` references |
+| **Claude Code** | `./CLAUDE.md` (root)<br>`.claude/memories/*.md` (non-root) | Plain Markdown | Root goes to CLAUDE.md<br>Non-root go to separate memory files<br>CLAUDE.md includes `@filename` references |
 
 ## Validation
 
@@ -321,7 +321,7 @@ rulesync validate
 ```
 
 Common validation rules:
-- Only one overview file is allowed per project
+- Only one root file (root: true) is allowed per project
 - All frontmatter fields are required and properly formatted
 - File patterns (globs) use valid syntax
 - Target tools are recognized values
