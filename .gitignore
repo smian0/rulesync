@@ -169,6 +169,7 @@ pnpm-lock.yaml
 
 CLAUDE.md
 .claude/memories
+.github/copilot-instructions.md
 .github/instructions
 .cursor
 .clinerules
