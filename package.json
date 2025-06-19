@@ -1,6 +1,6 @@
 {
 	"name": "rulesync",
-	"version": "0.11.0",
+	"version": "0.10.0",
 	"description": "Unified AI rules management CLI tool that generates configuration files for various AI development tools",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
@@ -14,10 +14,12 @@
 	"scripts": {
 		"dev": "tsx src/cli/index.ts",
 		"build": "tsup src/cli/index.ts --format cjs,esm --dts --clean",
-		"lint": "biome lint --write src/",
+		"lint": "biome lint src/",
+		"lint:fix": "biome lint --write src/",
 		"format": "biome format --write src/",
 		"format:check": "biome format src/",
-		"check": "biome check --write src/",
+		"check": "biome check src/",
+		"check:fix": "biome check --write src/",
 		"secretlint": "secretlint \"**/*\"",
 		"test": "vitest",
 		"test:watch": "vitest --watch",
