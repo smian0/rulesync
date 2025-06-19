@@ -8,7 +8,7 @@ vi.mock("../utils/index.js");
 const mockFileExists = vi.mocked(fileExists);
 
 const createMockRule = (overrides: Partial<ParsedRule> = {}): ParsedRule => ({
-  filename: "test-rule.md",
+  filename: "test-rule",
   filepath: "/path/to/test-rule.md",
   frontmatter: {
     targets: ["*"],
@@ -38,14 +38,14 @@ describe("validateRules", () => {
 
   it("should detect duplicate filenames", async () => {
     const rules = [
-      createMockRule({ filename: "duplicate.md" }),
-      createMockRule({ filename: "duplicate.md" }),
+      createMockRule({ filename: "duplicate" }),
+      createMockRule({ filename: "duplicate" }),
     ];
 
     const result = await validateRules(rules);
 
     expect(result.isValid).toBe(false);
-    expect(result.errors).toContain("Duplicate rule filename: duplicate.md");
+    expect(result.errors).toContain("Duplicate rule filename: duplicate");
   });
 
   it("should warn about empty content", async () => {
@@ -54,7 +54,7 @@ describe("validateRules", () => {
     const result = await validateRules(rules);
 
     expect(result.isValid).toBe(true);
-    expect(result.warnings).toContain("Rule test-rule.md has empty content");
+    expect(result.warnings).toContain("Rule test-rule has empty content");
   });
 
   it("should warn about short descriptions", async () => {
@@ -72,7 +72,7 @@ describe("validateRules", () => {
     const result = await validateRules(rules);
 
     expect(result.isValid).toBe(true);
-    expect(result.warnings).toContain("Rule test-rule.md has a very short description");
+    expect(result.warnings).toContain("Rule test-rule has a very short description");
   });
 
   it("should warn about missing glob patterns", async () => {
@@ -90,7 +90,7 @@ describe("validateRules", () => {
     const result = await validateRules(rules);
 
     expect(result.isValid).toBe(true);
-    expect(result.warnings).toContain("Rule test-rule.md has no glob patterns specified");
+    expect(result.warnings).toContain("Rule test-rule has no glob patterns specified");
   });
 
   it("should error when file does not exist", async () => {
@@ -106,7 +106,7 @@ describe("validateRules", () => {
   it("should handle multiple validation issues", async () => {
     const rules = [
       createMockRule({
-        filename: "problem.md",
+        filename: "problem",
         content: "",
         frontmatter: {
           targets: ["*"],
@@ -120,9 +120,9 @@ describe("validateRules", () => {
     const result = await validateRules(rules);
 
     expect(result.warnings).toHaveLength(3);
-    expect(result.warnings).toContain("Rule problem.md has empty content");
-    expect(result.warnings).toContain("Rule problem.md has a very short description");
-    expect(result.warnings).toContain("Rule problem.md has no glob patterns specified");
+    expect(result.warnings).toContain("Rule problem has empty content");
+    expect(result.warnings).toContain("Rule problem has a very short description");
+    expect(result.warnings).toContain("Rule problem has no glob patterns specified");
   });
 
   it("should handle empty rules array", async () => {

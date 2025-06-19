@@ -24,7 +24,7 @@ describe("copilot generator", () => {
         globs: ["**/*.ts"],
       },
       content: "Use TypeScript for all new code.",
-      filename: "typescript-rule.md",
+      filename: "typescript-rule",
       filepath: "/test/typescript-rule.md",
     },
     {
@@ -35,7 +35,7 @@ describe("copilot generator", () => {
         globs: ["**/*.js"],
       },
       content: "Use camelCase for variables.",
-      filename: "naming-rule.md",
+      filename: "naming-rule",
       filepath: "/test/naming-rule.md",
     },
   ];
@@ -71,7 +71,7 @@ describe("copilot generator", () => {
           globs: [],
         },
         content: "General content",
-        filename: "general.md",
+        filename: "general",
         filepath: "/test/general.md",
       },
     ];

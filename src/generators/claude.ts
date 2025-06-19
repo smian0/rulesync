@@ -85,6 +85,10 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
 function generateMemoryFile(rule: ParsedRule): string {
   const lines: string[] = [];
   
+  lines.push("Please also refer to the following files as needed:");
+  lines.push("");
+  lines.push("---");
+  lines.push("");
   lines.push(`# ${rule.filename}`);
   lines.push("");
   

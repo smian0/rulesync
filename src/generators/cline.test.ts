@@ -16,7 +16,7 @@ const mockConfig: Config = {
 
 const mockRules: ParsedRule[] = [
   {
-    filename: "security.md",
+    filename: "security",
     filepath: "/path/to/security.md",
     frontmatter: {
       targets: ["*"],
@@ -27,7 +27,7 @@ const mockRules: ParsedRule[] = [
     content: "Always validate user input and sanitize data",
   },
   {
-    filename: "styling.md",
+    filename: "styling",
     filepath: "/path/to/styling.md",
     frontmatter: {
       targets: ["cline"],

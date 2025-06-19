@@ -9,7 +9,7 @@ export async function generateClineConfig(
 
   for (const rule of rules) {
     const content = generateClineMarkdown(rule);
-    const filepath = join(config.outputPaths.cline, `${rule.filename}`);
+    const filepath = join(config.outputPaths.cline, `${rule.filename}.md`);
 
     outputs.push({
       tool: "cline",

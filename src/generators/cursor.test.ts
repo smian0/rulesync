@@ -16,7 +16,7 @@ const mockConfig: Config = {
 
 const mockRules: ParsedRule[] = [
   {
-    filename: "overview-rule.md",
+    filename: "overview-rule",
     filepath: "/path/to/overview-rule.md",
     frontmatter: {
       targets: ["*"],
@@ -27,7 +27,7 @@ const mockRules: ParsedRule[] = [
     content: "This is an overview rule content",
   },
   {
-    filename: "detail-rule.md",
+    filename: "detail-rule",
     filepath: "/path/to/detail-rule.md",
     frontmatter: {
       targets: ["cursor"],

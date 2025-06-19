@@ -16,7 +16,7 @@ const mockConfig: Config = {
 
 const mockRules: ParsedRule[] = [
   {
-    filename: "test-rule.md",
+    filename: "test-rule",
     filepath: "/path/to/test-rule.md",
     frontmatter: {
       targets: ["*"],
@@ -27,7 +27,7 @@ const mockRules: ParsedRule[] = [
     content: "This is a test rule",
   },
   {
-    filename: "copilot-only.md",
+    filename: "copilot-only",
     filepath: "/path/to/copilot-only.md",
     frontmatter: {
       targets: ["copilot"],
@@ -38,7 +38,7 @@ const mockRules: ParsedRule[] = [
     content: "This is a copilot only rule",
   },
   {
-    filename: "claude-only.md",
+    filename: "claude-only",
     filepath: "/path/to/claude-only.md",
     frontmatter: {
       targets: ["claude"],

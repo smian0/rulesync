@@ -25,7 +25,7 @@ const mockConfig = {
 
 const mockRules = [
   {
-    filename: "test.md",
+    filename: "test",
     filepath: ".rulesync/test.md",
     frontmatter: {
       targets: ["*"],
