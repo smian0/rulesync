@@ -8,7 +8,7 @@ A Node.js CLI tool that automatically generates configuration files for various 
 ## Supported Tools
 
 - **GitHub Copilot Custom Instructions** (`.github/instructions/*.instructions.md`)
-- **Cursor Project Rules** (`.cursor/rules/*.md`) 
+- **Cursor Project Rules** (`.cursor/rules/*.mdc`) 
 - **Cline Rules** (`.clinerules/*.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
 
@@ -308,7 +308,7 @@ globs: ["**/*.ts", "**/*.tsx"]
 | Tool | Output Path | Format | Rule Level Handling |
 |------|------------|--------|-------------------|
 | **GitHub Copilot** | `.github/instructions/*.instructions.md` | Front Matter + Markdown | Both levels use same format |
-| **Cursor** | `.cursor/rules/*.md` | MDC (YAML header + Markdown) | Root: `ruletype: always`<br>Non-root: `ruletype: autoattached`<br>Non-root without globs: `ruletype: agentrequested` |
+| **Cursor** | `.cursor/rules/*.mdc` | MDC (YAML header + Markdown) | Root: `ruletype: always`<br>Non-root: `ruletype: autoattached`<br>Non-root without globs: `ruletype: agentrequested` |
 | **Cline** | `.clinerules/*.md` | Plain Markdown | Both levels use same format |
 | **Claude Code** | `./CLAUDE.md` (root)<br>`.claude/memories/*.md` (non-root) | Plain Markdown | Root goes to CLAUDE.md<br>Non-root go to separate memory files<br>CLAUDE.md includes `@filename` references |
 

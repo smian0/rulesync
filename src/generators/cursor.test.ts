@@ -45,9 +45,9 @@ describe("generateCursorConfig", () => {
 
     expect(results).toHaveLength(2);
     expect(results[0].tool).toBe("cursor");
-    expect(results[0].filepath).toBe(".cursor/rules/overview-rule.md");
+    expect(results[0].filepath).toBe(".cursor/rules/overview-rule.mdc");
     expect(results[0].content).toContain("Overview rule");
-    expect(results[1].filepath).toBe(".cursor/rules/detail-rule.md");
+    expect(results[1].filepath).toBe(".cursor/rules/detail-rule.mdc");
     expect(results[1].content).toContain("Detail rule");
   });
 
