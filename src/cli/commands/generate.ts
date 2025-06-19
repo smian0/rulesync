@@ -3,8 +3,8 @@ import type { ToolTarget } from "../../types/index.js";
 import {
   fileExists,
   getDefaultConfig,
-  removeDirectory,
   removeClaudeGeneratedFiles,
+  removeDirectory,
   writeFileContent,
 } from "../../utils/index.js";
 

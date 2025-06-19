@@ -37,6 +37,13 @@ export async function fileExists(filepath: string): Promise<boolean> {
 }
 
 export async function removeDirectory(dirPath: string): Promise<void> {
+  // Safety check: prevent deletion of dangerous paths
+  const dangerousPaths = [".", "/", "~", "src", "node_modules"];
+  if (dangerousPaths.includes(dirPath) || dirPath === "") {
+    console.warn(`Skipping deletion of dangerous path: ${dirPath}`);
+    return;
+  }
+
   try {
     if (await fileExists(dirPath)) {
       await rm(dirPath, { recursive: true, force: true });
