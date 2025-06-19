@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { generateRooConfig } from "./roo.js";
 import type { Config, ParsedRule } from "../types/index.js";
+import { generateRooConfig } from "./roo.js";
 
 describe("generateRooConfig", () => {
   const mockConfig: Config = {

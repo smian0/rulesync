@@ -14,10 +14,10 @@
 	"scripts": {
 		"dev": "tsx src/cli/index.ts",
 		"build": "tsup src/cli/index.ts --format cjs,esm --dts --clean",
-		"lint": "biome lint src/",
+		"lint": "biome lint --write src/",
 		"format": "biome format --write src/",
 		"format:check": "biome format src/",
-		"check": "biome check src/",
+		"check": "biome check --write src/",
 		"secretlint": "secretlint \"**/*\"",
 		"test": "vitest",
 		"test:watch": "vitest --watch",

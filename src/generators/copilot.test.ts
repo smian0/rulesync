@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { generateCopilotConfig } from "./copilot.js";
 import type { Config, ParsedRule } from "../types/index.js";
+import { generateCopilotConfig } from "./copilot.js";
 
 const mockConfig: Config = {
   aiRulesDir: ".rulesync",
