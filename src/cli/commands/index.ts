@@ -1,3 +1,4 @@
+export * from "./add.js";
 export * from "./generate.js";
 export * from "./gitignore.js";
 export * from "./init.js";

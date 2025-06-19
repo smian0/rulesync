@@ -31,6 +31,11 @@ yarn global add rulesync
    ```
 
 2. **Edit the generated rule files** in `.rulesync/` directory to match your project needs
+   
+   Or add new rule files:
+   ```bash
+   npx rulesync add my-custom-rules
+   ```
 
 3. **Generate tool-specific configuration files:**
    ```bash
@@ -172,6 +177,11 @@ npx rulesync generate --delete --verbose
 ```bash
 # Initialize project with sample files
 npx rulesync init
+
+# Add a new rule file
+npx rulesync add <filename>
+npx rulesync add typescript-rules
+npx rulesync add security.md  # .md extension is automatically handled
 
 # Validate rule files
 npx rulesync validate

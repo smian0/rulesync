@@ -3,6 +3,7 @@
 import { Command } from "commander";
 import type { ToolTarget } from "../types/index.js";
 import {
+  addCommand,
   generateCommand,
   gitignoreCommand,
   initCommand,
@@ -16,6 +17,8 @@ const program = new Command();
 program.name("rulesync").description("Unified AI rules management CLI tool").version("0.1.0");
 
 program.command("init").description("Initialize rulesync in current directory").action(initCommand);
+
+program.command("add <filename>").description("Add a new rule file").action(addCommand);
 
 program
   .command("gitignore")
