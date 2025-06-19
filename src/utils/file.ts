@@ -45,3 +45,30 @@ export async function removeDirectory(dirPath: string): Promise<void> {
     console.warn(`Failed to remove directory ${dirPath}:`, error);
   }
 }
+
+export async function removeFile(filepath: string): Promise<void> {
+  try {
+    if (await fileExists(filepath)) {
+      await rm(filepath);
+    }
+  } catch (error) {
+    console.warn(`Failed to remove file ${filepath}:`, error);
+  }
+}
+
+export async function removeClaudeGeneratedFiles(): Promise<void> {
+  const filesToRemove = [
+    "CLAUDE.md",
+    ".claude/memories"
+  ];
+
+  for (const fileOrDir of filesToRemove) {
+    if (fileOrDir.endsWith("/memories")) {
+      // Remove the entire memories directory
+      await removeDirectory(fileOrDir);
+    } else {
+      // Remove individual file
+      await removeFile(fileOrDir);
+    }
+  }
+}

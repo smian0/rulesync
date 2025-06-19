@@ -4,6 +4,7 @@ import {
   fileExists,
   getDefaultConfig,
   removeDirectory,
+  removeClaudeGeneratedFiles,
   writeFileContent,
 } from "../../utils/index.js";
 
@@ -61,7 +62,8 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
             deleteTasks.push(removeDirectory(config.outputPaths.cline));
             break;
           case "claude":
-            deleteTasks.push(removeDirectory(config.outputPaths.claude));
+            // Use safe deletion for Claude Code files only
+            deleteTasks.push(removeClaudeGeneratedFiles());
             break;
         }
       }
