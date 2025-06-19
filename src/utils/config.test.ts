@@ -11,7 +11,7 @@ describe("config utils", () => {
       expect(config.outputPaths.cursor).toBe(".cursor/rules");
       expect(config.outputPaths.cline).toBe(".clinerules");
       expect(config.outputPaths.claude).toBe(".");
-      expect(config.defaultTargets).toEqual(["copilot", "cursor", "cline", "claude"]);
+      expect(config.defaultTargets).toEqual(["copilot", "cursor", "cline", "claude", "roo"]);
       expect(config.watchEnabled).toBe(false);
     });
   });
@@ -21,7 +21,7 @@ describe("config utils", () => {
 
     it("should resolve * to all default targets", () => {
       const targets = resolveTargets(["*"], config);
-      expect(targets).toEqual(["copilot", "cursor", "cline", "claude"]);
+      expect(targets).toEqual(["copilot", "cursor", "cline", "claude", "roo"]);
     });
 
     it("should return specific targets as-is", () => {

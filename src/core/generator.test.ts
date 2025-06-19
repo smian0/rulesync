@@ -83,7 +83,7 @@ describe("generateConfigurations", () => {
     expect(outputs[0].tool).toBe("claude");
     expect(outputs[0].filepath).toBe("CLAUDE.md");
     expect(outputs[0].content).toContain("This is a test rule");
-    expect(outputs[0].content).toContain("@claude-only");
+    expect(outputs[0].content).toContain("@.claude/memories/claude-only.md");
     expect(outputs[0].content).not.toContain("This is a copilot only rule");
   });
 

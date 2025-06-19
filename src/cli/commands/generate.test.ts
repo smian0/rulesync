@@ -3,6 +3,7 @@ import { generateConfigurations, parseRulesFromDirectory } from "../../core/inde
 import {
   fileExists,
   getDefaultConfig,
+  removeClaudeGeneratedFiles,
   removeDirectory,
   writeFileContent,
 } from "../../utils/index.js";
@@ -17,6 +18,7 @@ const mockFileExists = vi.mocked(fileExists);
 const mockGetDefaultConfig = vi.mocked(getDefaultConfig);
 const mockWriteFileContent = vi.mocked(writeFileContent);
 const mockRemoveDirectory = vi.mocked(removeDirectory);
+const mockRemoveClaudeGeneratedFiles = vi.mocked(removeClaudeGeneratedFiles);
 
 const mockConfig = {
   aiRulesDir: ".rulesync",
@@ -25,8 +27,9 @@ const mockConfig = {
     cursor: ".cursor/rules",
     cline: ".clinerules",
     claude: ".",
+    roo: ".roo/rules",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claude"],
+  defaultTargets: ["copilot", "cursor", "cline", "claude", "roo"],
   watchEnabled: false,
 } as const;
 
@@ -61,6 +64,7 @@ describe("generateCommand", () => {
     mockGenerateConfigurations.mockResolvedValue(mockOutputs);
     mockWriteFileContent.mockResolvedValue();
     mockRemoveDirectory.mockResolvedValue();
+    mockRemoveClaudeGeneratedFiles.mockResolvedValue();
 
     // Mock console methods
     vi.spyOn(console, "log").mockImplementation(() => {});
@@ -137,7 +141,7 @@ describe("generateCommand", () => {
     expect(mockRemoveDirectory).toHaveBeenCalledWith(".github/instructions");
     expect(mockRemoveDirectory).toHaveBeenCalledWith(".cursor/rules");
     expect(mockRemoveDirectory).toHaveBeenCalledWith(".clinerules");
-    expect(mockRemoveDirectory).toHaveBeenCalledWith(".");
+    expect(mockRemoveDirectory).toHaveBeenCalledWith(".roo/rules");
   });
 
   it("should delete only specified tool directories when --delete option is used with specific tools", async () => {
@@ -146,7 +150,7 @@ describe("generateCommand", () => {
     expect(mockRemoveDirectory).toHaveBeenCalledWith(".github/instructions");
     expect(mockRemoveDirectory).toHaveBeenCalledWith(".cursor/rules");
     expect(mockRemoveDirectory).not.toHaveBeenCalledWith(".clinerules");
-    expect(mockRemoveDirectory).not.toHaveBeenCalledWith(".");
+    expect(mockRemoveDirectory).not.toHaveBeenCalledWith(".roo/rules");
   });
 
   it("should show verbose output when deleting directories", async () => {

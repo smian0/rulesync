@@ -50,8 +50,8 @@ describe("claude generator", () => {
     expect(outputs[0].filepath).toBe("CLAUDE.md");
     expect(outputs[0].content).toContain("# Claude Code Memory - Project Instructions");
     expect(outputs[0].content).toContain("Generated from rulesync configuration");
-    expect(outputs[0].content).toContain("@architecture-rule");
-    expect(outputs[0].content).toContain("@naming-rule");
+    expect(outputs[0].content).toContain("@.claude/memories/architecture-rule.md");
+    expect(outputs[0].content).toContain("@.claude/memories/naming-rule.md");
   });
 
   it("should separate overview and detail rules", async () => {
@@ -59,8 +59,8 @@ describe("claude generator", () => {
 
     // Main CLAUDE.md should contain overview rules and memory references
     expect(outputs[0].content).toContain("typescript-rule");
-    expect(outputs[0].content).toContain("@architecture-rule");
-    expect(outputs[0].content).toContain("@naming-rule");
+    expect(outputs[0].content).toContain("@.claude/memories/architecture-rule.md");
+    expect(outputs[0].content).toContain("@.claude/memories/naming-rule.md");
 
     // Detail rules should be in separate memory files
     expect(outputs[1].filepath).toBe(".claude/memories/architecture-rule.md");

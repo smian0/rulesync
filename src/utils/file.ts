@@ -64,10 +64,7 @@ export async function removeFile(filepath: string): Promise<void> {
 }
 
 export async function removeClaudeGeneratedFiles(): Promise<void> {
-  const filesToRemove = [
-    "CLAUDE.md",
-    ".claude/memories"
-  ];
+  const filesToRemove = ["CLAUDE.md", ".claude/memories"];
 
   for (const fileOrDir of filesToRemove) {
     if (fileOrDir.endsWith("/memories")) {

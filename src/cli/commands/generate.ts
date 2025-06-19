@@ -65,6 +65,9 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
             // Use safe deletion for Claude Code files only
             deleteTasks.push(removeClaudeGeneratedFiles());
             break;
+          case "roo":
+            deleteTasks.push(removeDirectory(config.outputPaths.roo));
+            break;
         }
       }
 
