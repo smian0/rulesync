@@ -1,60 +1,60 @@
 ---
 root: false
 targets: ['*']
-description: "ファイル生成とMarkdown処理のベストプラクティス"
+description: "File generation and Markdown processing best practices"
 globs: ["src/generators/**/*.ts", "src/core/parser.ts", "src/utils/file.ts"]
 ---
 
-# ファイル生成とMarkdown処理
+# File Generation and Markdown Processing
 
-## gray-matter処理
+## gray-matter Processing
 
-### Frontmatter解析
-- YAML frontmatterのみサポート
-- 必須フィールドの検証を実装
-- 型安全な解析結果を保証
+### Frontmatter Parsing
+- Support YAML frontmatter only
+- Implement validation of required fields
+- Guarantee type-safe parsing results
 
-### 検証ルール
-- `root`: boolean型、必須
-- `targets`: 配列型、"*"または有効なツール名のみ
-- `description`: 非空文字列、必須
-- `globs`: 文字列配列、空配列も許可
+### Validation Rules
+- `root`: boolean type, required
+- `targets`: array type, "*" or valid tool names only
+- `description`: non-empty string, required
+- `globs`: string array, empty arrays allowed
 
-## 各ツールの生成規約
+## Generation Conventions for Each Tool
 
 ### GitHub Copilot
-- `.github/instructions/`ディレクトリに出力
-- ファイル名：`{ルール名}.instructions.md`
-- frontmatterの`applyTo`フィールドでglobパターン指定
+- Output to `.github/instructions/` directory
+- Filename: `{rule-name}.instructions.md`
+- Specify glob patterns in frontmatter's `applyTo` field
 
 ### Cursor
-- `.cursor/rules/`ディレクトリに出力
-- ファイル名：`{ルール名}.md`
-- 本文内で追加ファイル参照（`@filename`）の使用可能
+- Output to `.cursor/rules/` directory
+- Filename: `{rule-name}.md`
+- Can use additional file references (`@filename`) in content
 
 ### Cline
-- `.clinerules/`ディレクトリに出力
-- ファイル名：`{ルール名}.md`
-- プレーンMarkdown形式
+- Output to `.clinerules/` directory
+- Filename: `{rule-name}.md`
+- Plain Markdown format
 
 ### Claude Code
-- `CLAUDE.md`への統合形式
-- `@{ルール名}`でインポート可能な形式
+- Integrated format into `CLAUDE.md`
+- Format importable with `@{rule-name}`
 
-## ファイルI/O規約
+## File I/O Conventions
 
-### ディレクトリ作成
-- 出力先ディレクトリが存在しない場合は自動作成
-- 権限エラーを適切にハンドリング
+### Directory Creation
+- Automatically create output directory if it doesn't exist
+- Properly handle permission errors
 
-### 文字エンコーディング
-- UTF-8エンコーディングを使用
-- 改行コードはLF（\n）に統一
+### Character Encoding
+- Use UTF-8 encoding
+- Unify line endings to LF (\n)
 
-### 原子的操作
-- 一時ファイルに書き込み後、リネームで原子的更新
-- 書き込み失敗時の部分更新を防止
+### Atomic Operations
+- Write to temporary file, then rename for atomic updates
+- Prevent partial updates on write failures
 
-### バックアップ
-- 既存ファイルを上書きする際のバックアップは作成しない
-- Gitによるバージョン管理を前提
+### Backup
+- Do not create backups when overwriting existing files
+- Assume Git version control

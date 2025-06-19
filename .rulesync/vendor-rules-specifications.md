@@ -9,7 +9,7 @@ globs: []
 
 ## GitHub Copilot Custom Instructions
 
-https://code.visualstudio.com/docs/copilot/copilot-customization#_use-instructionsmd-files
+https://code.visualstudio.com/docs/copilot/copilot-customization
 
 ### Overview
 A mechanism to provide custom instructions to GitHub Copilot in VS Code. Automatically applied to chat requests.
@@ -88,40 +88,40 @@ alwaysApply: false
 
 https://docs.cline.bot/features/cline-rules
 
-### 概要
-Clineプロジェクトやコンバセーションに「システムレベルのガイダンス」を提供する仕組み。
+### Overview
+A mechanism to provide "system-level guidance" to Cline projects and conversations.
 
-### ファイル形式
-- **配置場所**: `.clinerules/`ディレクトリまたは`Documents/Cline/Rules`
-- **ファイル形式**: Markdownファイル
+### File Format
+- **Location**: `.clinerules/` directory or `Documents/Cline/Rules`
+- **File Format**: Markdown files
 
-### 作成方法
-1. Rulesタブの「+」ボタンをクリック
-2. チャットで`/newrule`スラッシュコマンドを使用
-3. 手動でMarkdownファイルを作成
+### Creation Methods
+1. Click the "+" button in Rules tab
+2. Use `/newrule` slash command in chat
+3. Manually create Markdown files
 
-### ファイル構造のベストプラクティス
-- 明確で簡潔な言語を使用
-- 期待する結果に焦点を当てる
-- 関心事別にルールを整理（例：ドキュメント、コーディング標準）
-- 数値プレフィックスでファイル順序を制御（オプション）
+### File Structure Best Practices
+- Use clear and concise language
+- Focus on expected results
+- Organize rules by concern (e.g., documentation, coding standards)
+- Control file order with numeric prefixes (optional)
 
-### フォルダシステムの特徴
-- `.clinerules/`内に複数のルールファイルをサポート
-- 非アクティブなルールセットを「rules bank」として維持可能
-- コンテキスト固有のルール有効化をサポート
-- プロジェクトコンテキスト間の簡単な切り替えが可能
+### Folder System Features
+- Support multiple rule files within `.clinerules/`
+- Can maintain inactive rule sets as "rules bank"
+- Support context-specific rule activation
+- Easy switching between project contexts
 
-### 高度な管理機能
-- Cline v3.13でトグル可能なポップオーバーUIを導入
-- アクティブなルールの瞬時表示・切り替えが可能
-- クイックルールファイル作成・管理機能
+### Advanced Management Features
+- Cline v3.13 introduces toggleable popover UI
+- Instant display and switching of active rules
+- Quick rule file creation and management functionality
 
-### 実装のヒント
-- 個別ルールファイルは焦点を絞る
-- 分かりやすいファイル名を使用
-- アクティブな`.clinerules/`フォルダのgit-ignoreを検討
-- ルール組み合わせ用のチームスクリプトを作成
+### Implementation Tips
+- Individual rule files should be focused
+- Use descriptive file names
+- Consider git-ignoring active `.clinerules/` folder
+- Create team scripts for rule combinations
 
 ## Roo Code Rules
 

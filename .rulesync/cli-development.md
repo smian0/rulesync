@@ -1,53 +1,53 @@
 ---
 root: false
 targets: ['*']
-description: "CLIツール開発の指針とCommander.js使用規約"
+description: "CLI tool development guidelines and Commander.js usage conventions"
 globs: ["src/cli/**/*.ts"]
 ---
 
-# CLIツール開発指針
+# CLI Tool Development Guidelines
 
-## Commander.js使用規約
+## Commander.js Usage Conventions
 
-### コマンド構造
-- 各コマンドは`src/cli/commands/`に個別ファイルとして配置
-- コマンド名は小文字ケバブケース（例：`generate`, `init`, `watch`）
-- サブコマンドよりもフラグオプションを優先
+### Command Structure
+- Each command is placed as an individual file in `src/cli/commands/`
+- Command names use lowercase kebab-case (e.g., `generate`, `init`, `watch`)
+- Prioritize flag options over subcommands
 
-### オプション定義
-- 短縮形と長縮形の両方を提供（例：`-o, --output`）
-- デフォルト値は設定ファイルまたは環境変数から取得
-- 必須オプションは最小限に抑制
+### Option Definitions
+- Provide both short and long forms (e.g., `-o, --output`)
+- Obtain default values from configuration files or environment variables
+- Minimize required options
 
-### ヘルプメッセージ
-- 各コマンドに明確な説明を追加
-- 使用例を含める
-- オプションの説明は簡潔かつ具体的に
+### Help Messages
+- Add clear descriptions to each command
+- Include usage examples
+- Keep option descriptions concise and specific
 
-## エラーハンドリング
+## Error Handling
 
-### 終了コード
-- 成功時：0
-- 一般的なエラー：1
-- 設定エラー：2
-- ファイルI/Oエラー：3
+### Exit Codes
+- Success: 0
+- General error: 1
+- Configuration error: 2
+- File I/O error: 3
 
-### エラーメッセージ
-- ユーザーが理解しやすい言語を使用
-- 解決策の提案を含める
-- 技術的な詳細はデバッグモードでのみ表示
+### Error Messages
+- Use user-friendly language
+- Include solution suggestions
+- Show technical details only in debug mode
 
-## ユーザビリティ
+## Usability
 
-### 進行状況表示
-- 長時間の処理にはプログレスバーまたはスピナーを表示
-- ファイル処理の進捗状況を表示
+### Progress Display
+- Show progress bars or spinners for long-running processes
+- Display file processing progress
 
-### 設定ファイル
-- `.rulesync/config.json`で設定をカスタマイズ可能
-- デフォルト設定で即座に使用開始できる設計
+### Configuration Files
+- Customizable settings via `.rulesync/config.json`
+- Designed for immediate use with default settings
 
-### 出力形式
-- 標準出力：成功メッセージと結果
-- 標準エラー：エラーメッセージとデバッグ情報
-- `--quiet`フラグで出力を抑制
+### Output Format
+- Standard output: success messages and results
+- Standard error: error messages and debug information
+- Suppress output with `--quiet` flag

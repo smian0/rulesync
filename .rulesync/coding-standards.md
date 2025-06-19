@@ -1,62 +1,62 @@
 ---
 root: false
 targets: ['*']
-description: "TypeScript/Node.jsコーディング規約とベストプラクティス"
+description: "TypeScript/Node.js coding standards and best practices"
 globs: ["src/**/*.ts", "src/**/*.js", "**/*.test.ts"]
 ---
 
-# コーディング規約とベストプラクティス
+# Coding Standards and Best Practices
 
-## TypeScript規約
+## TypeScript Standards
 
-### 型安全性の徹底
-- 常に明示的な型定義を使用
-- `any`は禁止、代わりに`unknown`を使用
-- `noUncheckedIndexedAccess`設定に従い、配列・オブジェクトアクセスではundefinedチェックを実施
-- `exactOptionalPropertyTypes`設定に従い、オプショナルプロパティの型を厳密に定義
+### Strict Type Safety
+- Always use explicit type definitions
+- Prohibit `any`, use `unknown` instead
+- Follow `noUncheckedIndexedAccess` setting, perform undefined checks for array/object access
+- Follow `exactOptionalPropertyTypes` setting, strictly define optional property types
 
-### 関数・変数の命名
-- camelCase形式を使用
-- 関数名は動詞から開始（例：`parseRuleFile`, `generateOutput`）
-- 定数は`UPPER_SNAKE_CASE`
-- 型定義は`PascalCase`
+### Function and Variable Naming
+- Use camelCase format
+- Function names start with verbs (e.g., `parseRuleFile`, `generateOutput`)
+- Constants use `UPPER_SNAKE_CASE`
+- Type definitions use `PascalCase`
 
-### インポート・エクスポート
-- Named exportを優先（default exportは避ける）
-- 相対インポートよりも絶対インポートを使用
-- インポートの順序：Node.js内蔵 → 外部ライブラリ → 内部モジュール
+### Import/Export
+- Prioritize named exports (avoid default exports)
+- Use absolute imports over relative imports
+- Import order: Node.js built-in → external libraries → internal modules
 
-## コードスタイル（Biome設定準拠）
+## Code Style (Biome Configuration Compliant)
 
-### フォーマット
-- インデント：スペース2個
-- 行幅：100文字
-- セミコロン：必須
-- クォート：ダブルクォート
-- 末尾カンマ：ES5形式
+### Formatting
+- Indentation: 2 spaces
+- Line width: 100 characters
+- Semicolons: required
+- Quotes: double quotes
+- Trailing commas: ES5 format
 
-### 関数定義
-- アロー関数よりも通常の関数宣言を優先
-- 非同期処理は`async/await`を使用（Promiseチェーンは避ける）
+### Function Definitions
+- Prioritize regular function declarations over arrow functions
+- Use `async/await` for asynchronous processing (avoid Promise chains)
 
-## エラーハンドリング
+## Error Handling
 
-### 例外処理
-- カスタムエラーメッセージを提供
-- ファイルパスや具体的な値を含める
-- 早期リターンパターンを活用
+### Exception Handling
+- Provide custom error messages
+- Include file paths and specific values
+- Utilize early return patterns
 
-### 検証
-- 関数の入力値は必ず検証
-- 型ガードを使用してランタイム安全性を確保
+### Validation
+- Always validate function input values
+- Use type guards to ensure runtime safety
 
-## テストコード
+## Test Code
 
-### 構造
-- `*.test.ts`形式でテストファイルを作成
-- 各関数に対応するテストケースを作成
-- 正常ケース・異常ケースの両方をカバー
+### Structure
+- Create test files in `*.test.ts` format
+- Create test cases corresponding to each function
+- Cover both normal and error cases
 
-### 命名
-- テスト関数名は`should + 期待動作`形式
-- 具体的で理解しやすい名前を使用
+### Naming
+- Test function names follow `should + expected behavior` format
+- Use specific and understandable names

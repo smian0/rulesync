@@ -1,34 +1,34 @@
 ---
 root: true
 targets: ['*']
-description: "rulesyncプロジェクトの概要とアーキテクチャガイド"
+description: "rulesync project overview and architecture guide"
 globs: ["src/**/*.ts"]
 ---
 
-# rulesyncプロジェクト概要
+# rulesync Project Overview
 
-rulesyncは複数のAI開発ツール（GitHub Copilot、Cursor、Cline、Claude Code）に対応した統一AI設定管理CLIツールです。
+rulesync is a unified AI configuration management CLI tool that supports multiple AI development tools (GitHub Copilot, Cursor, Cline, Claude Code).
 
-## 核心アーキテクチャ
+## Core Architecture
 
-### 主要コンポーネント
-- **CLI エントリーポイント**: `src/cli/index.ts` - Commander.jsを使用
-- **コアパース処理**: `src/core/parser.ts` - gray-matterでfrontmatter処理
-- **生成エンジン**: `src/core/generator.ts` - ツール別設定ファイル生成の統括
-- **ツール特化ジェネレータ**: `src/generators/` - 各AIツール向けのMarkdown生成
+### Main Components
+- **CLI Entry Point**: `src/cli/index.ts` - Uses Commander.js
+- **Core Parsing**: `src/core/parser.ts` - Frontmatter processing with gray-matter
+- **Generation Engine**: `src/core/generator.ts` - Orchestrates tool-specific configuration file generation
+- **Tool-Specific Generators**: `src/generators/` - Markdown generation for each AI tool
 
-### 設計パターン
-- **TypeScript strict mode**: `noUncheckedIndexedAccess`と`exactOptionalPropertyTypes`を有効化
-- **ESMとCJS二重出力**: tsupでdist/index.js（CJS）とdist/index.mjs（ESM）を生成
-- **関数型アプローチ**: 純粋関数を優先し、副作用を最小限に抑制
-- **エラーハンドリング**: 具体的なエラーメッセージと型安全性を重視
+### Design Patterns
+- **TypeScript strict mode**: Enable `noUncheckedIndexedAccess` and `exactOptionalPropertyTypes`
+- **Dual ESM/CJS output**: Generate dist/index.js (CJS) and dist/index.mjs (ESM) with tsup
+- **Functional approach**: Prioritize pure functions and minimize side effects
+- **Error handling**: Emphasize specific error messages and type safety
 
-### 入力データ構造
+### Input Data Structure
 ```typescript
 type RuleFrontmatter = {
-  root: boolean;           // ルートレベルかどうか
-  targets: ["*"] | ToolTarget[]; // 対象ツール指定
-  description: string;     // ルールの簡潔な説明
-  globs: string[];        // 適用ファイルパターン
+  root: boolean;           // Whether it's root level
+  targets: ["*"] | ToolTarget[]; // Target tool specification
+  description: string;     // Concise rule description
+  globs: string[];        // File patterns to apply
 }
 ```
