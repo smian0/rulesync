@@ -46,7 +46,7 @@ describe("claude generator", () => {
     const output = await generateClaudeConfig(mockRules, config);
 
     expect(output.tool).toBe("claude");
-    expect(output.filepath).toBe("./CLAUDE.md");
+    expect(output.filepath).toBe("CLAUDE.md");
     expect(output.content).toContain("# Claude Code Memory - Project Instructions");
     expect(output.content).toContain("Generated from rulesync configuration");
     expect(output.content).toContain("## Critical Rules");

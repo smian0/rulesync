@@ -1,11 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { generateCopilotConfig } from "../../src/generators/copilot.js";
-import type { ParsedRule } from "../../src/types/index.js";
-import { getDefaultConfig } from "../../src/utils/config.js";
+import { generateCopilotConfig } from "./copilot.js";
+import type { Config, ParsedRule } from "../types/index.js";
+
+const mockConfig: Config = {
+  aiRulesDir: ".rulesync",
+  outputPaths: {
+    copilot: ".github/instructions",
+    cursor: ".cursor/rules",
+    cline: ".clinerules",
+    claude: "."
+  },
+  defaultTargets: ["copilot", "cursor", "cline"],
+  watchEnabled: false,
+};
 
 describe("copilot generator", () => {
-  const config = getDefaultConfig();
-
   const mockRules: ParsedRule[] = [
     {
       frontmatter: {
@@ -15,7 +24,7 @@ describe("copilot generator", () => {
         globs: ["**/*.ts"],
       },
       content: "Use TypeScript for all new code.",
-      filename: "typescript-rule",
+      filename: "typescript-rule.md",
       filepath: "/test/typescript-rule.md",
     },
     {
@@ -26,47 +35,56 @@ describe("copilot generator", () => {
         globs: ["**/*.js"],
       },
       content: "Use camelCase for variables.",
-      filename: "naming-rule",
+      filename: "naming-rule.md",
       filepath: "/test/naming-rule.md",
     },
   ];
 
-  it("should generate copilot configuration", async () => {
-    const output = await generateCopilotConfig(mockRules, config);
+  it("should generate separate files for each rule", async () => {
+    const outputs = await generateCopilotConfig(mockRules, mockConfig);
 
-    expect(output.tool).toBe("copilot");
-    expect(output.filepath).toBe(".github/instructions/rulesync.instructions.md");
-    expect(output.content).toContain("---");
-    expect(output.content).toContain('description: "AI rules configuration for GitHub Copilot"');
-    expect(output.content).toContain('applyTo: "**"');
-    expect(output.content).toContain("# GitHub Copilot Instructions");
-    expect(output.content).toContain("## High Priority Rules");
-    expect(output.content).toContain("## Standard Rules");
+    expect(outputs).toHaveLength(2);
+    expect(outputs[0].tool).toBe("copilot");
+    expect(outputs[0].filepath).toBe(".github/instructions/typescript-rule.instructions.md");
+    expect(outputs[1].filepath).toBe(".github/instructions/naming-rule.instructions.md");
   });
 
-  it("should sort rules by priority", async () => {
-    const output = await generateCopilotConfig(mockRules, config);
+  it("should include frontmatter with description and applyTo", async () => {
+    const outputs = await generateCopilotConfig(mockRules, mockConfig);
 
-    // High priority should come before low priority
-    const highPriorityIndex = output.content.indexOf("typescript-rule");
-    const lowPriorityIndex = output.content.indexOf("naming-rule");
-
-    expect(highPriorityIndex).toBeLessThan(lowPriorityIndex);
+    expect(outputs[0].content).toContain('description: "High priority coding rule"');
+    expect(outputs[0].content).toContain('applyTo: "**/*.ts"');
+    expect(outputs[0].content).toContain("Use TypeScript for all new code.");
+    
+    expect(outputs[1].content).toContain('description: "Low priority naming rule"');
+    expect(outputs[1].content).toContain('applyTo: "**/*.js"');
+    expect(outputs[1].content).toContain("Use camelCase for variables.");
   });
 
-  it("should include rule metadata", async () => {
-    const output = await generateCopilotConfig([mockRules[0]], config);
+  it("should handle rules without globs", async () => {
+    const rulesWithoutGlobs: ParsedRule[] = [
+      {
+        frontmatter: {
+          priority: "medium",
+          targets: ["copilot"],
+          description: "General rule",
+          globs: [],
+        },
+        content: "General content",
+        filename: "general.md",
+        filepath: "/test/general.md",
+      },
+    ];
 
-    expect(output.content).toContain("**Description:** High priority coding rule");
-    expect(output.content).toContain("**Applies to:** **/*.ts");
-    expect(output.content).toContain("Use TypeScript for all new code.");
+    const outputs = await generateCopilotConfig(rulesWithoutGlobs, mockConfig);
+    
+    expect(outputs).toHaveLength(1);
+    expect(outputs[0].content).toContain('applyTo: "**"');
   });
 
   it("should handle empty rules array", async () => {
-    const output = await generateCopilotConfig([], config);
+    const outputs = await generateCopilotConfig([], mockConfig);
 
-    expect(output.content).toContain("# GitHub Copilot Instructions");
-    expect(output.content).not.toContain("## High Priority Rules");
-    expect(output.content).not.toContain("## Standard Rules");
+    expect(outputs).toHaveLength(0);
   });
 });

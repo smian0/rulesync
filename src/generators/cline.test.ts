@@ -8,6 +8,7 @@ const mockConfig: Config = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
+    claude: "."
   },
   defaultTargets: ["copilot", "cursor", "cline"],
   watchEnabled: false,
@@ -39,68 +40,34 @@ const mockRules: ParsedRule[] = [
 ];
 
 describe("generateClineConfig", () => {
-  it("should generate cline configuration with correct structure", async () => {
-    const result = await generateClineConfig(mockRules, mockConfig);
+  it("should generate separate files for each rule", async () => {
+    const results = await generateClineConfig(mockRules, mockConfig);
 
-    expect(result.tool).toBe("cline");
-    expect(result.filepath).toBe(".clinerules/01-rulesync.md");
-    expect(result.content).toContain("# Cline AI Assistant Rules");
+    expect(results).toHaveLength(2);
+    expect(results[0].tool).toBe("cline");
+    expect(results[0].filepath).toBe(".clinerules/security.md");
+    expect(results[1].filepath).toBe(".clinerules/styling.md");
   });
 
-  it("should separate high and low priority rules", async () => {
-    const result = await generateClineConfig(mockRules, mockConfig);
+  it("should include rule descriptions as headers", async () => {
+    const results = await generateClineConfig(mockRules, mockConfig);
 
-    expect(result.content).toContain("## High Priority Guidelines");
-    expect(result.content).toContain("## Standard Guidelines");
+    expect(results[0].content).toContain("# Security best practices");
+    expect(results[1].content).toContain("# Code styling guidelines");
   });
 
-  it("should sort rules by priority (high first)", async () => {
-    const result = await generateClineConfig(mockRules, mockConfig);
+  it("should include file patterns when present", async () => {
+    const results = await generateClineConfig(mockRules, mockConfig);
 
-    const highSectionIndex = result.content.indexOf("## High Priority Guidelines");
-    const standardSectionIndex = result.content.indexOf("## Standard Guidelines");
-
-    expect(highSectionIndex).toBeLessThan(standardSectionIndex);
+    expect(results[0].content).toContain("**Applies to files:** **/*.ts, **/*.js");
+    expect(results[1].content).toContain("**Applies to files:** **/*.css");
   });
 
-  it("should include rule descriptions and content", async () => {
-    const result = await generateClineConfig(mockRules, mockConfig);
+  it("should include rule content", async () => {
+    const results = await generateClineConfig(mockRules, mockConfig);
 
-    expect(result.content).toContain("Security best practices");
-    expect(result.content).toContain("Always validate user input and sanitize data");
-    expect(result.content).toContain("Code styling guidelines");
-    expect(result.content).toContain("Use consistent indentation and naming conventions");
-  });
-
-  it("should include file patterns", async () => {
-    const result = await generateClineConfig(mockRules, mockConfig);
-
-    expect(result.content).toContain("**/*.ts, **/*.js");
-    expect(result.content).toContain("**/*.css");
-  });
-
-  it("should handle only high priority rules", async () => {
-    const highPriorityOnly = mockRules.filter((r) => r.frontmatter.priority === "high");
-    const result = await generateClineConfig(highPriorityOnly, mockConfig);
-
-    expect(result.content).toContain("## High Priority Guidelines");
-    expect(result.content).not.toContain("## Standard Guidelines");
-  });
-
-  it("should handle only low priority rules", async () => {
-    const lowPriorityOnly = mockRules.filter((r) => r.frontmatter.priority === "low");
-    const result = await generateClineConfig(lowPriorityOnly, mockConfig);
-
-    expect(result.content).not.toContain("## High Priority Guidelines");
-    expect(result.content).toContain("## Standard Guidelines");
-  });
-
-  it("should handle empty rules", async () => {
-    const result = await generateClineConfig([], mockConfig);
-
-    expect(result.content).toContain("# Cline AI Assistant Rules");
-    expect(result.content).not.toContain("## High Priority Guidelines");
-    expect(result.content).not.toContain("## Standard Guidelines");
+    expect(results[0].content).toContain("Always validate user input and sanitize data");
+    expect(results[1].content).toContain("Use consistent indentation and naming conventions");
   });
 
   it("should handle rules without globs", async () => {
@@ -118,9 +85,17 @@ describe("generateClineConfig", () => {
       },
     ];
 
-    const result = await generateClineConfig(rulesWithoutGlobs, mockConfig);
+    const results = await generateClineConfig(rulesWithoutGlobs, mockConfig);
 
-    expect(result.content).toContain("General guidelines");
-    expect(result.content).not.toContain("**Applies to files:**");
+    expect(results).toHaveLength(1);
+    expect(results[0].content).toContain("# General guidelines");
+    expect(results[0].content).not.toContain("**Applies to files:**");
+    expect(results[0].content).toContain("General content");
+  });
+
+  it("should handle empty rules array", async () => {
+    const results = await generateClineConfig([], mockConfig);
+
+    expect(results).toHaveLength(0);
   });
 });

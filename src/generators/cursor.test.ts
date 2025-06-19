@@ -8,6 +8,7 @@ const mockConfig: Config = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
+    claude: "."
   },
   defaultTargets: ["copilot", "cursor", "cline"],
   watchEnabled: false,
@@ -39,62 +40,62 @@ const mockRules: ParsedRule[] = [
 ];
 
 describe("generateCursorConfig", () => {
-  it("should generate cursor configuration with correct structure", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
+  it("should generate separate files for each rule", async () => {
+    const results = await generateCursorConfig(mockRules, mockConfig);
 
-    expect(result.tool).toBe("cursor");
-    expect(result.filepath).toBe(".cursor/rules/rulesync.md");
-    expect(result.content).toContain("# Cursor IDE Rules");
+    expect(results).toHaveLength(2);
+    expect(results[0].tool).toBe("cursor");
+    expect(results[0].filepath).toBe(".cursor/rules/high-priority.md");
+    expect(results[0].content).toContain("High priority rule");
+    expect(results[1].filepath).toBe(".cursor/rules/low-priority.md");
+    expect(results[1].content).toContain("Low priority rule");
   });
 
-  it("should sort rules by priority (high first)", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
-
-    const highPriorityIndex = result.content.indexOf("high-priority.md");
-    const lowPriorityIndex = result.content.indexOf("low-priority.md");
-
-    expect(highPriorityIndex).toBeLessThan(lowPriorityIndex);
-  });
-
-  it("should include priority badges", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
-
-    expect(result.content).toContain("🔴 HIGH");
-    expect(result.content).toContain("🟡 STANDARD");
-  });
-
-  it("should include file patterns in globs", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
-
-    expect(result.content).toContain('globs: ["**/*.ts", "**/*.js"]');
-    expect(result.content).toContain('globs: ["**/*.md"]');
-  });
-
-  it("should set alwaysApply correctly based on priority", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
-
-    expect(result.content).toContain("alwaysApply: true");
-    expect(result.content).toContain("alwaysApply: false");
-  });
-
-  it("should handle empty rules", async () => {
-    const result = await generateCursorConfig([], mockConfig);
-
-    expect(result.content).toContain("# Cursor IDE Rules");
-    expect(result.content).not.toContain("🔴 HIGH");
-  });
-
-  it("should include rule descriptions", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
-
-    expect(result.content).toContain("High priority rule");
-    expect(result.content).toContain("Low priority rule");
+  it("should include frontmatter with description and globs", async () => {
+    const results = await generateCursorConfig(mockRules, mockConfig);
+    
+    expect(results[0].content).toContain("description: High priority rule");
+    expect(results[0].content).toContain('globs: ["**/*.ts", "**/*.js"]');
+    expect(results[0].content).toContain("alwaysApply: true");
+    
+    expect(results[1].content).toContain("description: Low priority rule");
+    expect(results[1].content).toContain('globs: ["**/*.md"]');
+    expect(results[1].content).toContain("alwaysApply: false");
   });
 
   it("should include rule content", async () => {
-    const result = await generateCursorConfig(mockRules, mockConfig);
+    const results = await generateCursorConfig(mockRules, mockConfig);
+    
+    expect(results[0].content).toContain("This is a high priority rule content");
+    expect(results[1].content).toContain("This is a low priority rule content");
+  });
 
-    expect(result.content).toContain("This is a high priority rule content");
-    expect(result.content).toContain("This is a low priority rule content");
+  it("should handle rules without globs", async () => {
+    const rulesWithoutGlobs: ParsedRule[] = [
+      {
+        filename: "no-globs.md",
+        filepath: "/path/to/no-globs.md",
+        frontmatter: {
+          targets: ["cursor"],
+          priority: "medium",
+          description: "Rule without globs",
+          globs: [],
+        },
+        content: "Content without globs",
+      },
+    ];
+
+    const results = await generateCursorConfig(rulesWithoutGlobs, mockConfig);
+    
+    expect(results).toHaveLength(1);
+    expect(results[0].content).toContain("description: Rule without globs");
+    expect(results[0].content).not.toContain("globs:");
+    expect(results[0].content).toContain("alwaysApply: false");
+  });
+
+  it("should handle empty rules array", async () => {
+    const results = await generateCursorConfig([], mockConfig);
+    
+    expect(results).toHaveLength(0);
   });
 });
