@@ -1,6 +1,11 @@
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
 import type { ToolTarget } from "../../types/index.js";
-import { fileExists, getDefaultConfig, removeDirectory, writeFileContent } from "../../utils/index.js";
+import {
+  fileExists,
+  getDefaultConfig,
+  removeDirectory,
+  writeFileContent,
+} from "../../utils/index.js";
 
 export interface GenerateOptions {
   tools?: ToolTarget[];
@@ -40,10 +45,10 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
       if (options.verbose) {
         console.log("Deleting existing output directories...");
       }
-      
+
       const targetTools = options.tools || config.defaultTargets;
       const deleteTasks = [];
-      
+
       for (const tool of targetTools) {
         switch (tool) {
           case "copilot":
@@ -60,9 +65,9 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
             break;
         }
       }
-      
+
       await Promise.all(deleteTasks);
-      
+
       if (options.verbose) {
         console.log("Deleted existing output directories");
       }

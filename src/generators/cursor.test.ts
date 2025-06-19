@@ -8,7 +8,7 @@ const mockConfig: Config = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
-    claude: "."
+    claude: ".",
   },
   defaultTargets: ["copilot", "cursor", "cline"],
   watchEnabled: false,
@@ -53,11 +53,11 @@ describe("generateCursorConfig", () => {
 
   it("should include frontmatter with description and globs", async () => {
     const results = await generateCursorConfig(mockRules, mockConfig);
-    
+
     expect(results[0].content).toContain("description: Overview rule");
     expect(results[0].content).toContain('globs: ["**/*.ts", "**/*.js"]');
     expect(results[0].content).toContain("ruletype: always");
-    
+
     expect(results[1].content).toContain("description: Detail rule");
     expect(results[1].content).toContain('globs: ["**/*.md"]');
     expect(results[1].content).toContain("ruletype: autoattached");
@@ -65,7 +65,7 @@ describe("generateCursorConfig", () => {
 
   it("should include rule content", async () => {
     const results = await generateCursorConfig(mockRules, mockConfig);
-    
+
     expect(results[0].content).toContain("This is an overview rule content");
     expect(results[1].content).toContain("This is a detail rule content");
   });
@@ -86,7 +86,7 @@ describe("generateCursorConfig", () => {
     ];
 
     const results = await generateCursorConfig(rulesWithoutGlobs, mockConfig);
-    
+
     expect(results).toHaveLength(1);
     expect(results[0].content).toContain("description: Rule without globs");
     expect(results[0].content).not.toContain("globs:");
@@ -95,7 +95,7 @@ describe("generateCursorConfig", () => {
 
   it("should handle empty rules array", async () => {
     const results = await generateCursorConfig([], mockConfig);
-    
+
     expect(results).toHaveLength(0);
   });
 });

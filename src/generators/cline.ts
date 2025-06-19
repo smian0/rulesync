@@ -36,4 +36,3 @@ function generateClineMarkdown(rule: ParsedRule): string {
 
   return lines.join("\n");
 }
-

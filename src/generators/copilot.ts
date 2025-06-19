@@ -40,4 +40,3 @@ function generateCopilotMarkdown(rule: ParsedRule): string {
 
   return lines.join("\n");
 }
-

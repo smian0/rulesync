@@ -8,7 +8,7 @@ const mockConfig: Config = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
-    claude: "."
+    claude: ".",
   },
   defaultTargets: ["copilot", "cursor", "cline"],
   watchEnabled: false,

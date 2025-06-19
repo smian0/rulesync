@@ -8,7 +8,7 @@ const mockConfig: Config = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
-    claude: "."
+    claude: ".",
   },
   defaultTargets: ["copilot", "cursor", "cline"],
   watchEnabled: false,
@@ -55,7 +55,7 @@ describe("copilot generator", () => {
     expect(outputs[0].content).toContain('description: "Overview coding rule"');
     expect(outputs[0].content).toContain('applyTo: "**/*.ts"');
     expect(outputs[0].content).toContain("Use TypeScript for all new code.");
-    
+
     expect(outputs[1].content).toContain('description: "Detail naming rule"');
     expect(outputs[1].content).toContain('applyTo: "**/*.js"');
     expect(outputs[1].content).toContain("Use camelCase for variables.");
@@ -77,7 +77,7 @@ describe("copilot generator", () => {
     ];
 
     const outputs = await generateCopilotConfig(rulesWithoutGlobs, mockConfig);
-    
+
     expect(outputs).toHaveLength(1);
     expect(outputs[0].content).toContain('applyTo: "**"');
   });

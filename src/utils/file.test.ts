@@ -1,6 +1,13 @@
 import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { ensureDir, fileExists, findFiles, readFileContent, removeDirectory, writeFileContent } from "./file.js";
+import {
+  ensureDir,
+  fileExists,
+  findFiles,
+  readFileContent,
+  removeDirectory,
+  writeFileContent,
+} from "./file.js";
 
 vi.mock("node:fs/promises");
 
@@ -154,7 +161,7 @@ describe("file utilities", () => {
     it("should handle removal errors gracefully", async () => {
       mockStat.mockResolvedValue({} as never);
       mockRm.mockRejectedValue(new Error("Permission denied"));
-      
+
       const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
 
       await removeDirectory("/path/to/dir");
@@ -164,7 +171,7 @@ describe("file utilities", () => {
         "Failed to remove directory /path/to/dir:",
         expect.any(Error)
       );
-      
+
       consoleSpy.mockRestore();
     });
   });

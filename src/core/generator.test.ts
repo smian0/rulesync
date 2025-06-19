@@ -70,7 +70,7 @@ describe("generateConfigurations", () => {
   it("should filter rules correctly for each tool", async () => {
     const outputs = await generateConfigurations(mockRules, mockConfig, ["copilot"]);
 
-    const allContent = outputs.map(o => o.content).join(' ');
+    const allContent = outputs.map((o) => o.content).join(" ");
     expect(allContent).toContain("This is a test rule");
     expect(allContent).toContain("This is a copilot only rule");
     expect(allContent).not.toContain("This is a claude only rule");

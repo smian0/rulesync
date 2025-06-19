@@ -30,7 +30,7 @@ function generateCursorMarkdown(rule: ParsedRule): string {
   if (rule.frontmatter.globs.length > 0) {
     lines.push(`globs: [${rule.frontmatter.globs.map((g) => `"${g}"`).join(", ")}]`);
   }
-  
+
   // Determine ruletype based on ruleLevel and globs
   let ruletype: string;
   if (rule.frontmatter.ruleLevel === "overview") {
@@ -40,7 +40,7 @@ function generateCursorMarkdown(rule: ParsedRule): string {
   } else {
     ruletype = "autoattached";
   }
-  
+
   lines.push(`ruletype: ${ruletype}`);
   lines.push("---");
   lines.push("");
@@ -49,4 +49,3 @@ function generateCursorMarkdown(rule: ParsedRule): string {
 
   return lines.join("\n");
 }
-

@@ -34,7 +34,7 @@ describe("gitignoreCommand", () => {
 
   it("should append rules to existing .gitignore", async () => {
     const existingContent = "node_modules/\n*.log\n";
-    
+
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(existingContent);
 
@@ -58,7 +58,7 @@ describe("gitignoreCommand", () => {
 .clinerules/
 CLAUDE.md
 `;
-    
+
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(existingContent);
 
@@ -72,7 +72,7 @@ CLAUDE.md
     const existingContent = `node_modules/
 .github/instructions/
 `;
-    
+
     mockExistsSync.mockReturnValue(true);
     mockReadFileSync.mockReturnValue(existingContent);
 

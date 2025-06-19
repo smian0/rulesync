@@ -8,8 +8,8 @@ export async function generateClaudeConfig(
   const outputs: GeneratedOutput[] = [];
 
   // Separate overview and detail rules
-  const overviewRules = rules.filter(r => r.frontmatter.ruleLevel === "overview");
-  const detailRules = rules.filter(r => r.frontmatter.ruleLevel === "detail");
+  const overviewRules = rules.filter((r) => r.frontmatter.ruleLevel === "overview");
+  const detailRules = rules.filter((r) => r.frontmatter.ruleLevel === "detail");
 
   // Generate CLAUDE.md with overview rule and references to detail files
   const claudeMdContent = generateClaudeMarkdown(overviewRules, detailRules);
@@ -65,7 +65,7 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
 
   lines.push(`### ${rule.filename}`);
   lines.push("");
-  
+
   if (rule.frontmatter.description) {
     lines.push(`**Description:** ${rule.frontmatter.description}`);
     lines.push("");
@@ -84,14 +84,14 @@ function formatRuleForClaude(rule: ParsedRule): string[] {
 
 function generateMemoryFile(rule: ParsedRule): string {
   const lines: string[] = [];
-  
+
   lines.push("Please also refer to the following files as needed:");
   lines.push("");
   lines.push("---");
   lines.push("");
   lines.push(`# ${rule.filename}`);
   lines.push("");
-  
+
   if (rule.frontmatter.description) {
     lines.push(`**Description:** ${rule.frontmatter.description}`);
     lines.push("");
@@ -103,6 +103,6 @@ function generateMemoryFile(rule: ParsedRule): string {
   }
 
   lines.push(rule.content);
-  
+
   return lines.join("\n");
 }

@@ -1,6 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
-import { fileExists, getDefaultConfig, removeDirectory, writeFileContent } from "../../utils/index.js";
+import {
+  fileExists,
+  getDefaultConfig,
+  removeDirectory,
+  writeFileContent,
+} from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
 
 vi.mock("../../core/index.js");
