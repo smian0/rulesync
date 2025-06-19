@@ -37,27 +37,3 @@ function generateClineMarkdown(rule: ParsedRule): string {
   return lines.join("\n");
 }
 
-function formatRuleForCline(rule: ParsedRule): string[] {
-  const lines: string[] = [];
-
-  lines.push(`### ${rule.filename}`);
-  lines.push("");
-
-  lines.push(`**Description:** ${rule.frontmatter.description}`);
-  lines.push("");
-
-  if (rule.frontmatter.globs.length > 0) {
-    lines.push(`**Applies to files:** ${rule.frontmatter.globs.join(", ")}`);
-    lines.push("");
-  }
-
-  // Add the actual rule content with clear formatting
-  lines.push("**Guidelines:**");
-  lines.push("");
-  lines.push(rule.content);
-  lines.push("");
-  lines.push("---");
-  lines.push("");
-
-  return lines;
-}

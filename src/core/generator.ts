@@ -21,9 +21,9 @@ export async function generateConfigurations(
       continue;
     }
 
-    const output = await generateForTool(tool, relevantRules, config);
-    if (output) {
-      outputs.push(output);
+    const toolOutputs = await generateForTool(tool, relevantRules, config);
+    if (toolOutputs) {
+      outputs.push(...toolOutputs);
     }
   }
 
@@ -41,7 +41,7 @@ async function generateForTool(
   tool: ToolTarget,
   rules: ParsedRule[],
   config: Config
-): Promise<GeneratedOutput | null> {
+): Promise<GeneratedOutput[] | null> {
   switch (tool) {
     case "copilot":
       return generateCopilotConfig(rules, config);
@@ -50,7 +50,7 @@ async function generateForTool(
     case "cline":
       return generateClineConfig(rules, config);
     case "claude":
-      return generateClaudeConfig(rules, config);
+      return [generateClaudeConfig(rules, config)];
     default:
       console.warn(`Unknown tool: ${tool}`);
       return null;
