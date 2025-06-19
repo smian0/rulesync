@@ -11,6 +11,8 @@ export const gitignoreCommand = async (): Promise<void> => {
     ".cursor/rules/",
     ".clinerules/",
     "CLAUDE.md",
+    ".claude/memories/",
+    ".roo/rules/",
   ];
 
   let gitignoreContent = "";

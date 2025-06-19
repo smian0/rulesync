@@ -1,1 +1,1 @@
-カバレッジが60%以上になるまでテストコードを追加してください。
+Add test code until coverage reaches 60% or higher.

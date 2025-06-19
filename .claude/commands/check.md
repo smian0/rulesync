@@ -1,4 +1,4 @@
-以下を実行し、FAILする場合はPASSするまで修正してください。s
+Execute the following commands and fix any failures until they PASS:
 
 - `pnpm lint`
 - `pnpm format`

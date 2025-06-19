@@ -172,30 +172,30 @@ A mechanism to provide custom instructions to Roo Code for personalized behavior
 
 https://docs.anthropic.com/en/docs/claude-code/memory
 
-### 概要
-Claude Codeにプロジェクトやユーザー固有のコンテキストと指示を提供するメモリシステム。
+### Overview
+A memory system that provides project-specific and user-specific context and instructions to Claude Code.
 
-### メモリの種類
-1. **プロジェクトメモリ** (`./CLAUDE.md`): チーム共有のプロジェクト指示
-2. **ユーザーメモリ** (`~/.claude/CLAUDE.md`): 全プロジェクト共通の個人設定
-3. **プロジェクトメモリ（ローカル）**: 非推奨
+### Memory Types
+1. **Project Memory** (`./CLAUDE.md`): Team-shared project instructions
+2. **User Memory** (`~/.claude/CLAUDE.md`): Personal settings common to all projects
+3. **Project Memory (Local)**: Deprecated
 
-### 主要特徴
-- Claude Code起動時に自動的にロード
-- `@path/to/import`構文で他ファイルをインポート可能
-- 相対・絶対パスでのインポートをサポート
-- 最大インポート深度は5ホップ
+### Key Features
+- Automatically loaded when Claude Code starts
+- Can import other files using `@path/to/import` syntax
+- Supports relative and absolute path imports
+- Maximum import depth is 5 hops
 
-### メモリファイルのベストプラクティス
-- 具体的な指示を記載
-- 箇条書きを使った構造化Markdownを使用
-- 説明的な見出しの下に整理
-- 定期的にレビュー・更新
+### Memory File Best Practices
+- Include specific instructions
+- Use structured Markdown with bullet points
+- Organize under descriptive headings
+- Review and update regularly
 
-### クイック追加機能
-- 行頭の`#`でメモリを素早く追加
-- `/memory`コマンドでシステムエディタでメモリファイルを編集
+### Quick Add Features
+- Quick memory addition with `#` at the beginning of lines
+- Edit memory files with system editor using `/memory` command
 
-### 検索メカニズム
-- 現在の作業ディレクトリからルートまで再帰的に検索
-- 特定ファイル領域を読み取る際にサブツリー内のCLAUDE.mdファイルを発見
+### Search Mechanism
+- Recursive search from current working directory to root
+- Discover CLAUDE.md files in subtrees when reading specific file regions

@@ -1,6 +1,6 @@
-プロジェクト全体と照らし合わせて、以下のドキュメントに更新すべき点があればしてください。
+Review the entire project and update the following documents if there are any points that need to be updated:
 
 - README.md
-  - このツールのユーザー向け。使い方や仕様を中心に。
+  - For users of this tool. Focus on usage and specifications.
 - CONTRIBUTING.md
-  - このツールの開発者向け。プロジェクト構成や依存関係、開発環境のセットアップやテスト方法を中心に。
+  - For developers of this tool. Focus on project structure, dependencies, development environment setup, and testing methods.
