@@ -219,7 +219,7 @@ npx rulesync gitignore
 root: true | false               # 必須: ルールレベル (概要の場合true、詳細の場合false)
 targets: ["*"]                   # 必須: ターゲットツール (* = すべて、または特定のツール)
 description: "簡潔な説明"        # 必須: ルールの説明
-globs: ["**/*.ts", "**/*.js"]    # 必須: ファイルパターン (空の配列可)
+globs: "**/*.ts,**/*.js"          # 必須: ファイルパターン (カンマ区切りまたは空文字列)
 ---
 ```
 
@@ -231,7 +231,7 @@ globs: ["**/*.ts", "**/*.js"]    # 必須: ファイルパターン (空の配�
 root: true
 targets: ["*"]
 description: "プロジェクト概要と開発思想"
-globs: ["src/**/*.ts"]
+globs: "src/**/*.ts"
 ---
 
 # プロジェクト開発ガイドライン
@@ -245,7 +245,7 @@ globs: ["src/**/*.ts"]
 root: false
 targets: ["copilot", "cursor", "roo"]
 description: "TypeScriptコーディング標準"
-globs: ["**/*.ts", "**/*.tsx"]
+globs: "**/*.ts,**/*.tsx"
 ---
 
 # TypeScriptコーディングルール

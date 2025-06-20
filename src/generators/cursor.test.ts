@@ -55,11 +55,11 @@ describe("generateCursorConfig", () => {
     const results = await generateCursorConfig(mockRules, mockConfig);
 
     expect(results[0].content).toContain("description: Overview rule");
-    expect(results[0].content).toContain('globs: ["**/*.ts", "**/*.js"]');
+    expect(results[0].content).toContain("globs: **/*.ts,**/*.js");
     expect(results[0].content).toContain("ruletype: always");
 
     expect(results[1].content).toContain("description: Detail rule");
-    expect(results[1].content).toContain('globs: ["**/*.md"]');
+    expect(results[1].content).toContain("globs: **/*.md");
     expect(results[1].content).toContain("ruletype: autoattached");
   });
 

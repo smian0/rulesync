@@ -219,7 +219,7 @@ Each rule file must include frontmatter with the following fields:
 root: true | false               # Required: Rule level (true for overview, false for details)
 targets: ["*"]                   # Required: Target tools (* = all, or specific tools)
 description: "Brief description" # Required: Rule description
-globs: ["**/*.ts", "**/*.js"]    # Required: File patterns (can be empty array)
+globs: "**/*.ts,**/*.js"          # Required: File patterns (comma-separated or empty string)
 ---
 ```
 
@@ -231,7 +231,7 @@ globs: ["**/*.ts", "**/*.js"]    # Required: File patterns (can be empty array)
 root: true
 targets: ["*"]
 description: "Project overview and development philosophy"
-globs: ["src/**/*.ts"]
+globs: "src/**/*.ts"
 ---
 
 # Project Development Guidelines
@@ -245,7 +245,7 @@ This project follows TypeScript-first development with clean architecture princi
 root: false
 targets: ["copilot", "cursor", "roo"]
 description: "TypeScript coding standards"
-globs: ["**/*.ts", "**/*.tsx"]
+globs: "**/*.ts,**/*.tsx"
 ---
 
 # TypeScript Coding Rules

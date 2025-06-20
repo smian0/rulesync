@@ -28,7 +28,7 @@ function generateCursorMarkdown(rule: ParsedRule): string {
   lines.push("---");
   lines.push(`description: ${rule.frontmatter.description}`);
   if (rule.frontmatter.globs.length > 0) {
-    lines.push(`globs: [${rule.frontmatter.globs.map((g) => `"${g}"`).join(", ")}]`);
+    lines.push(`globs: ${rule.frontmatter.globs.join(",")}`);
   }
 
   // Determine ruletype based on root and globs
