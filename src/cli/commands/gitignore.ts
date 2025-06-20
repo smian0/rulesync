@@ -13,6 +13,14 @@ export const gitignoreCommand = async (): Promise<void> => {
     "CLAUDE.md",
     ".claude/memories/",
     ".roo/rules/",
+    "# Support for --base-dir option (any depth)",
+    "**/.github/copilot-instructions.md",
+    "**/.github/instructions/",
+    "**/.cursor/rules/",
+    "**/.clinerules/",
+    "**/CLAUDE.md",
+    "**/.claude/memories/",
+    "**/.roo/rules/",
   ];
 
   let gitignoreContent = "";
