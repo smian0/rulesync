@@ -80,7 +80,12 @@ describe("generateCommand", () => {
 
     expect(mockFileExists).toHaveBeenCalledWith(".rulesync");
     expect(mockParseRulesFromDirectory).toHaveBeenCalledWith(".rulesync");
-    expect(mockGenerateConfigurations).toHaveBeenCalledWith(mockRules, mockConfig, undefined, process.cwd());
+    expect(mockGenerateConfigurations).toHaveBeenCalledWith(
+      mockRules,
+      mockConfig,
+      undefined,
+      process.cwd()
+    );
     expect(mockWriteFileContent).toHaveBeenCalledWith(
       ".github/instructions/test.md",
       "Generated content"
@@ -122,7 +127,12 @@ describe("generateCommand", () => {
   it("should handle specific tools option", async () => {
     await generateCommand({ tools: ["copilot"] });
 
-    expect(mockGenerateConfigurations).toHaveBeenCalledWith(mockRules, mockConfig, ["copilot"], process.cwd());
+    expect(mockGenerateConfigurations).toHaveBeenCalledWith(
+      mockRules,
+      mockConfig,
+      ["copilot"],
+      process.cwd()
+    );
   });
 
   it("should handle errors gracefully", async () => {

@@ -12,7 +12,9 @@ export async function generateCopilotConfig(
   for (const rule of rules) {
     const content = generateCopilotMarkdown(rule);
     const baseFilename = rule.filename.replace(/\.md$/, "");
-    const outputDir = baseDir ? join(baseDir, config.outputPaths.copilot) : config.outputPaths.copilot;
+    const outputDir = baseDir
+      ? join(baseDir, config.outputPaths.copilot)
+      : config.outputPaths.copilot;
     const filepath = join(outputDir, `${baseFilename}.instructions.md`);
 
     outputs.push({

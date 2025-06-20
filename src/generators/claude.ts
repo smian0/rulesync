@@ -14,7 +14,9 @@ export async function generateClaudeConfig(
 
   // Generate CLAUDE.md with root rule and references to detail files
   const claudeMdContent = generateClaudeMarkdown(rootRules, detailRules);
-  const claudeOutputDir = baseDir ? join(baseDir, config.outputPaths.claude) : config.outputPaths.claude;
+  const claudeOutputDir = baseDir
+    ? join(baseDir, config.outputPaths.claude)
+    : config.outputPaths.claude;
   outputs.push({
     tool: "claude",
     filepath: join(claudeOutputDir, "CLAUDE.md"),

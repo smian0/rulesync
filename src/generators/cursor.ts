@@ -10,7 +10,9 @@ export async function generateCursorConfig(
 
   for (const rule of rules) {
     const content = generateCursorMarkdown(rule);
-    const outputDir = baseDir ? join(baseDir, config.outputPaths.cursor) : config.outputPaths.cursor;
+    const outputDir = baseDir
+      ? join(baseDir, config.outputPaths.cursor)
+      : config.outputPaths.cursor;
     const filepath = join(outputDir, `${rule.filename}.mdc`);
 
     outputs.push({
