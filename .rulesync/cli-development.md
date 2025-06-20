@@ -50,4 +50,25 @@ globs: ["src/cli/**/*.ts"]
 ### Output Format
 - Standard output: success messages and results
 - Standard error: error messages and debug information
-- Suppress output with `--quiet` flag
+- Use emoji and colors for better UX (✅ ❌ ⚠️ 📁 🎯)
+- Verbose mode with `--verbose` flag for detailed output
+
+## Modern CLI Best Practices
+
+### Tool Integration
+- Support for monorepo workflows with `--base-dir` option
+- File watching capabilities with `chokidar`
+- Atomic file operations to prevent corruption
+- Git integration awareness
+
+### Performance Considerations
+- Lazy loading of heavy dependencies
+- Efficient file operations with streaming
+- Parallel processing where applicable
+- Memory-efficient parsing for large files
+
+### Developer Experience
+- Rich help text with examples
+- Auto-completion friendly command structure
+- Comprehensive error messages with suggestions
+- Status and validation commands for debugging
