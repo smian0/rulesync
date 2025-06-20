@@ -95,8 +95,8 @@ describe("statusCommand", () => {
 
     expect(console.log).toHaveBeenCalledWith("\n🎯 Target tool coverage:");
     expect(console.log).toHaveBeenCalledWith("   - Copilot: 2 rules"); // rule1 (*) + rule2 (copilot)
-    expect(console.log).toHaveBeenCalledWith("   - Cursor: 2 rules");  // rule1 (*) + rule2 (cursor)
-    expect(console.log).toHaveBeenCalledWith("   - Cline: 1 rules");   // rule1 (*) only
+    expect(console.log).toHaveBeenCalledWith("   - Cursor: 2 rules"); // rule1 (*) + rule2 (cursor)
+    expect(console.log).toHaveBeenCalledWith("   - Cline: 1 rules"); // rule1 (*) only
   });
 
   it("should check generated files status", async () => {
@@ -118,7 +118,9 @@ describe("statusCommand", () => {
   it("should show generate suggestion when rules exist", async () => {
     await statusCommand();
 
-    expect(console.log).toHaveBeenCalledWith("\n💡 Run 'rulesync generate' to update configuration files");
+    expect(console.log).toHaveBeenCalledWith(
+      "\n💡 Run 'rulesync generate' to update configuration files"
+    );
   });
 
   it("should not show generate suggestion when no rules exist", async () => {
@@ -127,7 +129,9 @@ describe("statusCommand", () => {
     await statusCommand();
 
     expect(console.log).toHaveBeenCalledWith("\n📋 Rules: 0 total");
-    expect(console.log).not.toHaveBeenCalledWith("\n💡 Run 'rulesync generate' to update configuration files");
+    expect(console.log).not.toHaveBeenCalledWith(
+      "\n💡 Run 'rulesync generate' to update configuration files"
+    );
   });
 
   it("should handle parsing errors gracefully", async () => {

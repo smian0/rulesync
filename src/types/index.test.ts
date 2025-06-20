@@ -69,7 +69,7 @@ describe("types/index", () => {
 
   it("should validate ToolTarget type constraints", () => {
     const validTargets: ToolTarget[] = ["copilot", "cursor", "cline", "claude", "roo"];
-    
+
     for (const target of validTargets) {
       expect(["copilot", "cursor", "cline", "claude", "roo"]).toContain(target);
     }

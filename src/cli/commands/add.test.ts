@@ -45,7 +45,7 @@ describe("addCommand", () => {
     expect(mockMkdir).toHaveBeenCalledWith(".rulesync", { recursive: true });
     expect(mockWriteFile).toHaveBeenCalledWith(
       path.join(".rulesync", "test-rule.md"),
-      expect.stringContaining('root: false'),
+      expect.stringContaining("root: false"),
       "utf8"
     );
     expect(console.log).toHaveBeenCalledWith(
@@ -69,7 +69,9 @@ describe("addCommand", () => {
 
     expect(mockWriteFile).toHaveBeenCalledWith(
       expect.any(String),
-      expect.stringMatching(/---\nroot: false\ntargets: \["\*"\]\ndescription: "Rules for typescript-rules"\nglobs: \[\]\n---\n\n# Typescript-rules Rules\n\nAdd your rules here\.\n/),
+      expect.stringMatching(
+        /---\nroot: false\ntargets: \["\*"\]\ndescription: "Rules for typescript-rules"\nglobs: \[\]\n---\n\n# Typescript-rules Rules\n\nAdd your rules here\.\n/
+      ),
       "utf8"
     );
   });

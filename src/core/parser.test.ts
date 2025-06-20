@@ -1,6 +1,6 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { beforeEach, afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { parseRuleFile, parseRulesFromDirectory } from "../../src/core/parser.js";
 
 const testDir = join(process.cwd(), "test-tmp");
@@ -259,7 +259,7 @@ globs: ["**/*.ts"]
 
     it("should handle directory with no markdown files", async () => {
       writeFileSync(join(testDir, "test.txt"), "Not markdown");
-      
+
       const rules = await parseRulesFromDirectory(testDir);
 
       expect(rules).toEqual([]);

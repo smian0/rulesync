@@ -72,7 +72,9 @@ describe("validateCommand", () => {
     mockFileExists.mockResolvedValue(false);
 
     await expect(validateCommand()).rejects.toThrow("process.exit called");
-    expect(console.error).toHaveBeenCalledWith("❌ .rulesync directory not found. Run 'rulesync init' first.");
+    expect(console.error).toHaveBeenCalledWith(
+      "❌ .rulesync directory not found. Run 'rulesync init' first."
+    );
   });
 
   it("should warn if no rules found", async () => {

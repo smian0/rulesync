@@ -28,7 +28,9 @@ describe("initCommand", () => {
     expect(console.log).toHaveBeenCalledWith("✅ rulesync initialized successfully!");
     expect(console.log).toHaveBeenCalledWith("\nNext steps:");
     expect(console.log).toHaveBeenCalledWith("1. Edit rule files in .rulesync/");
-    expect(console.log).toHaveBeenCalledWith("2. Run 'rulesync generate' to create configuration files");
+    expect(console.log).toHaveBeenCalledWith(
+      "2. Run 'rulesync generate' to create configuration files"
+    );
   });
 
   it("should create sample files", async () => {
@@ -72,37 +74,39 @@ describe("initCommand", () => {
 
     expect(mockWriteFileContent).not.toHaveBeenCalled();
     expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/coding-rules.md (already exists)");
-    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/naming-conventions.md (already exists)");
+    expect(console.log).toHaveBeenCalledWith(
+      "Skipped .rulesync/naming-conventions.md (already exists)"
+    );
     expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/architecture.md (already exists)");
   });
 
   it("should create proper content for root file", async () => {
     await initCommand();
 
-    const codingRulesCall = mockWriteFileContent.mock.calls.find(call => 
+    const codingRulesCall = mockWriteFileContent.mock.calls.find((call) =>
       call[0].includes("coding-rules.md")
     );
     expect(codingRulesCall).toBeDefined();
-    expect(codingRulesCall![1]).toContain("root: true");
-    expect(codingRulesCall![1]).toContain('targets: ["*"]');
-    expect(codingRulesCall![1]).toContain("General coding standards");
+    expect(codingRulesCall?.[1]).toContain("root: true");
+    expect(codingRulesCall?.[1]).toContain('targets: ["*"]');
+    expect(codingRulesCall?.[1]).toContain("General coding standards");
   });
 
   it("should create proper content for non-root files", async () => {
     await initCommand();
 
-    const namingCall = mockWriteFileContent.mock.calls.find(call => 
+    const namingCall = mockWriteFileContent.mock.calls.find((call) =>
       call[0].includes("naming-conventions.md")
     );
     expect(namingCall).toBeDefined();
-    expect(namingCall![1]).toContain("root: false");
-    expect(namingCall![1]).toContain("camelCase");
+    expect(namingCall?.[1]).toContain("root: false");
+    expect(namingCall?.[1]).toContain("camelCase");
 
-    const archCall = mockWriteFileContent.mock.calls.find(call => 
+    const archCall = mockWriteFileContent.mock.calls.find((call) =>
       call[0].includes("architecture.md")
     );
     expect(archCall).toBeDefined();
-    expect(archCall![1]).toContain("root: false");
-    expect(archCall![1]).toContain('targets: ["copilot", "cursor"]');
+    expect(archCall?.[1]).toContain("root: false");
+    expect(archCall?.[1]).toContain('targets: ["copilot", "cursor"]');
   });
 });
