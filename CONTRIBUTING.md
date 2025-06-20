@@ -2,6 +2,8 @@
 
 We welcome contributions to rulesync! This document outlines the process for contributing and how to get started.
 
+**English** | [日本語](./CONTRIBUTING.ja.md)
+
 ## Getting Started
 
 1. Fork the repository

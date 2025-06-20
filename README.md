@@ -5,6 +5,8 @@
 
 A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files (`.rulesync/*.md`).
 
+**English** | [日本語](./README.ja.md)
+
 ## Supported Tools
 
 - **GitHub Copilot Custom Instructions** (`.github/copilot-instructions.md` + `.github/instructions/*.instructions.md`)

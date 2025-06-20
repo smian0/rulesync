@@ -1,11 +1,11 @@
 ---
 root: false
 targets: ['*']
-description: "ドキュメントのメンテナンス時に使います。"
+description: "Guidelines for maintaining project documentation"
 globs: ['*']
 ---
 
-以下は実装と照らし合わせて都度更新すること。また、各言語版のドキュメント同士を都度内容を翻訳して同期すること。
+The following should be updated continuously in reference to the implementation. Also, synchronize the content by translating between each language version of the documents.
 
 - README.md, README.ja.md
   - For users of this tool. Focus on usage and specifications.
