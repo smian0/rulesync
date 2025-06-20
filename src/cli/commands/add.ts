@@ -1,6 +1,6 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { getConfig } from "../../utils/config.js";
+import { getDefaultConfig } from "../../utils/config.js";
 
 /**
  * ファイル名から.md拡張子を除去
@@ -31,7 +31,7 @@ Add your rules here.
  */
 export async function addCommand(filename: string): Promise<void> {
   try {
-    const config = getConfig();
+    const config = getDefaultConfig();
     const sanitizedFilename = sanitizeFilename(filename);
     const rulesDir = config.aiRulesDir;
     const filePath = path.join(rulesDir, `${sanitizedFilename}.md`);
