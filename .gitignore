@@ -175,3 +175,5 @@ pnpm-lock.yaml
 CLAUDE.md
 .roo/rules/
 .claude/memories/
+
+/tmp
