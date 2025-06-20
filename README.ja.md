@@ -166,6 +166,11 @@ npx rulesync generate --copilot --cursor --delete
 # 詳細出力
 npx rulesync generate --verbose
 npx rulesync generate --delete --verbose
+
+# 特定のベースディレクトリに生成（monorepoサポート）
+npx rulesync generate --base-dir ./packages/frontend
+npx rulesync generate --base-dir ./packages/frontend,./packages/backend
+npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 ```
 
 #### 生成オプション
@@ -173,6 +178,7 @@ npx rulesync generate --delete --verbose
 - `--delete`: 新しいファイルを作成する前に既存の生成済みファイルをすべて削除
 - `--verbose`: 生成プロセス中に詳細出力を表示
 - `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: 指定されたツールのみ生成
+- `--base-dir <paths>`: 指定されたベースディレクトリに設定ファイルを生成（複数パスの場合はカンマ区切り）。異なるプロジェクトディレクトリにツール固有の設定を生成したいmonorepoセットアップに便利。
 
 ### 4. その他のコマンド
 

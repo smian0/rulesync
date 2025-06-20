@@ -205,7 +205,7 @@ type(scope): description
 ### テストの実行
 
 ```bash
-# すべてのテスト（現在77テスト）
+# すべてのテスト（現在80テスト）
 pnpm test
 
 # 開発用ウォッチモード
@@ -242,13 +242,15 @@ pnpm test src/generators/copilot.test.ts
 ```typescript
 export async function generateNewToolConfig(
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
   
   for (const rule of rules) {
     const content = generateNewToolMarkdown(rule);
-    const filepath = join(config.outputPaths.newtool, `${rule.filename}.ext`);
+    const outputDir = baseDir ? join(baseDir, config.outputPaths.newtool) : config.outputPaths.newtool;
+    const filepath = join(outputDir, `${rule.filename}.ext`);
     
     outputs.push({
       tool: "newtool",

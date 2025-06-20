@@ -166,6 +166,11 @@ npx rulesync generate --copilot --cursor --delete
 # Verbose output
 npx rulesync generate --verbose
 npx rulesync generate --delete --verbose
+
+# Generate in specific base directories (monorepo support)
+npx rulesync generate --base-dir ./packages/frontend
+npx rulesync generate --base-dir ./packages/frontend,./packages/backend
+npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 ```
 
 #### Generate Options
@@ -173,6 +178,7 @@ npx rulesync generate --delete --verbose
 - `--delete`: Remove all existing generated files before creating new ones
 - `--verbose`: Show detailed output during generation process
 - `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: Generate only for specified tools
+- `--base-dir <paths>`: Generate configuration files in specified base directories (comma-separated for multiple paths). Useful for monorepo setups where you want to generate tool-specific configurations in different project directories.
 
 ### 4. Other Commands
 

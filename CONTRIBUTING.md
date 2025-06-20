@@ -205,7 +205,7 @@ The project uses Vitest for testing with comprehensive coverage (currently 69.46
 ### Running Tests
 
 ```bash
-# All tests (77 tests currently)
+# All tests (80 tests currently)
 pnpm test
 
 # Watch mode for development
@@ -242,13 +242,15 @@ To add support for a new AI tool:
 ```typescript
 export async function generateNewToolConfig(
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
   
   for (const rule of rules) {
     const content = generateNewToolMarkdown(rule);
-    const filepath = join(config.outputPaths.newtool, `${rule.filename}.ext`);
+    const outputDir = baseDir ? join(baseDir, config.outputPaths.newtool) : config.outputPaths.newtool;
+    const filepath = join(outputDir, `${rule.filename}.ext`);
     
     outputs.push({
       tool: "newtool",
