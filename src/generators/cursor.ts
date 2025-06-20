@@ -3,13 +3,15 @@ import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
 export async function generateCursorConfig(
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 
   for (const rule of rules) {
     const content = generateCursorMarkdown(rule);
-    const filepath = join(config.outputPaths.cursor, `${rule.filename}.mdc`);
+    const outputDir = baseDir ? join(baseDir, config.outputPaths.cursor) : config.outputPaths.cursor;
+    const filepath = join(outputDir, `${rule.filename}.mdc`);
 
     outputs.push({
       tool: "cursor",

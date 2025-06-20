@@ -9,7 +9,8 @@ import { resolveTargets } from "../utils/index.js";
 export async function generateConfigurations(
   rules: ParsedRule[],
   config: Config,
-  targetTools?: ToolTarget[]
+  targetTools?: ToolTarget[],
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
   const toolsToGenerate = targetTools || config.defaultTargets;
@@ -22,7 +23,7 @@ export async function generateConfigurations(
       continue;
     }
 
-    const toolOutputs = await generateForTool(tool, relevantRules, config);
+    const toolOutputs = await generateForTool(tool, relevantRules, config, baseDir);
     if (toolOutputs) {
       outputs.push(...toolOutputs);
     }
@@ -41,19 +42,20 @@ function filterRulesForTool(rules: ParsedRule[], tool: ToolTarget, config: Confi
 async function generateForTool(
   tool: ToolTarget,
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[] | null> {
   switch (tool) {
     case "copilot":
-      return generateCopilotConfig(rules, config);
+      return generateCopilotConfig(rules, config, baseDir);
     case "cursor":
-      return generateCursorConfig(rules, config);
+      return generateCursorConfig(rules, config, baseDir);
     case "cline":
-      return generateClineConfig(rules, config);
+      return generateClineConfig(rules, config, baseDir);
     case "claude":
-      return await generateClaudeConfig(rules, config);
+      return await generateClaudeConfig(rules, config, baseDir);
     case "roo":
-      return generateRooConfig(rules, config);
+      return generateRooConfig(rules, config, baseDir);
     default:
       console.warn(`Unknown tool: ${tool}`);
       return null;

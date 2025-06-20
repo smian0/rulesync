@@ -3,7 +3,8 @@ import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
 export async function generateCopilotConfig(
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 
@@ -11,7 +12,8 @@ export async function generateCopilotConfig(
   for (const rule of rules) {
     const content = generateCopilotMarkdown(rule);
     const baseFilename = rule.filename.replace(/\.md$/, "");
-    const filepath = join(config.outputPaths.copilot, `${baseFilename}.instructions.md`);
+    const outputDir = baseDir ? join(baseDir, config.outputPaths.copilot) : config.outputPaths.copilot;
+    const filepath = join(outputDir, `${baseFilename}.instructions.md`);
 
     outputs.push({
       tool: "copilot",

@@ -3,13 +3,15 @@ import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
 export async function generateClineConfig(
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 
   for (const rule of rules) {
     const content = generateClineMarkdown(rule);
-    const filepath = join(config.outputPaths.cline, `${rule.filename}.md`);
+    const outputDir = baseDir ? join(baseDir, config.outputPaths.cline) : config.outputPaths.cline;
+    const filepath = join(outputDir, `${rule.filename}.md`);
 
     outputs.push({
       tool: "cline",

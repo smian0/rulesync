@@ -3,13 +3,15 @@ import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
 export async function generateRooConfig(
   rules: ParsedRule[],
-  config: Config
+  config: Config,
+  baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 
   for (const rule of rules) {
     const content = generateRooMarkdown(rule);
-    const filepath = join(config.outputPaths.roo, `${rule.filename}.md`);
+    const outputDir = baseDir ? join(baseDir, config.outputPaths.roo) : config.outputPaths.roo;
+    const filepath = join(outputDir, `${rule.filename}.md`);
 
     outputs.push({
       tool: "roo",

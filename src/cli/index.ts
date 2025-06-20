@@ -33,6 +33,7 @@ program
   .option("--cline", "Generate only for Cline")
   .option("--claude", "Generate only for Claude Code")
   .option("--delete", "Delete all existing files in output directories before generating")
+  .option("-b, --base-dir <paths>", "Base directories to generate files (comma-separated for multiple paths)")
   .option("-v, --verbose", "Verbose output")
   .action(async (options) => {
     const tools: ToolTarget[] = [];
@@ -41,13 +42,20 @@ program
     if (options.cline) tools.push("cline");
     if (options.claude) tools.push("claude");
 
-    const generateOptions: { verbose?: boolean; tools?: ToolTarget[]; delete?: boolean } = {
+    const generateOptions: { verbose?: boolean; tools?: ToolTarget[]; delete?: boolean; baseDirs?: string[] } = {
       verbose: options.verbose,
       delete: options.delete,
     };
 
     if (tools.length > 0) {
       generateOptions.tools = tools;
+    }
+
+    if (options.baseDir) {
+      generateOptions.baseDirs = options.baseDir
+        .split(',')
+        .map((dir: string) => dir.trim())
+        .filter((dir: string) => dir.length > 0);
     }
 
     await generateCommand(generateOptions);

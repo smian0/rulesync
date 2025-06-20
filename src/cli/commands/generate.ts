@@ -12,10 +12,12 @@ export interface GenerateOptions {
   tools?: ToolTarget[];
   verbose?: boolean;
   delete?: boolean;
+  baseDirs?: string[];
 }
 
 export async function generateCommand(options: GenerateOptions = {}): Promise<void> {
   const config = getDefaultConfig();
+  const baseDirs = options.baseDirs || [process.cwd()];
 
   console.log("Generating configuration files...");
 
@@ -39,6 +41,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
 
     if (options.verbose) {
       console.log(`Found ${rules.length} rule(s)`);
+      console.log(`Base directories: ${baseDirs.join(", ")}`);
     }
 
     // Delete existing output directories if --delete option is specified
@@ -78,21 +81,37 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
       }
     }
 
-    // Generate configurations
-    const outputs = await generateConfigurations(rules, config, options.tools);
+    // Generate configurations for each base directory
+    let totalOutputs = 0;
+    for (const baseDir of baseDirs) {
+      if (options.verbose) {
+        console.log(`\nGenerating configurations for base directory: ${baseDir}`);
+      }
 
-    if (outputs.length === 0) {
+      const outputs = await generateConfigurations(rules, config, options.tools, baseDir);
+
+      if (outputs.length === 0) {
+        if (options.verbose) {
+          console.warn(`⚠️  No configurations generated for ${baseDir}`);
+        }
+        continue;
+      }
+
+      // Write output files
+      for (const output of outputs) {
+        await writeFileContent(output.filepath, output.content);
+        console.log(`✅ Generated ${output.tool} configuration: ${output.filepath}`);
+      }
+
+      totalOutputs += outputs.length;
+    }
+
+    if (totalOutputs === 0) {
       console.warn("⚠️  No configurations generated");
       return;
     }
 
-    // Write output files
-    for (const output of outputs) {
-      await writeFileContent(output.filepath, output.content);
-      console.log(`✅ Generated ${output.tool} configuration: ${output.filepath}`);
-    }
-
-    console.log(`\n🎉 Successfully generated ${outputs.length} configuration file(s)!`);
+    console.log(`\n🎉 Successfully generated ${totalOutputs} configuration file(s)!`);
   } catch (error) {
     console.error("❌ Failed to generate configurations:", error);
     process.exit(1);
