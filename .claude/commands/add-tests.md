@@ -1,1 +1,1 @@
-Add test code until coverage reaches 60% or higher.
+Add test code until coverage reaches 80% or higher.
