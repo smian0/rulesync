@@ -27,26 +27,26 @@ yarn global add rulesync
 
 ## 使い始める
 
-1. **rulesyncをグローバルにインストール:**
+1. **プロジェクトを初期化:**
    ```bash
-   npm install -g rulesync
+   npx rulesync init
    ```
 
-2. **プロジェクトを初期化:**
+2. **`.rulesync/`ディレクトリの生成されたルールファイル**をプロジェクトのニーズに合わせて編集します
+   
+   または新しいルールファイルを追加:
    ```bash
-   rulesync init
+   npx rulesync add my-custom-rules
    ```
 
-3. **`.rulesync/`ディレクトリの生成されたルールファイル**をプロジェクトのニーズに合わせて編集します
-
-4. **ツール固有の設定ファイルを生成:**
+3. **ツール固有の設定ファイルを生成:**
    ```bash
-   rulesync generate
+   npx rulesync generate
    ```
 
-5. **オプション: 生成されたファイルを.gitignoreに追加:**
+4. **オプション: 生成されたファイルを.gitignoreに追加:**
    ```bash
-   rulesync gitignore
+   npx rulesync gitignore
    ```
 
 以上です！AIコーディングアシスタントが生成された設定ファイルを自動的に使用するようになります。
@@ -112,7 +112,7 @@ Claude Codeの組み込み`/init`コマンドを使用する代わりに、rules
 ### 1. 初期化
 
 ```bash
-rulesync init
+npx rulesync init
 ```
 
 これにより、サンプルルールファイルを含む`.rulesync/`ディレクトリが作成されます。
@@ -148,24 +148,24 @@ rulesyncは2レベルのルールシステムを使用します：
 
 ```bash
 # すべてのツール用に生成
-rulesync generate
+npx rulesync generate
 
 # 特定のツール用に生成
-rulesync generate --copilot
-rulesync generate --cursor  
-rulesync generate --cline
-rulesync generate --claude
-rulesync generate --roo
+npx rulesync generate --copilot
+npx rulesync generate --cursor  
+npx rulesync generate --cline
+npx rulesync generate --claude
+npx rulesync generate --roo
 
 # クリーンビルド（既存ファイルを最初に削除）
-rulesync generate --delete
+npx rulesync generate --delete
 
 # 特定ツール用のクリーンビルド
-rulesync generate --copilot --cursor --delete
+npx rulesync generate --copilot --cursor --delete
 
 # 詳細出力
-rulesync generate --verbose
-rulesync generate --delete --verbose
+npx rulesync generate --verbose
+npx rulesync generate --delete --verbose
 ```
 
 #### 生成オプション
@@ -178,19 +178,24 @@ rulesync generate --delete --verbose
 
 ```bash
 # サンプルファイルでプロジェクトを初期化
-rulesync init
+npx rulesync init
+
+# 新しいルールファイルを追加
+npx rulesync add <filename>
+npx rulesync add typescript-rules
+npx rulesync add security.md  # .md拡張子は自動的に処理される
 
 # ルールファイルを検証
-rulesync validate
+npx rulesync validate
 
 # 現在のステータスを確認  
-rulesync status
+npx rulesync status
 
 # ファイルを監視して自動生成
-rulesync watch
+npx rulesync watch
 
 # 生成されたファイルを.gitignoreに追加
-rulesync gitignore
+npx rulesync gitignore
 ```
 
 ## 設定ファイル構造
@@ -265,7 +270,7 @@ globs: ["**/*.ts", "**/*.tsx"]
 rulesyncはルールファイルを検証し、有用なエラーメッセージを提供します：
 
 ```bash
-rulesync validate
+npx rulesync validate
 ```
 
 一般的なバリデーションルール：

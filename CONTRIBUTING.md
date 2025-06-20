@@ -63,6 +63,7 @@ rulesync/
 │   ├── cli/
 │   │   ├── commands/        # CLI command implementations
 │   │   │   ├── init.ts      # Initialize project
+│   │   │   ├── add.ts       # Add new rule files
 │   │   │   ├── generate.ts  # Generate configurations
 │   │   │   ├── watch.ts     # File watching
 │   │   │   ├── status.ts    # Project status

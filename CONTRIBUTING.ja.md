@@ -65,6 +65,7 @@ rulesync/
 │   ├── cli/
 │   │   ├── commands/        # CLIコマンドの実装
 │   │   │   ├── init.ts      # プロジェクト初期化
+│   │   │   ├── add.ts       # 新しいルールファイルの追加
 │   │   │   ├── generate.ts  # 設定生成
 │   │   │   ├── watch.ts     # ファイル監視
 │   │   │   ├── status.ts    # プロジェクト状態
@@ -94,7 +95,7 @@ rulesync/
 ### 主要な依存関係
 
 - **Commander.js**: コマンドラインインターフェース用のCLIフレームワーク
-- **gray-matter**: MarkdownファイルのフロントマターパーシングWw
+- **gray-matter**: Markdownファイルのフロントマターパーシング
 - **chokidar**: `watch`コマンド用のファイル監視
 - **tsup**: ビルドシステム（CJSとESMの両方を出力）
 - **tsx**: 開発用TypeScript実行
