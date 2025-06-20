@@ -5,7 +5,9 @@ import {
   fileExists,
   findFiles,
   readFileContent,
+  removeClaudeGeneratedFiles,
   removeDirectory,
+  removeFile,
   writeFileContent,
 } from "./file.js";
 
@@ -173,6 +175,93 @@ describe("file utilities", () => {
       );
 
       consoleSpy.mockRestore();
+    });
+
+    it("should skip dangerous paths", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      await removeDirectory(".");
+      await removeDirectory("/");
+      await removeDirectory("src");
+
+      expect(consoleSpy).toHaveBeenCalledWith("Skipping deletion of dangerous path: .");
+      expect(consoleSpy).toHaveBeenCalledWith("Skipping deletion of dangerous path: /");
+      expect(consoleSpy).toHaveBeenCalledWith("Skipping deletion of dangerous path: src");
+      expect(mockRm).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it("should skip empty path", async () => {
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      await removeDirectory("");
+
+      expect(consoleSpy).toHaveBeenCalledWith("Skipping deletion of dangerous path: ");
+      expect(mockRm).not.toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("removeFile", () => {
+    it("should remove file if it exists", async () => {
+      mockStat.mockResolvedValue({} as never);
+      mockRm.mockResolvedValue(undefined);
+
+      await removeFile("/path/to/file.txt");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to/file.txt");
+      expect(mockRm).toHaveBeenCalledWith("/path/to/file.txt");
+    });
+
+    it("should do nothing if file does not exist", async () => {
+      mockStat.mockRejectedValue(new Error("File not found"));
+
+      await removeFile("/path/to/nonexistent.txt");
+
+      expect(mockStat).toHaveBeenCalledWith("/path/to/nonexistent.txt");
+      expect(mockRm).not.toHaveBeenCalled();
+    });
+
+    it("should handle removal errors gracefully", async () => {
+      mockStat.mockResolvedValue({} as never);
+      mockRm.mockRejectedValue(new Error("Permission denied"));
+
+      const consoleSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+      await removeFile("/path/to/file.txt");
+
+      expect(mockRm).toHaveBeenCalledWith("/path/to/file.txt");
+      expect(consoleSpy).toHaveBeenCalledWith(
+        "Failed to remove file /path/to/file.txt:",
+        expect.any(Error)
+      );
+
+      consoleSpy.mockRestore();
+    });
+  });
+
+  describe("removeClaudeGeneratedFiles", () => {
+    it("should remove CLAUDE.md file and .claude/memories directory", async () => {
+      mockStat.mockResolvedValue({} as never);
+      mockRm.mockResolvedValue(undefined);
+
+      await removeClaudeGeneratedFiles();
+
+      expect(mockRm).toHaveBeenCalledWith("CLAUDE.md");
+      expect(mockRm).toHaveBeenCalledWith(".claude/memories", { recursive: true, force: true });
+    });
+
+    it("should handle non-existent files gracefully", async () => {
+      mockStat.mockRejectedValue(new Error("File not found"));
+
+      await removeClaudeGeneratedFiles();
+
+      // Should call stat for both files but not rm since they don't exist
+      expect(mockStat).toHaveBeenCalledWith("CLAUDE.md");
+      expect(mockStat).toHaveBeenCalledWith(".claude/memories");
+      expect(mockRm).not.toHaveBeenCalled();
     });
   });
 });

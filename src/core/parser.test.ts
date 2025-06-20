@@ -1,7 +1,7 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
-import { parseRuleFile } from "../../src/core/parser.js";
+import { beforeEach, afterEach, describe, expect, it } from "vitest";
+import { parseRuleFile, parseRulesFromDirectory } from "../../src/core/parser.js";
 
 const testDir = join(process.cwd(), "test-tmp");
 
@@ -114,6 +114,155 @@ globs: ["**/*.ts"]
       writeFileSync(filepath, ruleContent);
 
       await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid description");
+    });
+
+    it("should throw error for missing globs", async () => {
+      const ruleContent = `---
+root: true
+targets: ["copilot"]
+description: "Test rule"
+---
+
+# Missing Globs
+`;
+
+      const filepath = join(testDir, "missing-globs.md");
+      writeFileSync(filepath, ruleContent);
+
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid globs");
+    });
+
+    it("should throw error for invalid globs type", async () => {
+      const ruleContent = `---
+root: true
+targets: ["copilot"]
+description: "Test rule"
+globs: "not-an-array"
+---
+
+# Invalid Globs Type
+`;
+
+      const filepath = join(testDir, "invalid-globs-type.md");
+      writeFileSync(filepath, ruleContent);
+
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid globs");
+    });
+
+    it("should handle empty globs array", async () => {
+      const ruleContent = `---
+root: false
+targets: ["copilot"]
+description: "Test rule"
+globs: []
+---
+
+# Empty Globs
+`;
+
+      const filepath = join(testDir, "empty-globs.md");
+      writeFileSync(filepath, ruleContent);
+
+      const rule = await parseRuleFile(filepath);
+
+      expect(rule.frontmatter.globs).toEqual([]);
+    });
+
+    it("should throw error for file without frontmatter", async () => {
+      const ruleContent = `# No Frontmatter
+
+This file has no frontmatter.
+`;
+
+      const filepath = join(testDir, "no-frontmatter.md");
+      writeFileSync(filepath, ruleContent);
+
+      await expect(parseRuleFile(filepath)).rejects.toThrow();
+    });
+
+    it("should throw error for string targets", async () => {
+      const ruleContent = `---
+root: true
+targets: "*"
+description: "Test rule with string target"
+globs: ["**/*.ts"]
+---
+
+# String Target
+`;
+
+      const filepath = join(testDir, "string-target.md");
+      writeFileSync(filepath, ruleContent);
+
+      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid targets");
+    });
+  });
+
+  describe("parseRulesFromDirectory", () => {
+    it("should parse multiple rule files from directory", async () => {
+      const rule1Content = `---
+root: true
+targets: ["*"]
+description: "Rule 1"
+globs: ["**/*.ts"]
+---
+
+# Rule 1
+`;
+
+      const rule2Content = `---
+root: false
+targets: ["copilot"]
+description: "Rule 2"
+globs: ["**/*.js"]
+---
+
+# Rule 2
+`;
+
+      writeFileSync(join(testDir, "rule1.md"), rule1Content);
+      writeFileSync(join(testDir, "rule2.md"), rule2Content);
+
+      const rules = await parseRulesFromDirectory(testDir);
+
+      expect(rules).toHaveLength(2);
+      expect(rules[0].filename).toBe("rule1");
+      expect(rules[1].filename).toBe("rule2");
+    });
+
+    it("should ignore non-markdown files", async () => {
+      const ruleContent = `---
+root: true
+targets: ["*"]
+description: "Rule"
+globs: ["**/*.ts"]
+---
+
+# Rule
+`;
+
+      writeFileSync(join(testDir, "rule.md"), ruleContent);
+      writeFileSync(join(testDir, "not-markdown.txt"), "This is not markdown");
+      writeFileSync(join(testDir, "config.json"), '{"test": true}');
+
+      const rules = await parseRulesFromDirectory(testDir);
+
+      expect(rules).toHaveLength(1);
+      expect(rules[0].filename).toBe("rule");
+    });
+
+    it("should return empty array for non-existent directory", async () => {
+      const rules = await parseRulesFromDirectory(join(testDir, "non-existent"));
+
+      expect(rules).toEqual([]);
+    });
+
+    it("should handle directory with no markdown files", async () => {
+      writeFileSync(join(testDir, "test.txt"), "Not markdown");
+      
+      const rules = await parseRulesFromDirectory(testDir);
+
+      expect(rules).toEqual([]);
     });
   });
 });
