@@ -80,7 +80,7 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "invalid-rule.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid \"root\" field");
+      await expect(parseRuleFile(filepath)).rejects.toThrow('Invalid "root" field');
     });
 
     it("should throw error for invalid targets", async () => {
@@ -97,7 +97,7 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "invalid-targets.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Missing required field \"root\"");
+      await expect(parseRuleFile(filepath)).rejects.toThrow('Missing required field "root"');
     });
 
     it("should throw error for missing description", async () => {
@@ -113,7 +113,7 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "missing-desc.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Missing required field \"description\"");
+      await expect(parseRuleFile(filepath)).rejects.toThrow('Missing required field "description"');
     });
 
     it("should throw error for missing globs", async () => {
@@ -129,7 +129,7 @@ description: "Test rule"
       const filepath = join(testDir, "missing-globs.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Missing required field \"globs\"");
+      await expect(parseRuleFile(filepath)).rejects.toThrow('Missing required field "globs"');
     });
 
     it("should throw error for invalid globs type", async () => {
@@ -146,7 +146,7 @@ globs: "not-an-array"
       const filepath = join(testDir, "invalid-globs-type.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid \"globs\" field");
+      await expect(parseRuleFile(filepath)).rejects.toThrow('Invalid "globs" field');
     });
 
     it("should handle empty globs array", async () => {
@@ -207,7 +207,7 @@ globs: ["**/*.ts"]
       const filepath = join(testDir, "string-target.md");
       writeFileSync(filepath, ruleContent);
 
-      await expect(parseRuleFile(filepath)).rejects.toThrow("Invalid \"targets\" field");
+      await expect(parseRuleFile(filepath)).rejects.toThrow('Invalid "targets" field');
     });
   });
 
