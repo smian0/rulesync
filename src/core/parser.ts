@@ -45,19 +45,33 @@ export async function parseRuleFile(filepath: string): Promise<ParsedRule> {
 
 function validateFrontmatter(data: unknown, filepath: string): void {
   if (!data || typeof data !== "object") {
-    throw new Error(`Invalid frontmatter in ${filepath}: must be an object`);
+    if (!data) {
+      throw new Error(`Missing frontmatter in ${filepath}: file must contain YAML frontmatter with required fields (root, targets, description, globs)`);
+    }
+    throw new Error(`Invalid frontmatter in ${filepath}: frontmatter must be a valid YAML object`);
   }
 
   const obj = data as Record<string, unknown>;
 
+  // Check if the object is completely empty
+  if (Object.keys(obj).length === 0) {
+    throw new Error(`Missing frontmatter in ${filepath}: file must contain YAML frontmatter with required fields (root, targets, description, globs)`);
+  }
+
   // Validate root
+  if (obj.root === undefined) {
+    throw new Error(`Missing required field "root" in ${filepath}: must be true or false`);
+  }
   if (typeof obj.root !== "boolean") {
-    throw new Error(`Invalid root in ${filepath}: must be a boolean`);
+    throw new Error(`Invalid "root" field in ${filepath}: must be a boolean (true or false), got ${typeof obj.root}`);
   }
 
   // Validate targets
+  if (obj.targets === undefined) {
+    throw new Error(`Missing required field "targets" in ${filepath}: must be an array like ["*"] or ["copilot", "cursor"]`);
+  }
   if (!Array.isArray(obj.targets)) {
-    throw new Error(`Invalid targets in ${filepath}: must be an array`);
+    throw new Error(`Invalid "targets" field in ${filepath}: must be an array, got ${typeof obj.targets}`);
   }
 
   const validTargets = ["copilot", "cursor", "cline", "claude", "roo", "*"];
@@ -70,18 +84,24 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   }
 
   // Validate description
+  if (obj.description === undefined) {
+    throw new Error(`Missing required field "description" in ${filepath}: must be a descriptive string`);
+  }
   if (!obj.description || typeof obj.description !== "string") {
-    throw new Error(`Invalid description in ${filepath}: must be a non-empty string`);
+    throw new Error(`Invalid "description" field in ${filepath}: must be a non-empty string, got ${typeof obj.description}`);
   }
 
   // Validate globs
+  if (obj.globs === undefined) {
+    throw new Error(`Missing required field "globs" in ${filepath}: must be an array of file patterns like ["**/*.ts"]`);
+  }
   if (!Array.isArray(obj.globs)) {
-    throw new Error(`Invalid globs in ${filepath}: must be an array`);
+    throw new Error(`Invalid "globs" field in ${filepath}: must be an array, got ${typeof obj.globs}`);
   }
 
   for (const glob of obj.globs) {
     if (typeof glob !== "string") {
-      throw new Error(`Invalid glob in ${filepath}: all globs must be strings`);
+      throw new Error(`Invalid glob pattern in ${filepath}: all globs must be strings, got ${typeof glob}`);
     }
   }
 }
