@@ -96,6 +96,7 @@ rulesync/
 
 - **Commander.js**: コマンドラインインターフェース用のCLIフレームワーク
 - **gray-matter**: Markdownファイルのフロントマターパーシング
+- **marked**: Markdownのパーシングとレンダリング
 - **chokidar**: `watch`コマンド用のファイル監視
 - **tsup**: ビルドシステム（CJSとESMの両方を出力）
 - **tsx**: 開発用TypeScript実行
@@ -185,7 +186,7 @@ type(scope): description
 
 ## テスト
 
-プロジェクトは包括的なカバレッジ（現在69.46%）でVitestを使用してテストしています:
+プロジェクトは包括的なカバレッジ（現在95.46%）でVitestを使用してテストしています:
 
 ### テスト構造
 
@@ -205,7 +206,7 @@ type(scope): description
 ### テストの実行
 
 ```bash
-# すべてのテスト（現在80テスト）
+# すべてのテスト（現在100+テスト）
 pnpm test
 
 # 開発用ウォッチモード
@@ -220,10 +221,11 @@ pnpm test src/generators/copilot.test.ts
 
 ### モジュール別テストカバレッジ
 
-- **utils**: 100%（完全にカバー）
-- **generators**: 97.25%（ほぼ完全）
-- **core**: 83.12%（良好なカバレッジ）
-- **cli/commands**: 36.39%（改善が必要）
+- **cli/commands**: 98.48%（優秀なカバレッジ）
+- **core**: すべてのモジュールで高カバレッジ
+- **generators**: すべてのモジュールで高カバレッジ
+- **utils**: すべてのモジュールで高カバレッジ
+- **types**: すべてのモジュールで高カバレッジ
 
 ## 新しいAIツールの追加
 

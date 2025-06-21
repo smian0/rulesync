@@ -96,6 +96,7 @@ rulesync/
 
 - **Commander.js**: CLI framework for command-line interface
 - **gray-matter**: Frontmatter parsing for Markdown files
+- **marked**: Markdown parsing and rendering
 - **chokidar**: File watching for `watch` command
 - **tsup**: Build system (outputs both CJS and ESM)
 - **tsx**: TypeScript execution for development
@@ -185,7 +186,7 @@ The style is automatically enforced by our CI pipeline and pre-commit hooks.
 
 ## Testing
 
-The project uses Vitest for testing with comprehensive coverage (currently 69.46%):
+The project uses Vitest for testing with comprehensive coverage (currently 95.46%):
 
 ### Test Structure
 
@@ -205,7 +206,7 @@ The project uses Vitest for testing with comprehensive coverage (currently 69.46
 ### Running Tests
 
 ```bash
-# All tests (80 tests currently)
+# All tests (100+ tests currently)
 pnpm test
 
 # Watch mode for development
@@ -220,10 +221,11 @@ pnpm test src/generators/copilot.test.ts
 
 ### Test Coverage by Module
 
-- **utils**: 100% (fully covered)
-- **generators**: 97.25% (nearly complete)
-- **core**: 83.12% (good coverage)
-- **cli/commands**: 36.39% (needs improvement)
+- **cli/commands**: 98.48% (excellent coverage)
+- **core**: High coverage across all modules
+- **generators**: High coverage across all modules  
+- **utils**: High coverage across all modules
+- **types**: High coverage across all modules
 
 ## Adding New AI Tools
 
