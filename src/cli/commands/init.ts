@@ -21,15 +21,15 @@ export async function initCommand(): Promise<void> {
 async function createSampleFiles(aiRulesDir: string): Promise<void> {
   const sampleFiles = [
     {
-      filename: "coding-rules.md",
+      filename: "overview.md",
       content: `---
 root: true
 targets: ["*"]
-description: "General coding standards and best practices"
+description: "Project overview and general development guidelines"
 globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
 ---
 
-# Coding Rules
+# Project Overview
 
 ## General Guidelines
 
@@ -45,54 +45,94 @@ globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
 - Use semicolons
 - Use double quotes for strings
 - Use trailing commas in multi-line objects and arrays
-`,
-    },
-    {
-      filename: "naming-conventions.md",
-      content: `---
-root: false
-targets: ["*"]
-description: "Naming conventions for variables, functions, and files"
-globs: ["**/*.ts", "**/*.js"]
----
 
-# Naming Conventions
+## Architecture Principles
 
-## Variables and Functions
-- Use camelCase for variables and functions
-- Use descriptive names that explain the purpose
-- Avoid abbreviations unless they are well-known
-
-## Files and Directories
-- Use kebab-case for file names
-- Use PascalCase for component files
-- Use lowercase for directory names
-
-## Constants
-- Use SCREAMING_SNAKE_CASE for constants
-- Group related constants in enums or const objects
-`,
-    },
-    {
-      filename: "architecture.md",
-      content: `---
-root: false
-targets: ["copilot", "cursor"]
-description: "Architectural patterns and project structure guidelines"
-globs: ["src/**/*.ts"]
----
-
-# Architecture Guidelines
-
-## Project Structure
 - Organize code by feature, not by file type
 - Keep related files close together
-- Use index files for clean imports
-
-## Design Patterns
 - Use dependency injection for better testability
 - Implement proper error handling
 - Follow single responsibility principle
+`,
+    },
+    {
+      filename: "frontend.md",
+      content: `---
+root: false
+targets: ["*"]
+description: "Frontend development rules and best practices"
+globs: ["src/components/**/*.tsx", "src/pages/**/*.tsx", "**/*.css", "**/*.scss"]
+---
+
+# Frontend Development Rules
+
+## React Components
+
+- Use functional components with hooks
+- Follow PascalCase naming for components
+- Use TypeScript interfaces for props
+- Implement proper error boundaries
+
+## Styling
+
+- Use CSS modules or styled-components
+- Follow BEM methodology for CSS classes
+- Prefer flexbox and grid for layouts
+- Use semantic HTML elements
+
+## State Management
+
+- Use React hooks for local state
+- Consider Redux or Zustand for global state
+- Avoid prop drilling with context API
+- Keep state as close to where it's used as possible
+
+## Performance
+
+- Use React.memo for expensive components
+- Implement lazy loading for routes
+- Optimize images and assets
+- Use proper key props in lists
+`,
+    },
+    {
+      filename: "backend.md",
+      content: `---
+root: false
+targets: ["*"]
+description: "Backend development rules and API guidelines"
+globs: ["src/api/**/*.ts", "src/services/**/*.ts", "src/models/**/*.ts"]
+---
+
+# Backend Development Rules
+
+## API Design
+
+- Follow RESTful conventions
+- Use consistent HTTP status codes
+- Implement proper error handling with meaningful messages
+- Use API versioning when necessary
+
+## Database
+
+- Use proper indexing for performance
+- Implement database migrations
+- Follow naming conventions for tables and columns
+- Use transactions for data consistency
+
+## Security
+
+- Validate all input data
+- Use proper authentication and authorization
+- Implement rate limiting
+- Sanitize database queries to prevent SQL injection
+
+## Code Organization
+
+- Use service layer pattern
+- Implement proper logging
+- Use environment variables for configuration
+- Write comprehensive tests for business logic
 `,
     },
   ];

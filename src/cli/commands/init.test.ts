@@ -37,34 +37,34 @@ describe("initCommand", () => {
     await initCommand();
 
     expect(mockWriteFileContent).toHaveBeenCalledWith(
-      join(".rulesync", "coding-rules.md"),
+      join(".rulesync", "overview.md"),
       expect.stringContaining("root: true")
     );
     expect(mockWriteFileContent).toHaveBeenCalledWith(
-      join(".rulesync", "naming-conventions.md"),
+      join(".rulesync", "frontend.md"),
       expect.stringContaining("root: false")
     );
     expect(mockWriteFileContent).toHaveBeenCalledWith(
-      join(".rulesync", "architecture.md"),
-      expect.stringContaining("copilot")
+      join(".rulesync", "backend.md"),
+      expect.stringContaining("root: false")
     );
 
-    expect(console.log).toHaveBeenCalledWith("Created .rulesync/coding-rules.md");
-    expect(console.log).toHaveBeenCalledWith("Created .rulesync/naming-conventions.md");
-    expect(console.log).toHaveBeenCalledWith("Created .rulesync/architecture.md");
+    expect(console.log).toHaveBeenCalledWith("Created .rulesync/overview.md");
+    expect(console.log).toHaveBeenCalledWith("Created .rulesync/frontend.md");
+    expect(console.log).toHaveBeenCalledWith("Created .rulesync/backend.md");
   });
 
   it("should skip existing files", async () => {
     mockFileExists.mockImplementation(async (filepath) => {
-      return filepath.includes("coding-rules.md");
+      return filepath.includes("overview.md");
     });
 
     await initCommand();
 
     expect(mockWriteFileContent).toHaveBeenCalledTimes(2); // Only non-existing files
-    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/coding-rules.md (already exists)");
-    expect(console.log).toHaveBeenCalledWith("Created .rulesync/naming-conventions.md");
-    expect(console.log).toHaveBeenCalledWith("Created .rulesync/architecture.md");
+    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/overview.md (already exists)");
+    expect(console.log).toHaveBeenCalledWith("Created .rulesync/frontend.md");
+    expect(console.log).toHaveBeenCalledWith("Created .rulesync/backend.md");
   });
 
   it("should handle all files existing", async () => {
@@ -73,40 +73,38 @@ describe("initCommand", () => {
     await initCommand();
 
     expect(mockWriteFileContent).not.toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/coding-rules.md (already exists)");
-    expect(console.log).toHaveBeenCalledWith(
-      "Skipped .rulesync/naming-conventions.md (already exists)"
-    );
-    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/architecture.md (already exists)");
+    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/overview.md (already exists)");
+    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/frontend.md (already exists)");
+    expect(console.log).toHaveBeenCalledWith("Skipped .rulesync/backend.md (already exists)");
   });
 
   it("should create proper content for root file", async () => {
     await initCommand();
 
-    const codingRulesCall = mockWriteFileContent.mock.calls.find((call) =>
-      call[0].includes("coding-rules.md")
+    const overviewCall = mockWriteFileContent.mock.calls.find((call) =>
+      call[0].includes("overview.md")
     );
-    expect(codingRulesCall).toBeDefined();
-    expect(codingRulesCall?.[1]).toContain("root: true");
-    expect(codingRulesCall?.[1]).toContain('targets: ["*"]');
-    expect(codingRulesCall?.[1]).toContain("General coding standards");
+    expect(overviewCall).toBeDefined();
+    expect(overviewCall?.[1]).toContain("root: true");
+    expect(overviewCall?.[1]).toContain('targets: ["*"]');
+    expect(overviewCall?.[1]).toContain("Project overview");
   });
 
   it("should create proper content for non-root files", async () => {
     await initCommand();
 
-    const namingCall = mockWriteFileContent.mock.calls.find((call) =>
-      call[0].includes("naming-conventions.md")
+    const frontendCall = mockWriteFileContent.mock.calls.find((call) =>
+      call[0].includes("frontend.md")
     );
-    expect(namingCall).toBeDefined();
-    expect(namingCall?.[1]).toContain("root: false");
-    expect(namingCall?.[1]).toContain("camelCase");
+    expect(frontendCall).toBeDefined();
+    expect(frontendCall?.[1]).toContain("root: false");
+    expect(frontendCall?.[1]).toContain("Frontend development rules");
 
-    const archCall = mockWriteFileContent.mock.calls.find((call) =>
-      call[0].includes("architecture.md")
+    const backendCall = mockWriteFileContent.mock.calls.find((call) =>
+      call[0].includes("backend.md")
     );
-    expect(archCall).toBeDefined();
-    expect(archCall?.[1]).toContain("root: false");
-    expect(archCall?.[1]).toContain('targets: ["copilot", "cursor"]');
+    expect(backendCall).toBeDefined();
+    expect(backendCall?.[1]).toContain("root: false");
+    expect(backendCall?.[1]).toContain("Backend development rules");
   });
 });
