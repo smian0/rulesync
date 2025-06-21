@@ -304,5 +304,45 @@ globs: ["**/*.ts"]
 
       await expect(parseRulesFromDirectory(testDir)).rejects.toThrow("Validation errors found:");
     });
+
+    it("should throw error when multiple root rules exist", async () => {
+      const rootRule1 = `---
+root: true
+targets: ["*"]
+description: "Root rule 1"
+globs: ["**/*.ts"]
+---
+
+# Root Rule 1
+`;
+
+      const rootRule2 = `---
+root: true
+targets: ["copilot", "cursor"]
+description: "Root rule 2"
+globs: ["**/*.js"]
+---
+
+# Root Rule 2
+`;
+
+      const nonRootRule = `---
+root: false
+targets: ["cline"]
+description: "Non-root rule"
+globs: ["**/*.md"]
+---
+
+# Non-root Rule
+`;
+
+      writeFileSync(join(testDir, "root1.md"), rootRule1);
+      writeFileSync(join(testDir, "root2.md"), rootRule2);
+      writeFileSync(join(testDir, "nonroot.md"), nonRootRule);
+
+      await expect(parseRulesFromDirectory(testDir)).rejects.toThrow(
+        "Multiple root rules found:"
+      );
+    });
   });
 });

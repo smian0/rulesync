@@ -22,6 +22,13 @@ export async function parseRulesFromDirectory(aiRulesDir: string): Promise<Parse
     throw new Error(`Validation errors found:\n${errors.join("\n")}`);
   }
 
+  // Check for multiple root rules
+  const rootRules = rules.filter(rule => rule.frontmatter.root);
+  if (rootRules.length > 1) {
+    const rootRuleFiles = rootRules.map(rule => rule.filepath).join(", ");
+    throw new Error(`Multiple root rules found: ${rootRuleFiles}. Only one rule can have root: true.`);
+  }
+
   return rules;
 }
 

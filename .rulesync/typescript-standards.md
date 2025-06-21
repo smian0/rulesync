@@ -1,5 +1,5 @@
 ---
-root: true
+root: false
 targets: ["*"]
 description: "TypeScript strict mode development standards for rulesync project"
 globs: ["**/*.ts", "**/*.tsx"]
