@@ -65,7 +65,6 @@ function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule
   return lines.join("\n");
 }
 
-
 function generateMemoryFile(rule: ParsedRule): string {
   return rule.content.trim();
 }
