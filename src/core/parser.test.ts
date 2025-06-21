@@ -340,9 +340,7 @@ globs: ["**/*.md"]
       writeFileSync(join(testDir, "root2.md"), rootRule2);
       writeFileSync(join(testDir, "nonroot.md"), nonRootRule);
 
-      await expect(parseRulesFromDirectory(testDir)).rejects.toThrow(
-        "Multiple root rules found:"
-      );
+      await expect(parseRulesFromDirectory(testDir)).rejects.toThrow("Multiple root rules found:");
     });
   });
 });
