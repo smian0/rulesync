@@ -54,34 +54,17 @@ function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule
     lines.push("");
   }
 
-  lines.push("# Claude Code Memory - Project Instructions");
-  lines.push("");
-  lines.push(
-    "Generated from rulesync configuration. These instructions guide Claude Code's behavior for this project."
-  );
-  lines.push("");
-
   // Add root rules
   if (rootRules.length > 0) {
     for (const rule of rootRules) {
-      lines.push(...formatRuleForClaude(rule));
+      lines.push(rule.content);
+      lines.push("");
     }
   }
 
   return lines.join("\n");
 }
 
-function formatRuleForClaude(rule: ParsedRule): string[] {
-  const lines: string[] = [];
-
-  lines.push(`### ${rule.frontmatter.description}`);
-  lines.push("");
-
-  lines.push(rule.content);
-  lines.push("");
-
-  return lines;
-}
 
 function generateMemoryFile(rule: ParsedRule): string {
   return rule.content.trim();

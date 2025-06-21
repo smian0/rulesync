@@ -48,8 +48,8 @@ describe("claude generator", () => {
     expect(outputs).toHaveLength(3); // 1 main file + 2 detail memory files
     expect(outputs[0].tool).toBe("claude");
     expect(outputs[0].filepath).toBe("CLAUDE.md");
-    expect(outputs[0].content).toContain("# Claude Code Memory - Project Instructions");
-    expect(outputs[0].content).toContain("Generated from rulesync configuration");
+    expect(outputs[0].content).not.toContain("# Claude Code Memory - Project Instructions");
+    expect(outputs[0].content).not.toContain("Generated from rulesync configuration");
     expect(outputs[0].content).toContain("| Document | Description | File Patterns |");
     expect(outputs[0].content).toContain(
       "| @.claude/memories/architecture-rule.md | Detail architecture rule | **/*.tsx |"
@@ -63,7 +63,7 @@ describe("claude generator", () => {
     const outputs = await generateClaudeConfig(mockRules, config);
 
     // Main CLAUDE.md should contain overview rules and memory references
-    expect(outputs[0].content).toContain("Overview coding rule");
+    expect(outputs[0].content).toContain("Use TypeScript for all new code.");
     expect(outputs[0].content).toContain("| Document | Description | File Patterns |");
     expect(outputs[0].content).toContain(
       "| @.claude/memories/architecture-rule.md | Detail architecture rule | **/*.tsx |"
@@ -80,7 +80,7 @@ describe("claude generator", () => {
   it("should include rule metadata", async () => {
     const outputs = await generateClaudeConfig([mockRules[0]], config);
 
-    expect(outputs[0].content).toContain("### Overview coding rule");
+    expect(outputs[0].content).not.toContain("### Overview coding rule");
     expect(outputs[0].content).toContain("Use TypeScript for all new code.");
   });
 
@@ -99,7 +99,7 @@ describe("claude generator", () => {
 
     const outputs = await generateClaudeConfig([ruleWithoutDescription], config);
 
-    expect(outputs[0].content).not.toContain("**Description:**");
+    expect(outputs[0].content).not.toContain("### Test rule");
     expect(outputs[0].content).toContain("Some rule content.");
   });
 
@@ -118,15 +118,14 @@ describe("claude generator", () => {
 
     const outputs = await generateClaudeConfig([ruleWithoutGlobs], config);
 
-    expect(outputs[0].content).not.toContain("**File patterns:**");
-    expect(outputs[0].content).toContain("### Test rule");
+    expect(outputs[0].content).toContain("Some rule content.");
   });
 
   it("should handle empty rules array", async () => {
     const outputs = await generateClaudeConfig([], config);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs[0].content).toContain("# Claude Code Memory - Project Instructions");
+    expect(outputs[0].content).not.toContain("# Claude Code Memory - Project Instructions");
     expect(outputs[0].content).not.toContain("@");
   });
 
