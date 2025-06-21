@@ -6,14 +6,20 @@ import { findFiles, readFileContent } from "../utils/index.js";
 export async function parseRulesFromDirectory(aiRulesDir: string): Promise<ParsedRule[]> {
   const ruleFiles = await findFiles(aiRulesDir);
   const rules: ParsedRule[] = [];
+  const errors: string[] = [];
 
   for (const filepath of ruleFiles) {
     try {
       const rule = await parseRuleFile(filepath);
       rules.push(rule);
     } catch (error) {
-      console.warn(`Failed to parse rule file ${filepath}:`, error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse rule file ${filepath}: ${errorMessage}`);
     }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Validation errors found:\n${errors.join('\n')}`);
   }
 
   return rules;

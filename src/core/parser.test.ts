@@ -264,5 +264,32 @@ globs: ["**/*.ts"]
 
       expect(rules).toEqual([]);
     });
+
+    it("should throw error when directory contains invalid rule files", async () => {
+      const validRule = `---
+root: true
+targets: ["*"]
+description: "Valid rule"
+globs: ["**/*.ts"]
+---
+
+# Valid Rule
+`;
+
+      const invalidRule = `---
+root: invalid
+targets: ["copilot"]
+description: "Invalid rule"
+globs: ["**/*.ts"]
+---
+
+# Invalid Rule
+`;
+
+      writeFileSync(join(testDir, "valid.md"), validRule);
+      writeFileSync(join(testDir, "invalid.md"), invalidRule);
+
+      await expect(parseRulesFromDirectory(testDir)).rejects.toThrow("Validation errors found:");
+    });
   });
 });
