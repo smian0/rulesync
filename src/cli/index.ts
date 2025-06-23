@@ -6,6 +6,7 @@ import {
   addCommand,
   generateCommand,
   gitignoreCommand,
+  importCommand,
   initCommand,
   statusCommand,
   validateCommand,
@@ -24,6 +25,17 @@ program
   .command("gitignore")
   .description("Add generated files to .gitignore")
   .action(gitignoreCommand);
+
+program
+  .command("import")
+  .description("Import configurations from AI tools to rulesync format")
+  .option("--claude", "Import from Claude Code (CLAUDE.md)")
+  .option("--cursor", "Import from Cursor (.cursorrules)")
+  .option("--copilot", "Import from GitHub Copilot (.github/copilot-instructions.md)")
+  .option("--cline", "Import from Cline (.cline/instructions.md)")
+  .option("--roo", "Import from Roo Code (.roo/instructions.md)")
+  .option("-v, --verbose", "Verbose output")
+  .action(importCommand);
 
 program
   .command("generate")
