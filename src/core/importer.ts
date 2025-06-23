@@ -1,13 +1,13 @@
 import { join } from "node:path";
 import matter from "gray-matter";
-import type { ParsedRule, ToolTarget } from "../types/index.js";
 import {
   parseClaudeConfiguration,
-  parseCursorConfiguration,
-  parseCopilotConfiguration,
   parseClineConfiguration,
+  parseCopilotConfiguration,
+  parseCursorConfiguration,
   parseRooConfiguration,
 } from "../parsers/index.js";
+import type { ParsedRule, ToolTarget } from "../types/index.js";
 import { fileExists, writeFileContent } from "../utils/index.js";
 
 export interface ImportOptions {
@@ -35,31 +35,36 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   // Parse configuration based on tool
   try {
     switch (tool) {
-      case "claude":
+      case "claude": {
         const claudeResult = await parseClaudeConfiguration(baseDir);
         rules = claudeResult.rules;
         errors.push(...claudeResult.errors);
         break;
-      case "cursor":
+      }
+      case "cursor": {
         const cursorResult = await parseCursorConfiguration(baseDir);
         rules = cursorResult.rules;
         errors.push(...cursorResult.errors);
         break;
-      case "copilot":
+      }
+      case "copilot": {
         const copilotResult = await parseCopilotConfiguration(baseDir);
         rules = copilotResult.rules;
         errors.push(...copilotResult.errors);
         break;
-      case "cline":
+      }
+      case "cline": {
         const clineResult = await parseClineConfiguration(baseDir);
         rules = clineResult.rules;
         errors.push(...clineResult.errors);
         break;
-      case "roo":
+      }
+      case "roo": {
         const rooResult = await parseRooConfiguration(baseDir);
         rules = rooResult.rules;
         errors.push(...rooResult.errors);
         break;
+      }
       default:
         errors.push(`Unsupported tool: ${tool}`);
         return { success: false, rulesCreated: 0, errors };
@@ -93,10 +98,10 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
       const filename = await generateUniqueFilename(rulesDirPath, baseFilename);
       const filePath = join(rulesDirPath, `${filename}.md`);
       const content = generateRuleFileContent(rule);
-      
+
       await writeFileContent(filePath, content);
       rulesCreated++;
-      
+
       if (verbose) {
         console.log(`✅ Created rule file: ${filePath}`);
       }
@@ -109,7 +114,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   return {
     success: rulesCreated > 0,
     rulesCreated,
-    errors
+    errors,
   };
 }
 
@@ -121,11 +126,11 @@ function generateRuleFileContent(rule: ParsedRule): string {
 async function generateUniqueFilename(rulesDir: string, baseFilename: string): Promise<string> {
   let filename = baseFilename;
   let counter = 1;
-  
+
   while (await fileExists(join(rulesDir, `${filename}.md`))) {
     filename = `${baseFilename}-${counter}`;
     counter++;
   }
-  
+
   return filename;
 }

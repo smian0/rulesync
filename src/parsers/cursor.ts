@@ -7,7 +7,9 @@ export interface CursorImportResult {
   errors: string[];
 }
 
-export async function parseCursorConfiguration(baseDir: string = process.cwd()): Promise<CursorImportResult> {
+export async function parseCursorConfiguration(
+  baseDir: string = process.cwd()
+): Promise<CursorImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
 
@@ -20,23 +22,22 @@ export async function parseCursorConfiguration(baseDir: string = process.cwd()):
 
   try {
     const content = await readFileContent(cursorFilePath);
-    
+
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
         root: false,
         targets: ["cursor"],
         description: "Cursor IDE configuration rules",
-        globs: ["**/*"]
+        globs: ["**/*"],
       };
 
       rules.push({
         frontmatter,
         content: content.trim(),
         filename: "cursor-rules",
-        filepath: cursorFilePath
+        filepath: cursorFilePath,
       });
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     errors.push(`Failed to parse Cursor configuration: ${errorMessage}`);

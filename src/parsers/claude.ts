@@ -8,7 +8,9 @@ export interface ClaudeImportResult {
   errors: string[];
 }
 
-export async function parseClaudeConfiguration(baseDir: string = process.cwd()): Promise<ClaudeImportResult> {
+export async function parseClaudeConfiguration(
+  baseDir: string = process.cwd()
+): Promise<ClaudeImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
 
@@ -21,7 +23,7 @@ export async function parseClaudeConfiguration(baseDir: string = process.cwd()):
 
   try {
     const claudeContent = await readFileContent(claudeFilePath);
-    
+
     // Parse main CLAUDE.md content
     const mainRule = parseClaudeMainFile(claudeContent, claudeFilePath);
     if (mainRule) {
@@ -34,7 +36,6 @@ export async function parseClaudeConfiguration(baseDir: string = process.cwd()):
       const memoryRules = await parseClaudeMemoryFiles(memoryDir);
       rules.push(...memoryRules);
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     errors.push(`Failed to parse Claude configuration: ${errorMessage}`);
@@ -45,23 +46,25 @@ export async function parseClaudeConfiguration(baseDir: string = process.cwd()):
 
 function parseClaudeMainFile(content: string, filepath: string): ParsedRule | null {
   // Extract the main content, excluding the reference table
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   let contentStartIndex = 0;
-  
+
   // Skip the reference table if it exists
-  if (lines.some(line => line.includes('| Document | Description | File Patterns |'))) {
-    const tableEndIndex = lines.findIndex((line, index) => 
-      index > 0 && line.trim() === '' && 
-      lines[index - 1].includes('|') && 
-      !lines[index + 1]?.includes('|')
+  if (lines.some((line) => line.includes("| Document | Description | File Patterns |"))) {
+    const tableEndIndex = lines.findIndex(
+      (line, index) =>
+        index > 0 &&
+        line.trim() === "" &&
+        lines[index - 1].includes("|") &&
+        !lines[index + 1]?.includes("|")
     );
     if (tableEndIndex !== -1) {
       contentStartIndex = tableEndIndex + 1;
     }
   }
 
-  const mainContent = lines.slice(contentStartIndex).join('\n').trim();
-  
+  const mainContent = lines.slice(contentStartIndex).join("\n").trim();
+
   if (!mainContent) {
     return null;
   }
@@ -70,48 +73,48 @@ function parseClaudeMainFile(content: string, filepath: string): ParsedRule | nu
     root: false,
     targets: ["claude"],
     description: "Main Claude Code configuration",
-    globs: ["**/*"]
+    globs: ["**/*"],
   };
 
   return {
     frontmatter,
     content: mainContent,
     filename: "claude-main",
-    filepath
+    filepath,
   };
 }
 
 async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> {
   const rules: ParsedRule[] = [];
-  
+
   try {
     const { readdir } = await import("node:fs/promises");
     const files = await readdir(memoryDir);
-    
+
     for (const file of files) {
-      if (file.endsWith('.md')) {
+      if (file.endsWith(".md")) {
         const filePath = join(memoryDir, file);
         const content = await readFileContent(filePath);
-        
+
         if (content.trim()) {
-          const filename = basename(file, '.md');
+          const filename = basename(file, ".md");
           const frontmatter: RuleFrontmatter = {
             root: false,
             targets: ["claude"],
             description: `Memory file: ${filename}`,
-            globs: ["**/*"]
+            globs: ["**/*"],
           };
 
           rules.push({
             frontmatter,
             content: content.trim(),
             filename: `claude-memory-${filename}`,
-            filepath: filePath
+            filepath: filePath,
           });
         }
       }
     }
-  } catch (error) {
+  } catch (_error) {
     // Silently handle directory reading errors
   }
 

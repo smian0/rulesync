@@ -7,7 +7,9 @@ export interface RooImportResult {
   errors: string[];
 }
 
-export async function parseRooConfiguration(baseDir: string = process.cwd()): Promise<RooImportResult> {
+export async function parseRooConfiguration(
+  baseDir: string = process.cwd()
+): Promise<RooImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
 
@@ -20,23 +22,22 @@ export async function parseRooConfiguration(baseDir: string = process.cwd()): Pr
 
   try {
     const content = await readFileContent(rooFilePath);
-    
+
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
         root: false,
         targets: ["roo"],
         description: "Roo Code AI assistant instructions",
-        globs: ["**/*"]
+        globs: ["**/*"],
       };
 
       rules.push({
         frontmatter,
         content: content.trim(),
         filename: "roo-instructions",
-        filepath: rooFilePath
+        filepath: rooFilePath,
       });
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     errors.push(`Failed to parse Roo configuration: ${errorMessage}`);

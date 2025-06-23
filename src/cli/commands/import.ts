@@ -12,7 +12,7 @@ export interface ImportOptions {
 
 export async function importCommand(options: ImportOptions = {}): Promise<void> {
   const tools: ToolTarget[] = [];
-  
+
   // Collect selected tools
   if (options.claude) tools.push("claude");
   if (options.cursor) tools.push("cursor");
@@ -22,7 +22,9 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
 
   // Validate that at least one tool is selected
   if (tools.length === 0) {
-    console.error("❌ Please specify at least one tool to import from (--claude, --cursor, --copilot, --cline, --roo)");
+    console.error(
+      "❌ Please specify at least one tool to import from (--claude, --cursor, --copilot, --cline, --roo)"
+    );
     process.exit(1);
   }
 
@@ -40,7 +42,7 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
     try {
       const result = await importConfiguration({
         tool,
-        verbose: options.verbose
+        verbose: options.verbose,
       });
 
       if (result.success) {
@@ -64,7 +66,9 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
     console.log(`\n🎉 Successfully imported ${totalRulesCreated} rule(s) total!`);
     console.log("You can now run 'rulesync generate' to create tool-specific configurations.");
   } else {
-    console.warn("\n⚠️  No rules were imported. Please check that configuration files exist for the selected tools.");
+    console.warn(
+      "\n⚠️  No rules were imported. Please check that configuration files exist for the selected tools."
+    );
   }
 
   // Show detailed errors if verbose

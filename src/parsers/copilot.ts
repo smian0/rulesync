@@ -7,7 +7,9 @@ export interface CopilotImportResult {
   errors: string[];
 }
 
-export async function parseCopilotConfiguration(baseDir: string = process.cwd()): Promise<CopilotImportResult> {
+export async function parseCopilotConfiguration(
+  baseDir: string = process.cwd()
+): Promise<CopilotImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
 
@@ -20,23 +22,22 @@ export async function parseCopilotConfiguration(baseDir: string = process.cwd())
 
   try {
     const content = await readFileContent(copilotFilePath);
-    
+
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
         root: false,
         targets: ["copilot"],
         description: "GitHub Copilot instructions",
-        globs: ["**/*"]
+        globs: ["**/*"],
       };
 
       rules.push({
         frontmatter,
         content: content.trim(),
         filename: "copilot-instructions",
-        filepath: copilotFilePath
+        filepath: copilotFilePath,
       });
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     errors.push(`Failed to parse Copilot configuration: ${errorMessage}`);

@@ -1,8 +1,7 @@
 Execute the following commands and fix any failures until they PASS:
 
-- `pnpm lint`
-- `pnpm format`
-- `pnpm check`
-- `pnpm build`
+- `pnpm run fix`
 - `pnpm test`
 - `pnpm secretlint`
+
+終わったら `git commit` `git push` してください。

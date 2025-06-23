@@ -16,9 +16,11 @@ export async function generateConfigurations(
   const toolsToGenerate = targetTools || config.defaultTargets;
 
   // Check for root files
-  const rootFiles = rules.filter(rule => rule.frontmatter.root === true);
+  const rootFiles = rules.filter((rule) => rule.frontmatter.root === true);
   if (rootFiles.length === 0) {
-    console.warn("⚠️  Warning: No files with 'root: true' found. This may result in incomplete configurations.");
+    console.warn(
+      "⚠️  Warning: No files with 'root: true' found. This may result in incomplete configurations."
+    );
   }
 
   for (const tool of toolsToGenerate) {

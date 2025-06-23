@@ -7,7 +7,9 @@ export interface ClineImportResult {
   errors: string[];
 }
 
-export async function parseClineConfiguration(baseDir: string = process.cwd()): Promise<ClineImportResult> {
+export async function parseClineConfiguration(
+  baseDir: string = process.cwd()
+): Promise<ClineImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
 
@@ -20,23 +22,22 @@ export async function parseClineConfiguration(baseDir: string = process.cwd()): 
 
   try {
     const content = await readFileContent(clineFilePath);
-    
+
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
         root: false,
         targets: ["cline"],
         description: "Cline AI assistant instructions",
-        globs: ["**/*"]
+        globs: ["**/*"],
       };
 
       rules.push({
         frontmatter,
         content: content.trim(),
         filename: "cline-instructions",
-        filepath: clineFilePath
+        filepath: clineFilePath,
       });
     }
-
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     errors.push(`Failed to parse Cline configuration: ${errorMessage}`);
