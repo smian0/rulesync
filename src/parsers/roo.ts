@@ -23,7 +23,7 @@ export async function parseRooConfiguration(baseDir: string = process.cwd()): Pr
     
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
-        root: true,
+        root: false,
         targets: ["roo"],
         description: "Roo Code AI assistant instructions",
         globs: ["**/*"]

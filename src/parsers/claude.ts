@@ -67,7 +67,7 @@ function parseClaudeMainFile(content: string, filepath: string): ParsedRule | nu
   }
 
   const frontmatter: RuleFrontmatter = {
-    root: true,
+    root: false,
     targets: ["claude"],
     description: "Main Claude Code configuration",
     globs: ["**/*"]

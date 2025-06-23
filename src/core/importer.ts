@@ -89,7 +89,8 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   let rulesCreated = 0;
   for (const rule of rules) {
     try {
-      const filename = await generateUniqueFilename(rulesDirPath, rule.filename);
+      const baseFilename = `${tool}__${rule.filename}`;
+      const filename = await generateUniqueFilename(rulesDirPath, baseFilename);
       const filePath = join(rulesDirPath, `${filename}.md`);
       const content = generateRuleFileContent(rule);
       
@@ -114,8 +115,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
 
 function generateRuleFileContent(rule: ParsedRule): string {
   const frontmatter = matter.stringify("", rule.frontmatter);
-  const frontmatterOnly = frontmatter.split("---\n")[1] + "---\n";
-  return frontmatterOnly + rule.content;
+  return frontmatter + rule.content;
 }
 
 async function generateUniqueFilename(rulesDir: string, baseFilename: string): Promise<string> {

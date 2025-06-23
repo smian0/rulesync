@@ -23,7 +23,7 @@ export async function parseCursorConfiguration(baseDir: string = process.cwd()):
     
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
-        root: true,
+        root: false,
         targets: ["cursor"],
         description: "Cursor IDE configuration rules",
         globs: ["**/*"]

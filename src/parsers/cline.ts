@@ -23,7 +23,7 @@ export async function parseClineConfiguration(baseDir: string = process.cwd()): 
     
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
-        root: true,
+        root: false,
         targets: ["cline"],
         description: "Cline AI assistant instructions",
         globs: ["**/*"]

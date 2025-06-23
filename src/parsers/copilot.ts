@@ -23,7 +23,7 @@ export async function parseCopilotConfiguration(baseDir: string = process.cwd())
     
     if (content.trim()) {
       const frontmatter: RuleFrontmatter = {
-        root: true,
+        root: false,
         targets: ["copilot"],
         description: "GitHub Copilot instructions",
         globs: ["**/*"]
