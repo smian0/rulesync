@@ -33,9 +33,8 @@ export async function statusCommand(): Promise<void> {
       const targetCounts = { copilot: 0, cursor: 0, cline: 0, claude: 0, roo: 0 };
 
       for (const rule of rules) {
-        const targets = rule.frontmatter.targets[0] === "*"
-          ? config.defaultTargets
-          : rule.frontmatter.targets;
+        const targets =
+          rule.frontmatter.targets[0] === "*" ? config.defaultTargets : rule.frontmatter.targets;
 
         for (const target of targets) {
           if (target in targetCounts) {
