@@ -1,5 +1,4 @@
-import { join } from "node:path";
-import { basename } from "node:path";
+import { basename, join } from "node:path";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
