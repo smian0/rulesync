@@ -40,7 +40,6 @@
 		"fix": "pnpm run lint:fix && pnpm run format:fix && pnpm run bcheck:fix",
 		"format": "biome format src/",
 		"format:fix": "biome format --write src/",
-		"postinstall": "pnpm sort && pnpm secretlint && pnpm check && pnpm test",
 		"lint": "biome lint src/",
 		"lint:fix": "biome lint --write src/",
 		"prepublishOnly": "pnpm build",
