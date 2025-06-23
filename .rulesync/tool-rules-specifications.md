@@ -1,11 +1,11 @@
 ---
 root: false
 targets: ['*']
-description: "AI rule specifications for each vendor"
+description: "AI rule specifications for each tool"
 globs: []
 ---
 
-# Each vendor rules specifications
+# Each tool rules specifications
 
 ## GitHub Copilot Custom Instructions
 
