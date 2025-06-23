@@ -83,11 +83,11 @@ describe("statusCommand", () => {
     expect(mockParseRulesFromDirectory).not.toHaveBeenCalled();
   });
 
-  it("should count rules by priority", async () => {
+  it("should count rules by root status", async () => {
     await statusCommand();
 
-    expect(console.log).toHaveBeenCalledWith("   - High priority: 1");
-    expect(console.log).toHaveBeenCalledWith("   - Low priority: 1");
+    expect(console.log).toHaveBeenCalledWith("   - Root rules: 1");
+    expect(console.log).toHaveBeenCalledWith("   - Non-root rules: 1");
   });
 
   it("should count target tool coverage", async () => {
@@ -143,8 +143,8 @@ describe("statusCommand", () => {
     expect(console.error).toHaveBeenCalledWith("\n❌ Failed to get status:", error);
   });
 
-  it("should handle rules without priority field", async () => {
-    const rulesWithoutPriority = [
+  it("should handle rules with root field correctly", async () => {
+    const rulesWithRoot = [
       {
         filename: "rule1",
         filepath: ".rulesync/rule1.md",
@@ -157,11 +157,11 @@ describe("statusCommand", () => {
         content: "Rule 1 content",
       },
     ];
-    mockParseRulesFromDirectory.mockResolvedValue(rulesWithoutPriority);
+    mockParseRulesFromDirectory.mockResolvedValue(rulesWithRoot);
 
     await statusCommand();
 
-    expect(console.log).toHaveBeenCalledWith("   - High priority: 0");
-    expect(console.log).toHaveBeenCalledWith("   - Low priority: 0");
+    expect(console.log).toHaveBeenCalledWith("   - Root rules: 1");
+    expect(console.log).toHaveBeenCalledWith("   - Non-root rules: 0");
   });
 });

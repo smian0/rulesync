@@ -38,7 +38,7 @@ export async function statusCommand(): Promise<void> {
 
         for (const target of targets) {
           if (target in targetCounts) {
-            (targetCounts as any)[target]++;
+            targetCounts[target as keyof typeof targetCounts]++;
           }
         }
       }
