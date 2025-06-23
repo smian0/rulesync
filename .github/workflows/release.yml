@@ -31,12 +31,11 @@ jobs:
 
       - name: Run quality checks
         run: |
-          pnpm format:check
-          pnpm lint
+          pnpm check
           pnpm secretlint
           pnpm test
 
       - name: Publish to npm
         run: pnpm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
