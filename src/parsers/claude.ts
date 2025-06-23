@@ -54,7 +54,7 @@ function parseClaudeMainFile(content: string, filepath: string): ParsedRule | nu
       (line, index) =>
         index > 0 &&
         line.trim() === "" &&
-        lines[index - 1].includes("|") &&
+        lines[index - 1]?.includes("|") &&
         !lines[index + 1]?.includes("|")
     );
     if (tableEndIndex !== -1) {

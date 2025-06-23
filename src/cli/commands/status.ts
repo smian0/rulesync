@@ -22,24 +22,24 @@ export async function statusCommand(): Promise<void> {
     console.log(`\n📋 Rules: ${rules.length} total`);
 
     if (rules.length > 0) {
-      // Count by priority
-      const highPriority = rules.filter((r) => r.frontmatter.priority === "high").length;
-      const lowPriority = rules.filter((r) => r.frontmatter.priority === "low").length;
+      // Count by root status
+      const rootRules = rules.filter((r) => r.frontmatter.root).length;
+      const nonRootRules = rules.length - rootRules;
 
-      console.log(`   - High priority: ${highPriority}`);
-      console.log(`   - Low priority: ${lowPriority}`);
+      console.log(`   - Root rules: ${rootRules}`);
+      console.log(`   - Non-root rules: ${nonRootRules}`);
 
       // Count by target tools
-      const targetCounts = { copilot: 0, cursor: 0, cline: 0 };
+      const targetCounts = { copilot: 0, cursor: 0, cline: 0, claude: 0, roo: 0 };
 
       for (const rule of rules) {
-        const targets = rule.frontmatter.targets.includes("*")
+        const targets = rule.frontmatter.targets[0] === "*"
           ? config.defaultTargets
-          : (rule.frontmatter.targets as Array<keyof typeof targetCounts>);
+          : rule.frontmatter.targets;
 
         for (const target of targets) {
           if (target in targetCounts) {
-            targetCounts[target]++;
+            (targetCounts as any)[target]++;
           }
         }
       }
@@ -48,6 +48,8 @@ export async function statusCommand(): Promise<void> {
       console.log(`   - Copilot: ${targetCounts.copilot} rules`);
       console.log(`   - Cursor: ${targetCounts.cursor} rules`);
       console.log(`   - Cline: ${targetCounts.cline} rules`);
+      console.log(`   - Claude: ${targetCounts.claude} rules`);
+      console.log(`   - Roo: ${targetCounts.roo} rules`);
     }
 
     // Check output files

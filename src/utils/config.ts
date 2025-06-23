@@ -16,7 +16,7 @@ export function getDefaultConfig(): Config {
 }
 
 export function resolveTargets(targets: ToolTarget[] | ["*"], config: Config): ToolTarget[] {
-  if (targets.includes("*" as ToolTarget)) {
+  if (targets[0] === "*") {
     return config.defaultTargets;
   }
   return targets as ToolTarget[];

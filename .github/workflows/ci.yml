@@ -28,11 +28,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Run format check
-        run: pnpm format:check
-
-      - name: Run lint
-        run: pnpm lint
+      - name: Run check
+        run: pnpm check
 
       - name: Run secretlint
         run: pnpm secretlint

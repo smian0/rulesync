@@ -42,7 +42,7 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
     try {
       const result = await importConfiguration({
         tool,
-        verbose: options.verbose,
+        verbose: options.verbose ?? false,
       });
 
       if (result.success) {
