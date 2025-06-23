@@ -67,6 +67,7 @@ rulesync/
 │   │   │   ├── init.ts      # プロジェクト初期化
 │   │   │   ├── add.ts       # 新しいルールファイルの追加
 │   │   │   ├── generate.ts  # 設定生成
+│   │   │   ├── import.ts    # 既存設定のインポート
 │   │   │   ├── watch.ts     # ファイル監視
 │   │   │   ├── status.ts    # プロジェクト状態
 │   │   │   ├── validate.ts  # ルール検証
@@ -75,6 +76,7 @@ rulesync/
 │   ├── core/
 │   │   ├── parser.ts       # .rulesync/*.mdファイルのパース
 │   │   ├── generator.ts    # 生成のオーケストレーション
+│   │   ├── importer.ts     # 既存設定のインポート
 │   │   └── validator.ts    # ルール構造の検証
 │   ├── generators/         # ツール固有のジェネレーター
 │   │   ├── copilot.ts     # GitHub Copilot Custom Instructions
@@ -82,6 +84,12 @@ rulesync/
 │   │   ├── cline.ts       # Cline Rules
 │   │   ├── claude.ts      # Claude Code Memory (CLAUDE.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
+│   ├── parsers/           # インポート用ツール固有パーサー
+│   │   ├── copilot.ts     # GitHub Copilot設定のパース
+│   │   ├── cursor.ts      # Cursor設定のパース
+│   │   ├── cline.ts       # Cline設定のパース
+│   │   ├── claude.ts      # Claude Code設定のパース
+│   │   └── roo.ts         # Roo Code設定のパース
 │   ├── types/              # TypeScript型定義
 │   │   ├── config.ts      # 設定型
 │   │   └── rules.ts       # ルールとフロントマター型
@@ -186,7 +194,7 @@ type(scope): description
 
 ## テスト
 
-プロジェクトは包括的なカバレッジ（現在95.46%）でVitestを使用してテストしています:
+プロジェクトは包括的なカバレッジ（現在約68%、目標: 80%+）でVitestを使用してテストしています:
 
 ### テスト構造
 
@@ -221,11 +229,13 @@ pnpm test src/generators/copilot.test.ts
 
 ### モジュール別テストカバレッジ
 
-- **cli/commands**: 98.48%（優秀なカバレッジ）
-- **core**: すべてのモジュールで高カバレッジ
+- **cli/commands**: 85.41%（良好なカバレッジ、新しいimportコマンドのテストが必要）
+- **core**: 62.97%（改善が必要、新しいimporterモジュールのテストが必要）
 - **generators**: すべてのモジュールで高カバレッジ
 - **utils**: すべてのモジュールで高カバレッジ
 - **types**: すべてのモジュールで高カバレッジ
+
+注意: 新しいインポート機能のテスト実装が必要なため、カバレッジが一時的に低下しています。
 
 ## 新しいAIツールの追加
 

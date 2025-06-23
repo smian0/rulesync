@@ -67,6 +67,7 @@ rulesync/
 │   │   │   ├── init.ts      # Initialize project
 │   │   │   ├── add.ts       # Add new rule files
 │   │   │   ├── generate.ts  # Generate configurations
+│   │   │   ├── import.ts    # Import existing configurations
 │   │   │   ├── watch.ts     # File watching
 │   │   │   ├── status.ts    # Project status
 │   │   │   ├── validate.ts  # Rule validation
@@ -75,6 +76,7 @@ rulesync/
 │   ├── core/
 │   │   ├── parser.ts       # Parse .rulesync/*.md files
 │   │   ├── generator.ts    # Orchestrate generation
+│   │   ├── importer.ts     # Import existing configurations
 │   │   └── validator.ts    # Validate rule structure
 │   ├── generators/         # Tool-specific generators
 │   │   ├── copilot.ts     # GitHub Copilot Custom Instructions
@@ -82,6 +84,12 @@ rulesync/
 │   │   ├── cline.ts       # Cline Rules
 │   │   ├── claude.ts      # Claude Code Memory (CLAUDE.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
+│   ├── parsers/           # Tool-specific parsers for import
+│   │   ├── copilot.ts     # Parse GitHub Copilot configurations
+│   │   ├── cursor.ts      # Parse Cursor configurations
+│   │   ├── cline.ts       # Parse Cline configurations
+│   │   ├── claude.ts      # Parse Claude Code configurations
+│   │   └── roo.ts         # Parse Roo Code configurations
 │   ├── types/              # TypeScript type definitions
 │   │   ├── config.ts      # Configuration types
 │   │   └── rules.ts       # Rule and frontmatter types
@@ -186,7 +194,7 @@ The style is automatically enforced by our CI pipeline and pre-commit hooks.
 
 ## Testing
 
-The project uses Vitest for testing with comprehensive coverage (currently 95.46%):
+The project uses Vitest for testing with comprehensive coverage (currently ~68%, target: 80%+):
 
 ### Test Structure
 
@@ -221,11 +229,13 @@ pnpm test src/generators/copilot.test.ts
 
 ### Test Coverage by Module
 
-- **cli/commands**: 98.48% (excellent coverage)
-- **core**: High coverage across all modules
+- **cli/commands**: 85.41% (good coverage, new import command needs testing)
+- **core**: 62.97% (needs improvement, new importer module requires tests)
 - **generators**: High coverage across all modules  
 - **utils**: High coverage across all modules
 - **types**: High coverage across all modules
+
+Note: Coverage temporarily reduced due to new import functionality requiring test implementation.
 
 ## Adding New AI Tools
 

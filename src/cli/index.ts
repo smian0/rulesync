@@ -15,7 +15,7 @@ import {
 
 const program = new Command();
 
-program.name("rulesync").description("Unified AI rules management CLI tool").version("0.1.0");
+program.name("rulesync").description("Unified AI rules management CLI tool").version("0.20.0");
 
 program.command("init").description("Initialize rulesync in current directory").action(initCommand);
 
@@ -44,6 +44,7 @@ program
   .option("--cursor", "Generate only for Cursor")
   .option("--cline", "Generate only for Cline")
   .option("--claude", "Generate only for Claude Code")
+  .option("--roo", "Generate only for Roo Code")
   .option("--delete", "Delete all existing files in output directories before generating")
   .option(
     "-b, --base-dir <paths>",
@@ -56,6 +57,7 @@ program
     if (options.cursor) tools.push("cursor");
     if (options.cline) tools.push("cline");
     if (options.claude) tools.push("claude");
+    if (options.roo) tools.push("roo");
 
     const generateOptions: {
       verbose?: boolean;

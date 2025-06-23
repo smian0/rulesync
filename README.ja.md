@@ -27,6 +27,8 @@ yarn global add rulesync
 
 ## 使い始める
 
+### 新しいプロジェクト
+
 1. **プロジェクトを初期化:**
    ```bash
    npx rulesync init
@@ -47,6 +49,22 @@ yarn global add rulesync
 4. **オプション: 生成されたファイルを.gitignoreに追加:**
    ```bash
    npx rulesync gitignore
+   ```
+
+### AIツール設定を持つ既存プロジェクト
+
+既にAIツールの設定がある場合、それらをインポートできます：
+
+1. **既存設定をインポート:**
+   ```bash
+   npx rulesync import --claude --cursor --copilot
+   ```
+
+2. **`.rulesync/`ディレクトリのインポートされたルールを確認・編集**
+
+3. **統合された設定を生成:**
+   ```bash
+   npx rulesync generate
    ```
 
 以上です！AIコーディングアシスタントが生成された設定ファイルを自動的に使用するようになります。
@@ -180,7 +198,33 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 - `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: 指定されたツールのみ生成
 - `--base-dir <paths>`: 指定されたベースディレクトリに設定ファイルを生成（複数パスの場合はカンマ区切り）。異なるプロジェクトディレクトリにツール固有の設定を生成したいmonorepoセットアップに便利。
 
-### 4. その他のコマンド
+### 4. 既存設定のインポート
+
+プロジェクトに既存のAIツール設定がある場合、rulesync形式にインポートできます：
+
+```bash
+# 既存のAIツール設定からインポート
+npx rulesync import --claude    # CLAUDE.mdからインポート
+npx rulesync import --cursor    # .cursorrulesからインポート
+npx rulesync import --copilot   # .github/copilot-instructions.mdからインポート
+npx rulesync import --cline     # .cline/instructions.mdからインポート
+npx rulesync import --roo       # .roo/instructions.mdからインポート
+
+# 複数のツールからインポート
+npx rulesync import --claude --cursor --copilot
+
+# インポート時の詳細出力
+npx rulesync import --claude --verbose
+```
+
+importコマンドの動作：
+- 各AIツールの既存設定ファイルをパース
+- 適切なフロントマターを付けてrulesync形式に変換
+- インポートしたコンテンツで新しい`.rulesync/*.md`ファイルを作成
+- ファイル名の競合を避けるためツール固有のプレフィックスを使用（例：`claude__overview.md`）
+- 競合が発生した場合はユニークなファイル名を生成
+
+### 5. その他のコマンド
 
 ```bash
 # サンプルファイルでプロジェクトを初期化
