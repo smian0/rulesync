@@ -77,7 +77,9 @@ export async function parseCopilotConfiguration(
   }
 
   if (rules.length === 0) {
-    errors.push("No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)");
+    errors.push(
+      "No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)"
+    );
   }
 
   return { rules, errors };
