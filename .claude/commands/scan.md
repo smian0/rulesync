@@ -5,6 +5,8 @@ Review all files matching $FILE_PATTERN for the following points:
 - No vulnerable code is included
 - No malicious code is included
 
+For example, `node_modules/**/*` and other non-git-managed files are excluded from the scan.
+
 Make `{PROJECT_ROOT}/tmp/scan.md`, then write the results to the file sequentially.
 
 Follow the format below:
