@@ -36,6 +36,6 @@ jobs:
           pnpm test
 
       - name: Publish to npm
-        run: pnpm publish --git-checks=false
+        run: pnpm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
