@@ -1,5 +1,4 @@
-NEW_VERSION = $ARGUMENT
-
+NEW_VERSION = $ARGUMENTS
 
 1. Confirm that you are currently on the main branch. If not on main branch, abort this operation.
 2. Run `git pull`.
