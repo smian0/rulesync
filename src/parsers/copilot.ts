@@ -1,4 +1,5 @@
 import { basename, join } from "node:path";
+import matter from "gray-matter";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -17,9 +18,11 @@ export async function parseCopilotConfiguration(
   const copilotFilePath = join(baseDir, ".github", "copilot-instructions.md");
   if (await fileExists(copilotFilePath)) {
     try {
-      const content = await readFileContent(copilotFilePath);
+      const rawContent = await readFileContent(copilotFilePath);
+      const parsed = matter(rawContent);
+      const content = parsed.content.trim();
 
-      if (content.trim()) {
+      if (content) {
         const frontmatter: RuleFrontmatter = {
           root: false,
           targets: ["copilot"],
@@ -29,7 +32,7 @@ export async function parseCopilotConfiguration(
 
         rules.push({
           frontmatter,
-          content: content.trim(),
+          content,
           filename: "copilot-instructions",
           filepath: copilotFilePath,
         });
@@ -50,9 +53,11 @@ export async function parseCopilotConfiguration(
       for (const file of files) {
         if (file.endsWith(".instructions.md")) {
           const filePath = join(instructionsDir, file);
-          const content = await readFileContent(filePath);
+          const rawContent = await readFileContent(filePath);
+          const parsed = matter(rawContent);
+          const content = parsed.content.trim();
 
-          if (content.trim()) {
+          if (content) {
             const filename = basename(file, ".instructions.md");
             const frontmatter: RuleFrontmatter = {
               root: false,
@@ -63,7 +68,7 @@ export async function parseCopilotConfiguration(
 
             rules.push({
               frontmatter,
-              content: content.trim(),
+              content,
               filename: `copilot-${filename}`,
               filepath: filePath,
             });

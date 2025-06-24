@@ -1,4 +1,5 @@
 import { basename, join } from "node:path";
+import matter from "gray-matter";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -17,9 +18,11 @@ export async function parseCursorConfiguration(
   const cursorFilePath = join(baseDir, ".cursorrules");
   if (await fileExists(cursorFilePath)) {
     try {
-      const content = await readFileContent(cursorFilePath);
+      const rawContent = await readFileContent(cursorFilePath);
+      const parsed = matter(rawContent);
+      const content = parsed.content.trim();
 
-      if (content.trim()) {
+      if (content) {
         const frontmatter: RuleFrontmatter = {
           root: false,
           targets: ["cursor"],
@@ -29,7 +32,7 @@ export async function parseCursorConfiguration(
 
         rules.push({
           frontmatter,
-          content: content.trim(),
+          content,
           filename: "cursor-rules",
           filepath: cursorFilePath,
         });
@@ -40,7 +43,7 @@ export async function parseCursorConfiguration(
     }
   }
 
-  // Check for .cursor/rules/*.md files
+  // Check for .cursor/rules/*.mdc files
   const cursorRulesDir = join(baseDir, ".cursor", "rules");
   if (await fileExists(cursorRulesDir)) {
     try {
@@ -48,12 +51,14 @@ export async function parseCursorConfiguration(
       const files = await readdir(cursorRulesDir);
 
       for (const file of files) {
-        if (file.endsWith(".md")) {
+        if (file.endsWith(".mdc")) {
           const filePath = join(cursorRulesDir, file);
-          const content = await readFileContent(filePath);
+          const rawContent = await readFileContent(filePath);
+          const parsed = matter(rawContent);
+          const content = parsed.content.trim();
 
-          if (content.trim()) {
-            const filename = basename(file, ".md");
+          if (content) {
+            const filename = basename(file, ".mdc");
             const frontmatter: RuleFrontmatter = {
               root: false,
               targets: ["cursor"],
@@ -63,7 +68,7 @@ export async function parseCursorConfiguration(
 
             rules.push({
               frontmatter,
-              content: content.trim(),
+              content,
               filename: `cursor-${filename}`,
               filepath: filePath,
             });
@@ -77,7 +82,7 @@ export async function parseCursorConfiguration(
   }
 
   if (rules.length === 0) {
-    errors.push("No Cursor configuration files found (.cursorrules or .cursor/rules/*.md)");
+    errors.push("No Cursor configuration files found (.cursorrules or .cursor/rules/*.mdc)");
   }
 
   return { rules, errors };
