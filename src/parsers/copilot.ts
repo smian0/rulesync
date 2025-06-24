@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -15,32 +15,69 @@ export async function parseCopilotConfiguration(
 
   // Check for .github/copilot-instructions.md file
   const copilotFilePath = join(baseDir, ".github", "copilot-instructions.md");
-  if (!(await fileExists(copilotFilePath))) {
-    errors.push(".github/copilot-instructions.md file not found");
-    return { rules, errors };
+  if (await fileExists(copilotFilePath)) {
+    try {
+      const content = await readFileContent(copilotFilePath);
+
+      if (content.trim()) {
+        const frontmatter: RuleFrontmatter = {
+          root: false,
+          targets: ["copilot"],
+          description: "GitHub Copilot instructions",
+          globs: ["**/*"],
+        };
+
+        rules.push({
+          frontmatter,
+          content: content.trim(),
+          filename: "copilot-instructions",
+          filepath: copilotFilePath,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse copilot-instructions.md: ${errorMessage}`);
+    }
   }
 
-  try {
-    const content = await readFileContent(copilotFilePath);
+  // Check for .github/instructions/*.instructions.md files
+  const instructionsDir = join(baseDir, ".github", "instructions");
+  if (await fileExists(instructionsDir)) {
+    try {
+      const { readdir } = await import("node:fs/promises");
+      const files = await readdir(instructionsDir);
 
-    if (content.trim()) {
-      const frontmatter: RuleFrontmatter = {
-        root: false,
-        targets: ["copilot"],
-        description: "GitHub Copilot instructions",
-        globs: ["**/*"],
-      };
+      for (const file of files) {
+        if (file.endsWith(".instructions.md")) {
+          const filePath = join(instructionsDir, file);
+          const content = await readFileContent(filePath);
 
-      rules.push({
-        frontmatter,
-        content: content.trim(),
-        filename: "copilot-instructions",
-        filepath: copilotFilePath,
-      });
+          if (content.trim()) {
+            const filename = basename(file, ".instructions.md");
+            const frontmatter: RuleFrontmatter = {
+              root: false,
+              targets: ["copilot"],
+              description: `Copilot instruction: ${filename}`,
+              globs: ["**/*"],
+            };
+
+            rules.push({
+              frontmatter,
+              content: content.trim(),
+              filename: `copilot-${filename}`,
+              filepath: filePath,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse .github/instructions files: ${errorMessage}`);
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    errors.push(`Failed to parse Copilot configuration: ${errorMessage}`);
+  }
+
+  if (rules.length === 0) {
+    errors.push("No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)");
   }
 
   return { rules, errors };

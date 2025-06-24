@@ -10,8 +10,8 @@ describe("config utils", () => {
       expect(config.outputPaths.copilot).toBe(".github/instructions");
       expect(config.outputPaths.cursor).toBe(".cursor/rules");
       expect(config.outputPaths.cline).toBe(".clinerules");
-      expect(config.outputPaths.claude).toBe(".");
-      expect(config.defaultTargets).toEqual(["copilot", "cursor", "cline", "claude", "roo"]);
+      expect(config.outputPaths.claudecode).toBe(".");
+      expect(config.defaultTargets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo"]);
       expect(config.watchEnabled).toBe(false);
     });
   });
@@ -21,7 +21,7 @@ describe("config utils", () => {
 
     it("should resolve * to all default targets", () => {
       const targets = resolveTargets(["*"], config);
-      expect(targets).toEqual(["copilot", "cursor", "cline", "claude", "roo"]);
+      expect(targets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo"]);
     });
 
     it("should return specific targets as-is", () => {
@@ -34,14 +34,14 @@ describe("config utils", () => {
       expect(targets).toEqual(["copilot"]);
     });
 
-    it("should handle claude target", () => {
-      const targets = resolveTargets(["claude"], config);
-      expect(targets).toEqual(["claude"]);
+    it("should handle claudecode target", () => {
+      const targets = resolveTargets(["claudecode"], config);
+      expect(targets).toEqual(["claudecode"]);
     });
 
-    it("should handle mixed targets including claude", () => {
-      const targets = resolveTargets(["copilot", "claude"], config);
-      expect(targets).toEqual(["copilot", "claude"]);
+    it("should handle mixed targets including claudecode", () => {
+      const targets = resolveTargets(["copilot", "claudecode"], config);
+      expect(targets).toEqual(["copilot", "claudecode"]);
     });
   });
 });

@@ -29,7 +29,7 @@ program
 program
   .command("import")
   .description("Import configurations from AI tools to rulesync format")
-  .option("--claude", "Import from Claude Code (CLAUDE.md)")
+  .option("--claudecode", "Import from Claude Code (CLAUDE.md)")
   .option("--cursor", "Import from Cursor (.cursorrules)")
   .option("--copilot", "Import from GitHub Copilot (.github/copilot-instructions.md)")
   .option("--cline", "Import from Cline (.cline/instructions.md)")
@@ -43,7 +43,7 @@ program
   .option("--copilot", "Generate only for GitHub Copilot")
   .option("--cursor", "Generate only for Cursor")
   .option("--cline", "Generate only for Cline")
-  .option("--claude", "Generate only for Claude Code")
+  .option("--claudecode", "Generate only for Claude Code")
   .option("--roo", "Generate only for Roo Code")
   .option("--delete", "Delete all existing files in output directories before generating")
   .option(
@@ -56,7 +56,7 @@ program
     if (options.copilot) tools.push("copilot");
     if (options.cursor) tools.push("cursor");
     if (options.cline) tools.push("cline");
-    if (options.claude) tools.push("claude");
+    if (options.claudecode) tools.push("claudecode");
     if (options.roo) tools.push("roo");
 
     const generateOptions: {

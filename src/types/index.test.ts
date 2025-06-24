@@ -54,10 +54,10 @@ describe("types/index", () => {
         copilot: ".github/instructions",
         cursor: ".cursor/rules",
         cline: ".clinerules",
-        claude: ".",
+        claudecode: ".",
         roo: ".roo/rules",
       },
-      defaultTargets: ["copilot", "cursor", "cline", "claude", "roo"],
+      defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
       watchEnabled: false,
     };
 
@@ -68,10 +68,10 @@ describe("types/index", () => {
   });
 
   it("should validate ToolTarget type constraints", () => {
-    const validTargets: ToolTarget[] = ["copilot", "cursor", "cline", "claude", "roo"];
+    const validTargets: ToolTarget[] = ["copilot", "cursor", "cline", "claudecode", "roo"];
 
     for (const target of validTargets) {
-      expect(["copilot", "cursor", "cline", "claude", "roo"]).toContain(target);
+      expect(["copilot", "cursor", "cline", "claudecode", "roo"]).toContain(target);
     }
   });
 
@@ -89,7 +89,7 @@ describe("types/index", () => {
   it("should handle multiple specific targets in RuleFrontmatter", () => {
     const multiTargetRule: RuleFrontmatter = {
       root: false,
-      targets: ["copilot", "cursor", "claude"],
+      targets: ["copilot", "cursor", "claudecode"],
       description: "Multi-target rule",
       globs: ["**/*.ts", "**/*.js"],
     };

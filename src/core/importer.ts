@@ -35,7 +35,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   // Parse configuration based on tool
   try {
     switch (tool) {
-      case "claude": {
+      case "claudecode": {
         const claudeResult = await parseClaudeConfiguration(baseDir);
         rules = claudeResult.rules;
         errors.push(...claudeResult.errors);

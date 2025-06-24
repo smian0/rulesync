@@ -9,11 +9,11 @@ describe("generateRooConfig", () => {
       copilot: ".github/instructions",
       cursor: ".cursor/rules",
       cline: ".clinerules",
-      claude: ".",
+      claudecode: ".",
       roo: ".roo/rules",
     },
     watchEnabled: false,
-    defaultTargets: ["copilot", "cursor", "cline", "claude", "roo"],
+    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
   };
 
   it("should generate basic Roo configuration", async () => {

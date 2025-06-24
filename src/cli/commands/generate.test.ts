@@ -26,10 +26,10 @@ const mockConfig = {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
     cline: ".clinerules",
-    claude: ".",
+    claudecode: ".",
     roo: ".roo/rules",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claude", "roo"],
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
   watchEnabled: false,
 } as const;
 

@@ -30,7 +30,7 @@ export async function statusCommand(): Promise<void> {
       console.log(`   - Non-root rules: ${nonRootRules}`);
 
       // Count by target tools
-      const targetCounts = { copilot: 0, cursor: 0, cline: 0, claude: 0, roo: 0 };
+      const targetCounts = { copilot: 0, cursor: 0, cline: 0, claudecode: 0, roo: 0 };
 
       for (const rule of rules) {
         const targets =
@@ -47,7 +47,7 @@ export async function statusCommand(): Promise<void> {
       console.log(`   - Copilot: ${targetCounts.copilot} rules`);
       console.log(`   - Cursor: ${targetCounts.cursor} rules`);
       console.log(`   - Cline: ${targetCounts.cline} rules`);
-      console.log(`   - Claude: ${targetCounts.claude} rules`);
+      console.log(`   - Claude Code: ${targetCounts.claudecode} rules`);
       console.log(`   - Roo: ${targetCounts.roo} rules`);
     }
 

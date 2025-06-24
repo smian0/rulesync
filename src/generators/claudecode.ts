@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
 
-export async function generateClaudeConfig(
+export async function generateClaudecodeConfig(
   rules: ParsedRule[],
   config: Config,
   baseDir?: string
@@ -15,10 +15,10 @@ export async function generateClaudeConfig(
   // Generate CLAUDE.md with root rule and references to detail files
   const claudeMdContent = generateClaudeMarkdown(rootRules, detailRules);
   const claudeOutputDir = baseDir
-    ? join(baseDir, config.outputPaths.claude)
-    : config.outputPaths.claude;
+    ? join(baseDir, config.outputPaths.claudecode)
+    : config.outputPaths.claudecode;
   outputs.push({
-    tool: "claude",
+    tool: "claudecode",
     filepath: join(claudeOutputDir, "CLAUDE.md"),
     content: claudeMdContent,
   });
@@ -27,7 +27,7 @@ export async function generateClaudeConfig(
   for (const rule of detailRules) {
     const memoryContent = generateMemoryFile(rule);
     outputs.push({
-      tool: "claude",
+      tool: "claudecode",
       filepath: join(claudeOutputDir, ".claude", "memories", `${rule.filename}.md`),
       content: memoryContent,
     });

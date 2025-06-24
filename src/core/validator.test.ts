@@ -133,13 +133,13 @@ describe("validateRules", () => {
     expect(result.warnings).toHaveLength(0);
   });
 
-  it("should validate claude target correctly", async () => {
+  it("should validate claudecode target correctly", async () => {
     const rules = [
       createMockRule({
         frontmatter: {
-          targets: ["claude"],
+          targets: ["claudecode"],
           root: false,
-          description: "Claude specific rule",
+          description: "Claudecode specific rule",
           globs: ["**/*.md"],
         },
       }),
@@ -152,13 +152,13 @@ describe("validateRules", () => {
     expect(result.warnings).toHaveLength(0);
   });
 
-  it("should validate mixed targets including claude", async () => {
+  it("should validate mixed targets including claudecode", async () => {
     const rules = [
       createMockRule({
         frontmatter: {
-          targets: ["copilot", "claude"],
+          targets: ["copilot", "claudecode"],
           root: true,
-          description: "Rule for both copilot and claude",
+          description: "Rule for both copilot and claudecode",
           globs: ["**/*.ts", "**/*.js"],
         },
       }),

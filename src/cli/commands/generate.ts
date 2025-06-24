@@ -64,7 +64,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
           case "cline":
             deleteTasks.push(removeDirectory(config.outputPaths.cline));
             break;
-          case "claude":
+          case "claudecode":
             // Use safe deletion for Claude Code files only
             deleteTasks.push(removeClaudeGeneratedFiles());
             break;

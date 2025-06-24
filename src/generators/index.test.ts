@@ -3,7 +3,7 @@ import * as generators from "./index.js";
 
 describe("generators/index", () => {
   it("should export all generator functions", () => {
-    expect(generators.generateClaudeConfig).toBeDefined();
+    expect(generators.generateClaudecodeConfig).toBeDefined();
     expect(generators.generateClineConfig).toBeDefined();
     expect(generators.generateCopilotConfig).toBeDefined();
     expect(generators.generateCursorConfig).toBeDefined();
@@ -11,7 +11,7 @@ describe("generators/index", () => {
   });
 
   it("should export functions as expected types", () => {
-    expect(typeof generators.generateClaudeConfig).toBe("function");
+    expect(typeof generators.generateClaudecodeConfig).toBe("function");
     expect(typeof generators.generateClineConfig).toBe("function");
     expect(typeof generators.generateCopilotConfig).toBe("function");
     expect(typeof generators.generateCursorConfig).toBe("function");

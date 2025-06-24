@@ -2,7 +2,7 @@ import { importConfiguration } from "../../core/importer.js";
 import type { ToolTarget } from "../../types/index.js";
 
 export interface ImportOptions {
-  claude?: boolean;
+  claudecode?: boolean;
   cursor?: boolean;
   copilot?: boolean;
   cline?: boolean;
@@ -14,7 +14,7 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   const tools: ToolTarget[] = [];
 
   // Collect selected tools
-  if (options.claude) tools.push("claude");
+  if (options.claudecode) tools.push("claudecode");
   if (options.cursor) tools.push("cursor");
   if (options.copilot) tools.push("copilot");
   if (options.cline) tools.push("cline");
@@ -23,7 +23,7 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   // Validate that at least one tool is selected
   if (tools.length === 0) {
     console.error(
-      "❌ Please specify at least one tool to import from (--claude, --cursor, --copilot, --cline, --roo)"
+      "❌ Please specify at least one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo)"
     );
     process.exit(1);
   }

@@ -1,4 +1,4 @@
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -13,34 +13,71 @@ export async function parseCursorConfiguration(
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
 
-  // Check for .cursorrules file
+  // Check for .cursorrules file (legacy)
   const cursorFilePath = join(baseDir, ".cursorrules");
-  if (!(await fileExists(cursorFilePath))) {
-    errors.push(".cursorrules file not found");
-    return { rules, errors };
+  if (await fileExists(cursorFilePath)) {
+    try {
+      const content = await readFileContent(cursorFilePath);
+
+      if (content.trim()) {
+        const frontmatter: RuleFrontmatter = {
+          root: false,
+          targets: ["cursor"],
+          description: "Cursor IDE configuration rules",
+          globs: ["**/*"],
+        };
+
+        rules.push({
+          frontmatter,
+          content: content.trim(),
+          filename: "cursor-rules",
+          filepath: cursorFilePath,
+        });
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse .cursorrules file: ${errorMessage}`);
+    }
   }
 
-  try {
-    const content = await readFileContent(cursorFilePath);
+  // Check for .cursor/rules/*.md files
+  const cursorRulesDir = join(baseDir, ".cursor", "rules");
+  if (await fileExists(cursorRulesDir)) {
+    try {
+      const { readdir } = await import("node:fs/promises");
+      const files = await readdir(cursorRulesDir);
 
-    if (content.trim()) {
-      const frontmatter: RuleFrontmatter = {
-        root: false,
-        targets: ["cursor"],
-        description: "Cursor IDE configuration rules",
-        globs: ["**/*"],
-      };
+      for (const file of files) {
+        if (file.endsWith(".md")) {
+          const filePath = join(cursorRulesDir, file);
+          const content = await readFileContent(filePath);
 
-      rules.push({
-        frontmatter,
-        content: content.trim(),
-        filename: "cursor-rules",
-        filepath: cursorFilePath,
-      });
+          if (content.trim()) {
+            const filename = basename(file, ".md");
+            const frontmatter: RuleFrontmatter = {
+              root: false,
+              targets: ["cursor"],
+              description: `Cursor rule: ${filename}`,
+              globs: ["**/*"],
+            };
+
+            rules.push({
+              frontmatter,
+              content: content.trim(),
+              filename: `cursor-${filename}`,
+              filepath: filePath,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse .cursor/rules files: ${errorMessage}`);
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    errors.push(`Failed to parse Cursor configuration: ${errorMessage}`);
+  }
+
+  if (rules.length === 0) {
+    errors.push("No Cursor configuration files found (.cursorrules or .cursor/rules/*.md)");
   }
 
   return { rules, errors };

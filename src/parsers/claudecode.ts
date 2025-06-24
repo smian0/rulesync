@@ -70,7 +70,7 @@ function parseClaudeMainFile(content: string, filepath: string): ParsedRule | nu
 
   const frontmatter: RuleFrontmatter = {
     root: false,
-    targets: ["claude"],
+    targets: ["claudecode"],
     description: "Main Claude Code configuration",
     globs: ["**/*"],
   };
@@ -99,7 +99,7 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
           const filename = basename(file, ".md");
           const frontmatter: RuleFrontmatter = {
             root: false,
-            targets: ["claude"],
+            targets: ["claudecode"],
             description: `Memory file: ${filename}`,
             globs: ["**/*"],
           };

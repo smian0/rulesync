@@ -1,4 +1,4 @@
-import { generateClaudeConfig } from "../generators/claude.js";
+import { generateClaudecodeConfig } from "../generators/claudecode.js";
 import { generateClineConfig } from "../generators/cline.js";
 import { generateCopilotConfig } from "../generators/copilot.js";
 import { generateCursorConfig } from "../generators/cursor.js";
@@ -60,8 +60,8 @@ async function generateForTool(
       return generateCursorConfig(rules, config, baseDir);
     case "cline":
       return generateClineConfig(rules, config, baseDir);
-    case "claude":
-      return await generateClaudeConfig(rules, config, baseDir);
+    case "claudecode":
+      return await generateClaudecodeConfig(rules, config, baseDir);
     case "roo":
       return generateRooConfig(rules, config, baseDir);
     default:
