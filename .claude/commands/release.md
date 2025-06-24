@@ -8,4 +8,5 @@ NEW_VERSION = $ARGUMENT
 5. Compare code changes between the previous version tag and current commit to prepare the Release description.
   - Write in English.
   - Do not include confidential information.
-6. Use the `gh` command to create a Release on the `github.com/dyoshikawa/rulesync` repository with both title and tag set to NEW_VERSION, using the content from step 4 as the description.
+6. 念の為、リリース内容に非公開にすべき内容が混入していないかを確認してください。
+7. Use the `gh` command to create a Release on the `github.com/dyoshikawa/rulesync` repository with both title and tag set to NEW_VERSION, using the content from step 4 as the description.
