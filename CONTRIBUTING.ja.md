@@ -16,7 +16,7 @@ rulesyncへの貢献を歓迎します！このドキュメントでは、貢献
 ### 前提条件
 
 - Node.js 20.0.0 以上（推奨: 24.0.0+）
-- pnpm（推奨）またはnpm/yarn
+- pnpm 10.12.2+（推奨）またはnpm/yarn
 
 ### 開発コマンド
 
@@ -51,8 +51,14 @@ pnpm format:check
 # リントとフォーマットの両方を実行
 pnpm check
 
+# リントとフォーマット問題を修正
+pnpm fix
+
 # シークレットをチェック
 pnpm secretlint
+
+# 型チェック
+pnpm typecheck
 ```
 
 ## プロジェクトアーキテクチャ
@@ -84,12 +90,12 @@ rulesync/
 │   │   ├── cline.ts       # Cline Rules
 │   │   ├── claudecode.ts  # Claude Code Memory (CLAUDE.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
-│   ├── parsers/           # インポート用ツール固有パーサー
-│   │   ├── copilot.ts     # GitHub Copilot設定のパース
-│   │   ├── cursor.ts      # Cursor設定のパース
-│   │   ├── cline.ts       # Cline設定のパース
-│   │   ├── claudecode.ts  # Claude Code設定のパース
-│   │   └── roo.ts         # Roo Code設定のパース
+│   ├── parsers/           # インポート機能用ツール固有パーサー
+│   │   ├── copilot.ts     # GitHub Copilot設定のパース (.github/copilot-instructions.md)
+│   │   ├── cursor.ts      # Cursor設定のパース (.cursorrules, .cursor/rules/*.mdc)
+│   │   ├── cline.ts       # Cline設定のパース (.cline/instructions.md)
+│   │   ├── claudecode.ts  # Claude Code設定のパース (CLAUDE.md, .claude/memories/*.md)
+│   │   └── roo.ts         # Roo Code設定のパース (.roo/instructions.md)
 │   ├── types/              # TypeScript型定義
 │   │   ├── config.ts      # 設定型
 │   │   └── rules.ts       # ルールとフロントマター型
@@ -102,14 +108,14 @@ rulesync/
 
 ### 主要な依存関係
 
-- **Commander.js**: コマンドラインインターフェース用のCLIフレームワーク
-- **gray-matter**: Markdownファイルのフロントマターパーシング
-- **marked**: Markdownのパーシングとレンダリング
-- **chokidar**: `watch`コマンド用のファイル監視
-- **tsup**: ビルドシステム（CJSとESMの両方を出力）
-- **tsx**: 開発用TypeScript実行
-- **Biome**: 統合リンターとフォーマッター
-- **Vitest**: カバレッジ付きテストフレームワーク
+- **Commander.js v14.0.0**: コマンドラインインターフェース用のCLIフレームワーク
+- **gray-matter v4.0.3**: Markdownファイルのフロントマターパーシング（YAML、TOML、JSON対応）
+- **marked v15.0.12**: Markdownのパーシングとレンダリング
+- **chokidar v4.0.3**: 高性能な`watch`コマンド用のファイル監視
+- **tsup v8.5.0**: ビルドシステム（CJSとESMの両方を出力）
+- **tsx v4.20.3**: 開発用TypeScript実行
+- **Biome v2.0.0**: 統合リンターとフォーマッター（ESLint + Prettierの代替）
+- **Vitest v3.2.4**: カバレッジ付きテストフレームワーク
 
 ### ビルドシステム
 
@@ -194,7 +200,7 @@ type(scope): description
 
 ## テスト
 
-プロジェクトは包括的なカバレッジ（現在約68%、目標: 80%+）でVitestを使用してテストしています:
+プロジェクトは包括的なカバレッジ（現在: 21テストファイルで157テスト、目標: 80%+カバレッジ）でVitestを使用してテストしています:
 
 ### テスト構造
 
@@ -214,7 +220,7 @@ type(scope): description
 ### テストの実行
 
 ```bash
-# すべてのテスト（現在100+テスト）
+# すべてのテスト（21テストファイルで157テスト）
 pnpm test
 
 # 開発用ウォッチモード
@@ -225,6 +231,10 @@ pnpm test:coverage
 
 # 特定のテストファイルを実行
 pnpm test src/generators/copilot.test.ts
+
+# 特定機能のテストを実行
+pnpm test src/cli/commands/import.test.ts  # インポート機能のテスト
+pnpm test src/parsers/                     # すべてのパーサーのテスト
 ```
 
 ### モジュール別テストカバレッジ
@@ -242,12 +252,13 @@ pnpm test src/generators/copilot.test.ts
 新しいAIツールのサポートを追加するには:
 
 1. **ジェネレーターを作成**: `src/generators/newtool.ts`を追加
-2. **インターフェースを実装**: パターンに従って非同期関数をエクスポート
-3. **コアに追加**: `src/core/generator.ts`を更新
-4. **CLIオプションを追加**: `src/cli/index.ts`を更新
-5. **型を更新**: `src/types/rules.ts`の`ToolTarget`に追加
-6. **テストを追加**: `src/generators/newtool.test.ts`を作成
-7. **ドキュメントを更新**: README.mdに追加
+2. **パーサーを作成**: インポート機能用に`src/parsers/newtool.ts`を追加
+3. **インターフェースを実装**: パターンに従って非同期関数をエクスポート
+4. **コアに追加**: `src/core/generator.ts`と`src/core/importer.ts`を更新
+5. **CLIオプションを追加**: generateとimportコマンドの両方で`src/cli/index.ts`を更新
+6. **型を更新**: `src/types/rules.ts`の`ToolTarget`に追加
+7. **テストを追加**: `src/generators/newtool.test.ts`と`src/parsers/newtool.test.ts`を作成
+8. **ドキュメントを更新**: README.mdとREADME.ja.mdに追加
 
 ### ジェネレーターインターフェースパターン
 
@@ -272,6 +283,41 @@ export async function generateNewToolConfig(
   }
   
   return outputs;
+}
+```
+
+### パーサーインターフェースパターン
+
+```typescript
+export async function parseNewToolConfiguration(
+  baseDir: string = process.cwd()
+): Promise<{ rules: ParsedRule[]; errors: string[] }> {
+  const rules: ParsedRule[] = [];
+  const errors: string[] = [];
+  
+  // 設定ファイルを確認
+  const configFiles = await findNewToolConfigFiles(baseDir);
+  
+  if (configFiles.length === 0) {
+    errors.push("NewTool設定ファイルが見つかりません");
+    return { rules, errors };
+  }
+  
+  // 各設定ファイルをパース
+  for (const configFile of configFiles) {
+    try {
+      const content = await readFile(configFile, "utf-8");
+      const parsed = await parseNewToolFormat(content);
+      rules.push({
+        ...parsed,
+        filename: generateUniqueFilename("newtool", parsed),
+      });
+    } catch (error) {
+      errors.push(`${configFile}のパースに失敗: ${error.message}`);
+    }
+  }
+  
+  return { rules, errors };
 }
 ```
 

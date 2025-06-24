@@ -16,7 +16,7 @@ We welcome contributions to rulesync! This document outlines the process for con
 ### Prerequisites
 
 - Node.js 20.0.0 or higher (recommended: 24.0.0+)
-- pnpm (recommended) or npm/yarn
+- pnpm 10.12.2+ (recommended) or npm/yarn
 
 ### Development Commands
 
@@ -51,8 +51,14 @@ pnpm format:check
 # Run both lint and format
 pnpm check
 
+# Fix linting and formatting issues
+pnpm fix
+
 # Check for secrets
 pnpm secretlint
+
+# Type checking
+pnpm typecheck
 ```
 
 ## Project Architecture
@@ -84,12 +90,12 @@ rulesync/
 │   │   ├── cline.ts       # Cline Rules
 │   │   ├── claudecode.ts  # Claude Code Memory (CLAUDE.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
-│   ├── parsers/           # Tool-specific parsers for import
-│   │   ├── copilot.ts     # Parse GitHub Copilot configurations
-│   │   ├── cursor.ts      # Parse Cursor configurations
-│   │   ├── cline.ts       # Parse Cline configurations
-│   │   ├── claudecode.ts  # Parse Claude Code configurations
-│   │   └── roo.ts         # Parse Roo Code configurations
+│   ├── parsers/           # Tool-specific parsers for import functionality
+│   │   ├── copilot.ts     # Parse GitHub Copilot configurations (.github/copilot-instructions.md)
+│   │   ├── cursor.ts      # Parse Cursor configurations (.cursorrules, .cursor/rules/*.mdc)
+│   │   ├── cline.ts       # Parse Cline configurations (.cline/instructions.md)
+│   │   ├── claudecode.ts  # Parse Claude Code configurations (CLAUDE.md, .claude/memories/*.md)
+│   │   └── roo.ts         # Parse Roo Code configurations (.roo/instructions.md)
 │   ├── types/              # TypeScript type definitions
 │   │   ├── config.ts      # Configuration types
 │   │   └── rules.ts       # Rule and frontmatter types
@@ -102,14 +108,14 @@ rulesync/
 
 ### Key Dependencies
 
-- **Commander.js**: CLI framework for command-line interface
-- **gray-matter**: Frontmatter parsing for Markdown files
-- **marked**: Markdown parsing and rendering
-- **chokidar**: File watching for `watch` command
-- **tsup**: Build system (outputs both CJS and ESM)
-- **tsx**: TypeScript execution for development
-- **Biome**: Unified linter and formatter
-- **Vitest**: Testing framework with coverage
+- **Commander.js v14.0.0**: CLI framework for command-line interface
+- **gray-matter v4.0.3**: Frontmatter parsing for Markdown files (supports YAML, TOML, JSON)
+- **marked v15.0.12**: Markdown parsing and rendering
+- **chokidar v4.0.3**: File watching for `watch` command with high performance
+- **tsup v8.5.0**: Build system (outputs both CJS and ESM)
+- **tsx v4.20.3**: TypeScript execution for development
+- **Biome v2.0.0**: Unified linter and formatter (replaces ESLint + Prettier)
+- **Vitest v3.2.4**: Testing framework with coverage
 
 ### Build System
 
@@ -194,7 +200,7 @@ The style is automatically enforced by our CI pipeline and pre-commit hooks.
 
 ## Testing
 
-The project uses Vitest for testing with comprehensive coverage (currently ~68%, target: 80%+):
+The project uses Vitest for testing with comprehensive coverage (current: 157 tests across 21 test files, target: 80%+ coverage):
 
 ### Test Structure
 
@@ -214,7 +220,7 @@ The project uses Vitest for testing with comprehensive coverage (currently ~68%,
 ### Running Tests
 
 ```bash
-# All tests (100+ tests currently)
+# All tests (157 tests across 21 test files)
 pnpm test
 
 # Watch mode for development
@@ -225,6 +231,10 @@ pnpm test:coverage
 
 # Run specific test file
 pnpm test src/generators/copilot.test.ts
+
+# Run tests for specific functionality
+pnpm test src/cli/commands/import.test.ts  # Test import functionality
+pnpm test src/parsers/                     # Test all parsers
 ```
 
 ### Test Coverage by Module
@@ -242,12 +252,13 @@ Note: Coverage temporarily reduced due to new import functionality requiring tes
 To add support for a new AI tool:
 
 1. **Create generator**: Add `src/generators/newtool.ts`
-2. **Implement interface**: Export async function following the pattern
-3. **Add to core**: Update `src/core/generator.ts` 
-4. **Add CLI option**: Update `src/cli/index.ts`
-5. **Update types**: Add to `ToolTarget` in `src/types/rules.ts`
-6. **Add tests**: Create `src/generators/newtool.test.ts`
-7. **Update docs**: Add to README.md
+2. **Create parser**: Add `src/parsers/newtool.ts` for import functionality
+3. **Implement interfaces**: Export async functions following the patterns
+4. **Add to core**: Update `src/core/generator.ts` and `src/core/importer.ts`
+5. **Add CLI options**: Update `src/cli/index.ts` for both generate and import commands
+6. **Update types**: Add to `ToolTarget` in `src/types/rules.ts`
+7. **Add tests**: Create `src/generators/newtool.test.ts` and `src/parsers/newtool.test.ts`
+8. **Update docs**: Add to README.md and README.ja.md
 
 ### Generator Interface Pattern
 
@@ -272,6 +283,41 @@ export async function generateNewToolConfig(
   }
   
   return outputs;
+}
+```
+
+### Parser Interface Pattern
+
+```typescript
+export async function parseNewToolConfiguration(
+  baseDir: string = process.cwd()
+): Promise<{ rules: ParsedRule[]; errors: string[] }> {
+  const rules: ParsedRule[] = [];
+  const errors: string[] = [];
+  
+  // Check for configuration files
+  const configFiles = await findNewToolConfigFiles(baseDir);
+  
+  if (configFiles.length === 0) {
+    errors.push("No NewTool configuration files found");
+    return { rules, errors };
+  }
+  
+  // Parse each configuration file
+  for (const configFile of configFiles) {
+    try {
+      const content = await readFile(configFile, "utf-8");
+      const parsed = await parseNewToolFormat(content);
+      rules.push({
+        ...parsed,
+        filename: generateUniqueFilename("newtool", parsed),
+      });
+    } catch (error) {
+      errors.push(`Failed to parse ${configFile}: ${error.message}`);
+    }
+  }
+  
+  return { rules, errors };
 }
 ```
 

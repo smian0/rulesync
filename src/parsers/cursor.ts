@@ -1,5 +1,6 @@
 import { basename, join } from "node:path";
 import matter from "gray-matter";
+import yaml from "js-yaml";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -7,6 +8,33 @@ export interface CursorImportResult {
   rules: ParsedRule[];
   errors: string[];
 }
+
+// Custom gray-matter options for more lenient YAML parsing
+// This is needed to handle Cursor's .mdc file format where "globs: *" (without quotes) is valid
+// but causes YAML parsing errors since * is a reserved character in YAML.
+// We preprocess the frontmatter to add quotes around bare asterisks in globs fields.
+const customMatterOptions = {
+  engines: {
+    yaml: {
+      parse: (str: string): object => {
+        try {
+          // Preprocess to handle "globs: *" (Cursor's valid format) by adding quotes
+          // This converts "globs: *" to "globs: \"*\"" for proper YAML parsing
+          const preprocessed = str.replace(/^(\s*globs:\s*)\*\s*$/gm, '$1"*"');
+          return yaml.load(preprocessed, { schema: yaml.DEFAULT_SCHEMA }) as object;
+        } catch (error) {
+          // If that fails, try with FAILSAFE_SCHEMA as a fallback
+          try {
+            return yaml.load(str, { schema: yaml.FAILSAFE_SCHEMA }) as object;
+          } catch {
+            // If all else fails, throw the original error
+            throw error;
+          }
+        }
+      },
+    },
+  },
+};
 
 export async function parseCursorConfiguration(
   baseDir: string = process.cwd()
@@ -19,7 +47,7 @@ export async function parseCursorConfiguration(
   if (await fileExists(cursorFilePath)) {
     try {
       const rawContent = await readFileContent(cursorFilePath);
-      const parsed = matter(rawContent);
+      const parsed = matter(rawContent, customMatterOptions);
       const content = parsed.content.trim();
 
       if (content) {
@@ -55,7 +83,7 @@ export async function parseCursorConfiguration(
           const filePath = join(cursorRulesDir, file);
           try {
             const rawContent = await readFileContent(filePath);
-            const parsed = matter(rawContent);
+            const parsed = matter(rawContent, customMatterOptions);
             const content = parsed.content.trim();
 
             if (content) {

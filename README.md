@@ -3,17 +3,19 @@
 [![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
 [![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
 
-A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files (`.rulesync/*.md`).
+A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files (`.rulesync/*.md`). Also imports existing AI tool configurations into the unified format.
 
 **English** | [日本語](./README.ja.md)
 
 ## Supported Tools
 
+rulesync supports both **generation** and **import** for the following AI development tools:
+
 - **GitHub Copilot Custom Instructions** (`.github/copilot-instructions.md` + `.github/instructions/*.instructions.md`)
-- **Cursor Project Rules** (`.cursor/rules/*.mdc`) 
-- **Cline Rules** (`.clinerules/*.md`)
+- **Cursor Project Rules** (`.cursor/rules/*.mdc` + `.cursorrules`) 
+- **Cline Rules** (`.clinerules/*.md` + `.cline/instructions.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
-- **Roo Code Rules** (`.roo/rules/*.md`)
+- **Roo Code Rules** (`.roo/rules/*.md` + `.roo/instructions.md`)
 
 ## Installation
 
@@ -53,11 +55,19 @@ yarn global add rulesync
 
 ### Existing Project with AI Tool Configurations
 
-If you already have AI tool configurations, you can import them:
+If you already have AI tool configurations, you can import them into rulesync format:
 
 1. **Import existing configurations:**
    ```bash
+   # Import from multiple tools at once
    npx rulesync import --claudecode --cursor --copilot
+   
+   # Or import from specific tools
+   npx rulesync import --claudecode  # From CLAUDE.md and .claude/memories/*.md
+   npx rulesync import --cursor      # From .cursorrules and .cursor/rules/*.mdc
+   npx rulesync import --copilot     # From .github/copilot-instructions.md
+   npx rulesync import --cline       # From .cline/instructions.md
+   npx rulesync import --roo         # From .roo/instructions.md
    ```
 
 2. **Review and edit** the imported rules in `.rulesync/` directory
@@ -218,11 +228,13 @@ npx rulesync import --claudecode --verbose
 ```
 
 The import command will:
-- Parse existing configuration files from each AI tool
-- Convert them to rulesync format with appropriate frontmatter
-- Create new `.rulesync/*.md` files with imported content
-- Use tool-specific prefixes to avoid filename conflicts (e.g., `claudecode__overview.md`)
+- Parse existing configuration files from each AI tool using custom parsers
+- Convert them to rulesync format with appropriate frontmatter metadata
+- Create new `.rulesync/*.md` files with imported content and proper rule categorization
+- Use tool-specific prefixes to avoid filename conflicts (e.g., `claudecode-overview.md`, `cursor-custom-rules.md`)
 - Generate unique filenames if conflicts occur
+- Support complex formats like Cursor's MDC files with YAML frontmatter
+- Handle multiple file imports (e.g., all files from `.claude/memories/` directory)
 
 ### 5. Other Commands
 

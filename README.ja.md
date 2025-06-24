@@ -3,17 +3,19 @@
 [![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
 [![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
 
-統一されたAIルールファイル（`.rulesync/*.md`）から、様々なAI開発ツール用の設定ファイルを自動生成するNode.js CLIツールです。
+統一されたAIルールファイル（`.rulesync/*.md`）から、様々なAI開発ツール用の設定ファイルを自動生成するNode.js CLIツールです。既存のAIツール設定を統一形式にインポートすることも可能です。
 
 [English](./README.md) | **日本語**
 
 ## 対応ツール
 
+rulesyncは以下のAI開発ツールの**生成**と**インポート**の両方をサポートしています：
+
 - **GitHub Copilot Custom Instructions** (`.github/copilot-instructions.md` + `.github/instructions/*.instructions.md`)
-- **Cursor Project Rules** (`.cursor/rules/*.mdc`) 
-- **Cline Rules** (`.clinerules/*.md`)
+- **Cursor Project Rules** (`.cursor/rules/*.mdc` + `.cursorrules`) 
+- **Cline Rules** (`.clinerules/*.md` + `.cline/instructions.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
-- **Roo Code Rules** (`.roo/rules/*.md`)
+- **Roo Code Rules** (`.roo/rules/*.md` + `.roo/instructions.md`)
 
 ## インストール
 
@@ -53,11 +55,19 @@ yarn global add rulesync
 
 ### AIツール設定を持つ既存プロジェクト
 
-既にAIツールの設定がある場合、それらをインポートできます：
+既にAIツールの設定がある場合、それらをrulesync形式にインポートできます：
 
 1. **既存設定をインポート:**
    ```bash
+   # 複数のツールから一度にインポート
    npx rulesync import --claudecode --cursor --copilot
+   
+   # または特定のツールからインポート
+   npx rulesync import --claudecode  # CLAUDE.mdと.claude/memories/*.mdから
+   npx rulesync import --cursor      # .cursorrulesと.cursor/rules/*.mdcから
+   npx rulesync import --copilot     # .github/copilot-instructions.mdから
+   npx rulesync import --cline       # .cline/instructions.mdから
+   npx rulesync import --roo         # .roo/instructions.mdから
    ```
 
 2. **`.rulesync/`ディレクトリのインポートされたルールを確認・編集**
@@ -218,11 +228,13 @@ npx rulesync import --claudecode --verbose
 ```
 
 importコマンドの動作：
-- 各AIツールの既存設定ファイルをパース
-- 適切なフロントマターを付けてrulesync形式に変換
-- インポートしたコンテンツで新しい`.rulesync/*.md`ファイルを作成
-- ファイル名の競合を避けるためツール固有のプレフィックスを使用（例：`claudecode__overview.md`）
+- カスタムパーサーを使用して各AIツールの既存設定ファイルをパース
+- 適切なフロントマターメタデータを付けてrulesync形式に変換
+- インポートしたコンテンツと適切なルール分類で新しい`.rulesync/*.md`ファイルを作成
+- ファイル名の競合を避けるためツール固有のプレフィックスを使用（例：`claudecode-overview.md`、`cursor-custom-rules.md`）
 - 競合が発生した場合はユニークなファイル名を生成
+- YAMLフロントマター付きのCursorのMDCファイルなど複雑なフォーマットをサポート
+- 複数ファイルのインポート（例：`.claude/memories/`ディレクトリのすべてのファイル）に対応
 
 ### 5. その他のコマンド
 
