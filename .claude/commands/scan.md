@@ -1,6 +1,6 @@
 FILE_PATTERN = $ARGUMENTS || './**/*'
 
-$FILE_PATTERN にマッチするすべてのファイルについて、以下の観点でレビューしてください。
+Review all files matching $FILE_PATTERN for the following points:
 
-- 脆弱性のあるコードが含まれていないこと
-- 悪意のあるコードが含まれていないこと
+- No vulnerable code is included
+- No malicious code is included
