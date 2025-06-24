@@ -31,9 +31,9 @@ const customMatterOptions = {
             throw error;
           }
         }
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 export async function parseCursorConfiguration(

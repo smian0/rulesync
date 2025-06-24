@@ -42,7 +42,7 @@ This is a test cursor rule content.
 
       expect(result.errors).toEqual([]);
       expect(result.rules).toHaveLength(1);
-      
+
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
       expect(rule.frontmatter.description).toBe("Cursor rule: test-rule");
@@ -74,11 +74,13 @@ This rule applies to all files using the asterisk wildcard without quotes.
 
       expect(result.errors).toEqual([]);
       expect(result.rules).toHaveLength(1);
-      
+
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
       expect(rule.frontmatter.description).toBe("Cursor rule: docs-maintenance");
-      expect(rule.content.trim()).toBe("# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.");
+      expect(rule.content.trim()).toBe(
+        "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes."
+      );
       expect(rule.filename).toBe("cursor-docs-maintenance");
     });
 
@@ -122,13 +124,13 @@ ruletype: autoattached
 
       expect(result.errors).toEqual([]);
       expect(result.rules).toHaveLength(3);
-      
+
       // Check that all files were parsed, including the one with globs: *
-      const filenames = result.rules.map(rule => rule.filename).sort();
+      const filenames = result.rules.map((rule) => rule.filename).sort();
       expect(filenames).toEqual([
         "cursor-build-tooling",
-        "cursor-cli-development", 
-        "cursor-docs-maintenance"
+        "cursor-cli-development",
+        "cursor-docs-maintenance",
       ]);
     });
 
@@ -148,12 +150,14 @@ This is a legacy .cursorrules file.
 
       expect(result.errors).toEqual([]);
       expect(result.rules).toHaveLength(1);
-      
+
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
       expect(rule.frontmatter.description).toBe("Cursor IDE configuration rules");
       expect(rule.frontmatter.globs).toEqual(["**/*"]);
-      expect(rule.content.trim()).toBe("# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file.");
+      expect(rule.content.trim()).toBe(
+        "# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file."
+      );
       expect(rule.filename).toBe("cursor-rules");
     });
 
@@ -200,7 +204,9 @@ ruletype: always
       const result = await parseCursorConfiguration(testDir);
 
       // When files exist but have empty content, an error is generated because no rules were parsed
-      expect(result.errors).toEqual(["No Cursor configuration files found (.cursorrules or .cursor/rules/*.mdc)"]);
+      expect(result.errors).toEqual([
+        "No Cursor configuration files found (.cursorrules or .cursor/rules/*.mdc)",
+      ]);
       expect(result.rules).toHaveLength(0); // Empty content files are skipped
     });
 
@@ -208,7 +214,9 @@ ruletype: always
       const result = await parseCursorConfiguration(testDir);
 
       expect(result.rules).toEqual([]);
-      expect(result.errors).toEqual(["No Cursor configuration files found (.cursorrules or .cursor/rules/*.mdc)"]);
+      expect(result.errors).toEqual([
+        "No Cursor configuration files found (.cursorrules or .cursor/rules/*.mdc)",
+      ]);
     });
 
     it("should handle malformed YAML gracefully", async () => {
