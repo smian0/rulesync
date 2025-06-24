@@ -8,7 +8,8 @@
 			"Bash(grep:*)",
      		"WebFetch(domain:code.visualstudio.com)",
       		"WebFetch(domain:docs.cursor.com)",
-      		"WebFetch(domain:docs.cline.bot)"
+      		"WebFetch(domain:docs.cline.bot)",
+			"Bash(gh release create --repo dyoshikawa/rulesync:*)"
 		],
 		"deny": [
 			"Bash(npm publish:*)",
