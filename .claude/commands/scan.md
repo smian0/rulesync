@@ -10,10 +10,10 @@ Make `{PROJECT_ROOT}/tmp/scan.md`, then write the results to the file sequential
 Follow the format below:
 
 ```md
-- File: {FILE_1_PATH}
+- [ ] File: {FILE_1_PATH}
   - ResultType: (Passed, Vulnerable, Malicious)
   - ResultDescription: {RESULT_DESCRIPTION}
-- File: {FILE_2_PATH}
+- [ ] File: {FILE_2_PATH}
   ...
 
 # Summary
