@@ -53,25 +53,30 @@ export async function parseCursorConfiguration(
       for (const file of files) {
         if (file.endsWith(".mdc")) {
           const filePath = join(cursorRulesDir, file);
-          const rawContent = await readFileContent(filePath);
-          const parsed = matter(rawContent);
-          const content = parsed.content.trim();
+          try {
+            const rawContent = await readFileContent(filePath);
+            const parsed = matter(rawContent);
+            const content = parsed.content.trim();
 
-          if (content) {
-            const filename = basename(file, ".mdc");
-            const frontmatter: RuleFrontmatter = {
-              root: false,
-              targets: ["cursor"],
-              description: `Cursor rule: ${filename}`,
-              globs: ["**/*"],
-            };
+            if (content) {
+              const filename = basename(file, ".mdc");
+              const frontmatter: RuleFrontmatter = {
+                root: false,
+                targets: ["cursor"],
+                description: `Cursor rule: ${filename}`,
+                globs: ["**/*"],
+              };
 
-            rules.push({
-              frontmatter,
-              content,
-              filename: `cursor-${filename}`,
-              filepath: filePath,
-            });
+              rules.push({
+                frontmatter,
+                content,
+                filename: `cursor-${filename}`,
+                filepath: filePath,
+              });
+            }
+          } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            errors.push(`Failed to parse ${filePath}: ${errorMessage}`);
           }
         }
       }
