@@ -9,4 +9,4 @@ NEW_VERSION = $ARGUMENTS
   - Write in English.
   - Do not include confidential information.
 7. As a precaution, verify that the release content does not contain any information that should remain private.
-8. Use the `gh release create v{version} --repo dyoshikawa/rulesync ...` command to create a Release on the `github.com/dyoshikawa/rulesync` repository with both title and tag set to NEW_VERSION, using the content from step 4 as the description.
+8. Use the `gh release create {version} --repo dyoshikawa/rulesync ...` command to create a Release on the `github.com/dyoshikawa/rulesync` repository with both title and tag set to NEW_VERSION, using the content from step 4 as the description.
