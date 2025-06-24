@@ -54,6 +54,7 @@
 		"chokidar": "4.0.3",
 		"commander": "14.0.0",
 		"gray-matter": "4.0.3",
+		"js-yaml": "4.1.0",
 		"marked": "15.0.12"
 	},
 	"devDependencies": {
