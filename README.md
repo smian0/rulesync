@@ -57,7 +57,7 @@ If you already have AI tool configurations, you can import them:
 
 1. **Import existing configurations:**
    ```bash
-   npx rulesync import --claude --cursor --copilot
+   npx rulesync import --claudecode --cursor --copilot
    ```
 
 2. **Review and edit** the imported rules in `.rulesync/` directory
@@ -172,7 +172,7 @@ npx rulesync generate
 npx rulesync generate --copilot
 npx rulesync generate --cursor  
 npx rulesync generate --cline
-npx rulesync generate --claude
+npx rulesync generate --claudecode
 npx rulesync generate --roo
 
 # Clean build (delete existing files first)
@@ -195,7 +195,7 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 - `--delete`: Remove all existing generated files before creating new ones
 - `--verbose`: Show detailed output during generation process
-- `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: Generate only for specified tools
+- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`: Generate only for specified tools
 - `--base-dir <paths>`: Generate configuration files in specified base directories (comma-separated for multiple paths). Useful for monorepo setups where you want to generate tool-specific configurations in different project directories.
 
 ### 4. Import Existing Configurations
@@ -204,24 +204,24 @@ If you already have AI tool configurations in your project, you can import them 
 
 ```bash
 # Import from existing AI tool configurations
-npx rulesync import --claude    # Import from CLAUDE.md
-npx rulesync import --cursor    # Import from .cursorrules
-npx rulesync import --copilot   # Import from .github/copilot-instructions.md
-npx rulesync import --cline     # Import from .cline/instructions.md
-npx rulesync import --roo       # Import from .roo/instructions.md
+npx rulesync import --claudecode # Import from CLAUDE.md and .claude/memories/*.md
+npx rulesync import --cursor     # Import from .cursorrules and .cursor/rules/*.md
+npx rulesync import --copilot    # Import from .github/copilot-instructions.md and .github/instructions/*.instructions.md
+npx rulesync import --cline      # Import from .cline/instructions.md
+npx rulesync import --roo        # Import from .roo/instructions.md
 
 # Import from multiple tools
-npx rulesync import --claude --cursor --copilot
+npx rulesync import --claudecode --cursor --copilot
 
 # Verbose output during import
-npx rulesync import --claude --verbose
+npx rulesync import --claudecode --verbose
 ```
 
 The import command will:
 - Parse existing configuration files from each AI tool
 - Convert them to rulesync format with appropriate frontmatter
 - Create new `.rulesync/*.md` files with imported content
-- Use tool-specific prefixes to avoid filename conflicts (e.g., `claude__overview.md`)
+- Use tool-specific prefixes to avoid filename conflicts (e.g., `claudecode__overview.md`)
 - Generate unique filenames if conflicts occur
 
 ### 5. Other Commands

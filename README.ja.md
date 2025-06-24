@@ -57,7 +57,7 @@ yarn global add rulesync
 
 1. **既存設定をインポート:**
    ```bash
-   npx rulesync import --claude --cursor --copilot
+   npx rulesync import --claudecode --cursor --copilot
    ```
 
 2. **`.rulesync/`ディレクトリのインポートされたルールを確認・編集**
@@ -172,7 +172,7 @@ npx rulesync generate
 npx rulesync generate --copilot
 npx rulesync generate --cursor  
 npx rulesync generate --cline
-npx rulesync generate --claude
+npx rulesync generate --claudecode
 npx rulesync generate --roo
 
 # クリーンビルド（既存ファイルを最初に削除）
@@ -195,7 +195,7 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 - `--delete`: 新しいファイルを作成する前に既存の生成済みファイルをすべて削除
 - `--verbose`: 生成プロセス中に詳細出力を表示
-- `--copilot`, `--cursor`, `--cline`, `--claude`, `--roo`: 指定されたツールのみ生成
+- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`: 指定されたツールのみ生成
 - `--base-dir <paths>`: 指定されたベースディレクトリに設定ファイルを生成（複数パスの場合はカンマ区切り）。異なるプロジェクトディレクトリにツール固有の設定を生成したいmonorepoセットアップに便利。
 
 ### 4. 既存設定のインポート
@@ -204,24 +204,24 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 ```bash
 # 既存のAIツール設定からインポート
-npx rulesync import --claude    # CLAUDE.mdからインポート
-npx rulesync import --cursor    # .cursorrulesからインポート
-npx rulesync import --copilot   # .github/copilot-instructions.mdからインポート
-npx rulesync import --cline     # .cline/instructions.mdからインポート
-npx rulesync import --roo       # .roo/instructions.mdからインポート
+npx rulesync import --claudecode # CLAUDE.mdと.claude/memories/*.mdからインポート
+npx rulesync import --cursor     # .cursorrulesと.cursor/rules/*.mdからインポート
+npx rulesync import --copilot    # .github/copilot-instructions.mdと.github/instructions/*.instructions.mdからインポート
+npx rulesync import --cline      # .cline/instructions.mdからインポート
+npx rulesync import --roo        # .roo/instructions.mdからインポート
 
 # 複数のツールからインポート
-npx rulesync import --claude --cursor --copilot
+npx rulesync import --claudecode --cursor --copilot
 
 # インポート時の詳細出力
-npx rulesync import --claude --verbose
+npx rulesync import --claudecode --verbose
 ```
 
 importコマンドの動作：
 - 各AIツールの既存設定ファイルをパース
 - 適切なフロントマターを付けてrulesync形式に変換
 - インポートしたコンテンツで新しい`.rulesync/*.md`ファイルを作成
-- ファイル名の競合を避けるためツール固有のプレフィックスを使用（例：`claude__overview.md`）
+- ファイル名の競合を避けるためツール固有のプレフィックスを使用（例：`claudecode__overview.md`）
 - 競合が発生した場合はユニークなファイル名を生成
 
 ### 5. その他のコマンド

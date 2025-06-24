@@ -82,13 +82,13 @@ rulesync/
 │   │   ├── copilot.ts     # GitHub Copilot Custom Instructions
 │   │   ├── cursor.ts      # Cursor Project Rules (MDC format)
 │   │   ├── cline.ts       # Cline Rules
-│   │   ├── claude.ts      # Claude Code Memory (CLAUDE.md + memories)
+│   │   ├── claudecode.ts  # Claude Code Memory (CLAUDE.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
 │   ├── parsers/           # Tool-specific parsers for import
 │   │   ├── copilot.ts     # Parse GitHub Copilot configurations
 │   │   ├── cursor.ts      # Parse Cursor configurations
 │   │   ├── cline.ts       # Parse Cline configurations
-│   │   ├── claude.ts      # Parse Claude Code configurations
+│   │   ├── claudecode.ts  # Parse Claude Code configurations
 │   │   └── roo.ts         # Parse Roo Code configurations
 │   ├── types/              # TypeScript type definitions
 │   │   ├── config.ts      # Configuration types
