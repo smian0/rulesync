@@ -9,7 +9,7 @@
      		"WebFetch(domain:code.visualstudio.com)",
       		"WebFetch(domain:docs.cursor.com)",
       		"WebFetch(domain:docs.cline.bot)",
-			"Bash(gh release create --repo dyoshikawa/rulesync:*)"
+			"Bash(gh release create:*)"
 		],
 		"deny": [
 			"Bash(npm publish:*)",
