@@ -209,6 +209,45 @@ globs: ["**/*.ts"]
 
       await expect(parseRuleFile(filepath)).rejects.toThrow('Invalid "targets" field');
     });
+
+    it("should accept claudecode as valid target", async () => {
+      const ruleContent = `---
+root: false
+targets: ["claudecode"]
+description: "Test rule for Claude Code"
+globs: ["**/*.ts"]
+---
+
+# Claude Code Rule
+`;
+
+      const filepath = join(testDir, "claudecode-rule.md");
+      writeFileSync(filepath, ruleContent);
+
+      const rule = await parseRuleFile(filepath);
+
+      expect(rule.frontmatter.targets).toEqual(["claudecode"]);
+      expect(rule.frontmatter.description).toBe("Test rule for Claude Code");
+    });
+
+    it("should accept mixed targets including claudecode", async () => {
+      const ruleContent = `---
+root: false
+targets: ["copilot", "claudecode", "cursor"]
+description: "Test rule for multiple tools including Claude Code"
+globs: ["**/*.ts"]
+---
+
+# Mixed Targets with Claude Code
+`;
+
+      const filepath = join(testDir, "mixed-claudecode-rule.md");
+      writeFileSync(filepath, ruleContent);
+
+      const rule = await parseRuleFile(filepath);
+
+      expect(rule.frontmatter.targets).toEqual(["copilot", "claudecode", "cursor"]);
+    });
   });
 
   describe("parseRulesFromDirectory", () => {
