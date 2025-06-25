@@ -16,6 +16,7 @@ rulesyncは以下のAI開発ツールの**生成**と**インポート**の両�
 - **Cline Rules** (`.clinerules/*.md` + `.cline/instructions.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
 - **Roo Code Rules** (`.roo/rules/*.md` + `.roo/instructions.md`)
+- **Gemini CLI** (`GEMINI.md` + `.gemini/memories/*.md`)
 
 ## インストール
 
@@ -68,6 +69,7 @@ yarn global add rulesync
    npx rulesync import --copilot     # .github/copilot-instructions.mdから
    npx rulesync import --cline       # .cline/instructions.mdから
    npx rulesync import --roo         # .roo/instructions.mdから
+   npx rulesync import --geminicli   # GEMINI.mdと.gemini/memories/*.mdから
    ```
 
 2. **`.rulesync/`ディレクトリのインポートされたルールを確認・編集**
@@ -93,9 +95,10 @@ AI開発ツールは新しいツールが頻繁に登場し、急速に進化し
 - Cursor：リファクタリング
 - Claude Code：アーキテクチャ設計
 - Cline：デバッグ支援
+- Gemini CLI：知的コード解析
 
 ### 🔓 **ベンダーロックインなし**
-ベンダーロックインを完全に回避できます。rulesyncの使用を停止することを決定した場合でも、生成されたルールファイル（`.github/instructions/`、`.cursor/rules/`、`.clinerules/`、`CLAUDE.md`など）をそのまま使い続けることができます。
+ベンダーロックインを完全に回避できます。rulesyncの使用を停止することを決定した場合でも、生成されたルールファイル（`.github/instructions/`、`.cursor/rules/`、`.clinerules/`、`CLAUDE.md`、`GEMINI.md`など）をそのまま使い続けることができます。
 
 ### 🎯 **ツール間の一貫性**
 すべてのAIツールに一貫したルールを適用し、チーム全体のコード品質と開発体験を向上させます。
@@ -171,6 +174,7 @@ rulesyncは2レベルのルールシステムを使用します：
 | **GitHub Copilot** | 標準フォーマット | 標準フォーマット | すべてのルールがフロントマター付きの同じフォーマットを使用 |
 | **Cline** | 標準フォーマット | 標準フォーマット | すべてのルールがプレーンMarkdownフォーマットを使用 |
 | **Roo Code** | 標準フォーマット | 標準フォーマット | すべてのルールが説明ヘッダー付きのプレーンMarkdownフォーマットを使用 |
+| **Gemini CLI** | `GEMINI.md` | `.gemini/memories/*.md` | GEMINI.mdがメモリファイルへの`@filename`参照を含む |
 
 ### 3. 設定ファイルの生成
 
@@ -184,6 +188,7 @@ npx rulesync generate --cursor
 npx rulesync generate --cline
 npx rulesync generate --claudecode
 npx rulesync generate --roo
+npx rulesync generate --geminicli
 
 # クリーンビルド（既存ファイルを最初に削除）
 npx rulesync generate --delete
@@ -205,7 +210,7 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 - `--delete`: 新しいファイルを作成する前に既存の生成済みファイルをすべて削除
 - `--verbose`: 生成プロセス中に詳細出力を表示
-- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`: 指定されたツールのみ生成
+- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`, `--geminicli`: 指定されたツールのみ生成
 - `--base-dir <paths>`: 指定されたベースディレクトリに設定ファイルを生成（複数パスの場合はカンマ区切り）。異なるプロジェクトディレクトリにツール固有の設定を生成したいmonorepoセットアップに便利。
 
 ### 4. 既存設定のインポート
@@ -219,6 +224,7 @@ npx rulesync import --cursor     # .cursorrulesと.cursor/rules/*.mdからイン
 npx rulesync import --copilot    # .github/copilot-instructions.mdと.github/instructions/*.instructions.mdからインポート
 npx rulesync import --cline      # .cline/instructions.mdからインポート
 npx rulesync import --roo        # .roo/instructions.mdからインポート
+npx rulesync import --geminicli  # GEMINI.mdと.gemini/memories/*.mdからインポート
 
 # 複数のツールからインポート
 npx rulesync import --claudecode --cursor --copilot
@@ -326,6 +332,7 @@ globs: "**/*.ts,**/*.tsx"
 | **Cline** | `.clinerules/*.md` | プレーンMarkdown | 両レベルとも同じフォーマットを使用 |
 | **Claude Code** | `./CLAUDE.md` (ルート)<br>`.claude/memories/*.md` (非ルート) | プレーンMarkdown | ルートはCLAUDE.mdに移動<br>非ルートは別メモリファイルに移動<br>CLAUDE.mdは`@filename`参照を含む |
 | **Roo Code** | `.roo/rules/*.md` | プレーンMarkdown | 両レベルとも説明ヘッダー付きの同じフォーマットを使用 |
+| **Gemini CLI** | `GEMINI.md` (ルート)<br>`.gemini/memories/*.md` (非ルート) | プレーンMarkdown | ルートはGEMINI.mdに移動<br>非ルートは別メモリファイルに移動<br>GEMINI.mdは`@filename`参照を含む |
 
 ## バリデーション
 

@@ -89,12 +89,14 @@ rulesync/
 │   │   ├── cursor.ts      # Cursor Project Rules (MDCフォーマット)
 │   │   ├── cline.ts       # Cline Rules
 │   │   ├── claudecode.ts  # Claude Code Memory (CLAUDE.md + memories)
+│   │   ├── geminicli.ts   # Gemini CLI設定 (GEMINI.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
 │   ├── parsers/           # インポート機能用ツール固有パーサー
 │   │   ├── copilot.ts     # GitHub Copilot設定のパース (.github/copilot-instructions.md)
 │   │   ├── cursor.ts      # Cursor設定のパース (.cursorrules, .cursor/rules/*.mdc)
 │   │   ├── cline.ts       # Cline設定のパース (.cline/instructions.md)
 │   │   ├── claudecode.ts  # Claude Code設定のパース (CLAUDE.md, .claude/memories/*.md)
+│   │   ├── geminicli.ts   # Gemini CLI設定のパース (GEMINI.md, .gemini/memories/*.md)
 │   │   └── roo.ts         # Roo Code設定のパース (.roo/instructions.md)
 │   ├── types/              # TypeScript型定義
 │   │   ├── config.ts      # 設定型
@@ -249,7 +251,7 @@ pnpm test src/parsers/                     # すべてのパーサーのテス�
 
 ## 新しいAIツールの追加
 
-新しいAIツールのサポートを追加するには:
+新しいAIツールのサポートを追加するには（最近追加された`geminicli`を参考として）:
 
 1. **ジェネレーターを作成**: `src/generators/newtool.ts`を追加
 2. **パーサーを作成**: インポート機能用に`src/parsers/newtool.ts`を追加
@@ -257,8 +259,9 @@ pnpm test src/parsers/                     # すべてのパーサーのテス�
 4. **コアに追加**: `src/core/generator.ts`と`src/core/importer.ts`を更新
 5. **CLIオプションを追加**: generateとimportコマンドの両方で`src/cli/index.ts`を更新
 6. **型を更新**: `src/types/rules.ts`の`ToolTarget`に追加
-7. **テストを追加**: `src/generators/newtool.test.ts`と`src/parsers/newtool.test.ts`を作成
-8. **ドキュメントを更新**: README.mdとREADME.ja.mdに追加
+7. **設定を更新**: `src/utils/config.ts`で出力パスを追加
+8. **テストを追加**: `src/generators/newtool.test.ts`と`src/parsers/newtool.test.ts`を作成
+9. **ドキュメントを更新**: README.mdとREADME.ja.mdに追加
 
 ### ジェネレーターインターフェースパターン
 
