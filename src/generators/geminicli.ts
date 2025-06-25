@@ -61,7 +61,9 @@ function generateGeminiRootMarkdown(
 
     for (const rule of memoryRules) {
       const relativePath = `@.gemini/memories/${rule.filename}.md`;
-      lines.push(`| ${relativePath} | ${rule.frontmatter.description} | - |`);
+      const filePatterns =
+        rule.frontmatter.globs.length > 0 ? rule.frontmatter.globs.join(", ") : "-";
+      lines.push(`| ${relativePath} | ${rule.frontmatter.description} | ${filePatterns} |`);
     }
     lines.push("");
     lines.push("");

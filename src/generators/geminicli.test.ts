@@ -56,7 +56,9 @@ describe("generateGeminiConfig", () => {
     // Check root file
     expect(results[1].tool).toBe("geminicli");
     expect(results[1].filepath).toBe("GEMINI.md");
-    expect(results[1].content).toContain("Please also reference the following documents as needed:");
+    expect(results[1].content).toContain(
+      "Please also reference the following documents as needed:"
+    );
     expect(results[1].content).toContain("| Document | Description | File Patterns |");
     expect(results[1].content).toContain("@.gemini/memories/detail-rule.md");
     expect(results[1].content).toContain("This is an overview rule content");
@@ -67,7 +69,9 @@ describe("generateGeminiConfig", () => {
     const rootFile = results.find((r) => r.filepath === "GEMINI.md");
 
     expect(rootFile?.content).toContain("| Document | Description | File Patterns |");
-    expect(rootFile?.content).toContain("| @.gemini/memories/detail-rule.md | Detail rule | - |");
+    expect(rootFile?.content).toContain(
+      "| @.gemini/memories/detail-rule.md | Detail rule | **/*.md |"
+    );
   });
 
   it("should handle only root rule", async () => {
@@ -90,7 +94,9 @@ describe("generateGeminiConfig", () => {
     expect(results).toHaveLength(1);
     expect(results[0].filepath).toBe("GEMINI.md");
     expect(results[0].content).toContain("This is root only content");
-    expect(results[0].content).not.toContain("Please also reference the following documents as needed:");
+    expect(results[0].content).not.toContain(
+      "Please also reference the following documents as needed:"
+    );
   });
 
   it("should handle only memory rules", async () => {
@@ -118,7 +124,9 @@ describe("generateGeminiConfig", () => {
 
     // Root file
     expect(results[1].filepath).toBe("GEMINI.md");
-    expect(results[1].content).toContain("Please also reference the following documents as needed:");
+    expect(results[1].content).toContain(
+      "Please also reference the following documents as needed:"
+    );
     expect(results[1].content).toContain("| Document | Description | File Patterns |");
     expect(results[1].content).not.toContain("This is memory rule content");
   });
