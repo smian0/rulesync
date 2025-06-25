@@ -89,12 +89,14 @@ rulesync/
 │   │   ├── cursor.ts      # Cursor Project Rules (MDC format)
 │   │   ├── cline.ts       # Cline Rules
 │   │   ├── claudecode.ts  # Claude Code Memory (CLAUDE.md + memories)
+│   │   ├── geminicli.ts   # Gemini CLI configuration (GEMINI.md + memories)
 │   │   └── roo.ts         # Roo Code Rules
 │   ├── parsers/           # Tool-specific parsers for import functionality
 │   │   ├── copilot.ts     # Parse GitHub Copilot configurations (.github/copilot-instructions.md)
 │   │   ├── cursor.ts      # Parse Cursor configurations (.cursorrules, .cursor/rules/*.mdc)
 │   │   ├── cline.ts       # Parse Cline configurations (.cline/instructions.md)
 │   │   ├── claudecode.ts  # Parse Claude Code configurations (CLAUDE.md, .claude/memories/*.md)
+│   │   ├── geminicli.ts   # Parse Gemini CLI configurations (GEMINI.md, .gemini/memories/*.md)
 │   │   └── roo.ts         # Parse Roo Code configurations (.roo/instructions.md)
 │   ├── types/              # TypeScript type definitions
 │   │   ├── config.ts      # Configuration types
@@ -249,7 +251,7 @@ Note: Coverage temporarily reduced due to new import functionality requiring tes
 
 ## Adding New AI Tools
 
-To add support for a new AI tool:
+To add support for a new AI tool (see the recent addition of `geminicli` as a reference):
 
 1. **Create generator**: Add `src/generators/newtool.ts`
 2. **Create parser**: Add `src/parsers/newtool.ts` for import functionality
@@ -257,8 +259,9 @@ To add support for a new AI tool:
 4. **Add to core**: Update `src/core/generator.ts` and `src/core/importer.ts`
 5. **Add CLI options**: Update `src/cli/index.ts` for both generate and import commands
 6. **Update types**: Add to `ToolTarget` in `src/types/rules.ts`
-7. **Add tests**: Create `src/generators/newtool.test.ts` and `src/parsers/newtool.test.ts`
-8. **Update docs**: Add to README.md and README.ja.md
+7. **Update config**: Add output path in `src/utils/config.ts`
+8. **Add tests**: Create `src/generators/newtool.test.ts` and `src/parsers/newtool.test.ts`
+9. **Update docs**: Add to README.md and README.ja.md
 
 ### Generator Interface Pattern
 

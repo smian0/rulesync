@@ -1,6 +1,6 @@
 ---
 root: false
-targets: ['roo']
+targets: ['*']
 description: "Roo Code rules specification"
 globs: []
 ---

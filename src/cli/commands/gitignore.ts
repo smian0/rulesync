@@ -13,6 +13,8 @@ export const gitignoreCommand = async (): Promise<void> => {
     "**/CLAUDE.md",
     "**/.claude/memories/",
     "**/.roo/rules/",
+    "**/GEMINI.md",
+    "**/.gemini/memories/",
   ];
 
   let gitignoreContent = "";

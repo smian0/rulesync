@@ -16,6 +16,7 @@ rulesync supports both **generation** and **import** for the following AI develo
 - **Cline Rules** (`.clinerules/*.md` + `.cline/instructions.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
 - **Roo Code Rules** (`.roo/rules/*.md` + `.roo/instructions.md`)
+- **Gemini CLI** (`GEMINI.md` + `.gemini/memories/*.md`)
 
 ## Installation
 
@@ -68,6 +69,7 @@ If you already have AI tool configurations, you can import them into rulesync fo
    npx rulesync import --copilot     # From .github/copilot-instructions.md
    npx rulesync import --cline       # From .cline/instructions.md
    npx rulesync import --roo         # From .roo/instructions.md
+   npx rulesync import --geminicli   # From GEMINI.md and .gemini/memories/*.md
    ```
 
 2. **Review and edit** the imported rules in `.rulesync/` directory
@@ -93,9 +95,10 @@ Enable hybrid development workflows combining multiple AI tools:
 - Cursor for refactoring
 - Claude Code for architecture design
 - Cline for debugging assistance
+- Gemini CLI for intelligent code analysis
 
 ### 🔓 **No Vendor Lock-in**
-Avoid vendor lock-in completely. If you decide to stop using rulesync, you can continue using the generated rule files (`.github/instructions/`, `.cursor/rules/`, `.clinerules/`, `CLAUDE.md`, etc.) as-is.
+Avoid vendor lock-in completely. If you decide to stop using rulesync, you can continue using the generated rule files (`.github/instructions/`, `.cursor/rules/`, `.clinerules/`, `CLAUDE.md`, `GEMINI.md`, etc.) as-is.
 
 ### 🎯 **Consistency Across Tools**
 Apply consistent rules across all AI tools, improving code quality and development experience for the entire team.
@@ -171,6 +174,7 @@ Each AI tool handles rule levels differently:
 | **GitHub Copilot** | Standard format | Standard format | All rules use same format with frontmatter |
 | **Cline** | Standard format | Standard format | All rules use plain Markdown format |
 | **Roo Code** | Standard format | Standard format | All rules use plain Markdown format with description header |
+| **Gemini CLI** | `GEMINI.md` | `.gemini/memories/*.md` | GEMINI.md includes `@filename` references to memory files |
 
 ### 3. Generate Configuration Files
 
@@ -184,6 +188,7 @@ npx rulesync generate --cursor
 npx rulesync generate --cline
 npx rulesync generate --claudecode
 npx rulesync generate --roo
+npx rulesync generate --geminicli
 
 # Clean build (delete existing files first)
 npx rulesync generate --delete
@@ -205,7 +210,7 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 - `--delete`: Remove all existing generated files before creating new ones
 - `--verbose`: Show detailed output during generation process
-- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`: Generate only for specified tools
+- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`, `--geminicli`: Generate only for specified tools
 - `--base-dir <paths>`: Generate configuration files in specified base directories (comma-separated for multiple paths). Useful for monorepo setups where you want to generate tool-specific configurations in different project directories.
 
 ### 4. Import Existing Configurations
@@ -219,6 +224,7 @@ npx rulesync import --cursor     # Import from .cursorrules and .cursor/rules/*.
 npx rulesync import --copilot    # Import from .github/copilot-instructions.md and .github/instructions/*.instructions.md
 npx rulesync import --cline      # Import from .cline/instructions.md
 npx rulesync import --roo        # Import from .roo/instructions.md
+npx rulesync import --geminicli  # Import from GEMINI.md and .gemini/memories/*.md
 
 # Import from multiple tools
 npx rulesync import --claudecode --cursor --copilot
@@ -326,6 +332,7 @@ globs: "**/*.ts,**/*.tsx"
 | **Cline** | `.clinerules/*.md` | Plain Markdown | Both levels use same format |
 | **Claude Code** | `./CLAUDE.md` (root)<br>`.claude/memories/*.md` (non-root) | Plain Markdown | Root goes to CLAUDE.md<br>Non-root go to separate memory files<br>CLAUDE.md includes `@filename` references |
 | **Roo Code** | `.roo/rules/*.md` | Plain Markdown | Both levels use same format with description header |
+| **Gemini CLI** | `GEMINI.md` (root)<br>`.gemini/memories/*.md` (non-root) | Plain Markdown | Root goes to GEMINI.md<br>Non-root go to separate memory files<br>GEMINI.md includes `@filename` references |
 
 ## Validation
 

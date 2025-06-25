@@ -11,7 +11,15 @@ describe("config utils", () => {
       expect(config.outputPaths.cursor).toBe(".cursor/rules");
       expect(config.outputPaths.cline).toBe(".clinerules");
       expect(config.outputPaths.claudecode).toBe(".");
-      expect(config.defaultTargets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo"]);
+      expect(config.outputPaths.geminicli).toBe(".gemini/memories");
+      expect(config.defaultTargets).toEqual([
+        "copilot",
+        "cursor",
+        "cline",
+        "claudecode",
+        "roo",
+        "geminicli",
+      ]);
       expect(config.watchEnabled).toBe(false);
     });
   });
@@ -21,7 +29,7 @@ describe("config utils", () => {
 
     it("should resolve * to all default targets", () => {
       const targets = resolveTargets(["*"], config);
-      expect(targets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo"]);
+      expect(targets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"]);
     });
 
     it("should return specific targets as-is", () => {

@@ -1,6 +1,6 @@
 ---
 root: false
-targets: ['claude']
+targets: ['*']
 description: "Claude Code memories specification"
 globs: []
 ---

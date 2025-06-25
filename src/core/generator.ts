@@ -2,6 +2,7 @@ import { generateClaudecodeConfig } from "../generators/claudecode.js";
 import { generateClineConfig } from "../generators/cline.js";
 import { generateCopilotConfig } from "../generators/copilot.js";
 import { generateCursorConfig } from "../generators/cursor.js";
+import { generateGeminiConfig } from "../generators/geminicli.js";
 import { generateRooConfig } from "../generators/roo.js";
 import type { Config, GeneratedOutput, ParsedRule, ToolTarget } from "../types/index.js";
 import { resolveTargets } from "../utils/index.js";
@@ -64,6 +65,8 @@ async function generateForTool(
       return await generateClaudecodeConfig(rules, config, baseDir);
     case "roo":
       return generateRooConfig(rules, config, baseDir);
+    case "geminicli":
+      return generateGeminiConfig(rules, config, baseDir);
     default:
       console.warn(`Unknown tool: ${tool}`);
       return null;

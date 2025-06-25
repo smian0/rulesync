@@ -93,7 +93,7 @@ function validateFrontmatter(data: unknown, filepath: string): void {
     );
   }
 
-  const validTargets = ["copilot", "cursor", "cline", "claudecode", "roo", "*"];
+  const validTargets = ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "*"];
   for (const target of obj.targets) {
     if (typeof target !== "string" || !validTargets.includes(target)) {
       throw new Error(

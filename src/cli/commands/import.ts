@@ -7,6 +7,7 @@ export interface ImportOptions {
   copilot?: boolean;
   cline?: boolean;
   roo?: boolean;
+  geminicli?: boolean;
   verbose?: boolean;
 }
 
@@ -19,11 +20,12 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   if (options.copilot) tools.push("copilot");
   if (options.cline) tools.push("cline");
   if (options.roo) tools.push("roo");
+  if (options.geminicli) tools.push("geminicli");
 
   // Validate that at least one tool is selected
   if (tools.length === 0) {
     console.error(
-      "❌ Please specify at least one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo)"
+      "❌ Please specify at least one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo, --geminicli)"
     );
     process.exit(1);
   }

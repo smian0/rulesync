@@ -1,6 +1,6 @@
 ---
 root: false
-targets: ['cline']
+targets: ['*']
 description: "Cline rules specification"
 globs: []
 ---

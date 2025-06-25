@@ -34,6 +34,7 @@ program
   .option("--copilot", "Import from GitHub Copilot (.github/copilot-instructions.md)")
   .option("--cline", "Import from Cline (.cline/instructions.md)")
   .option("--roo", "Import from Roo Code (.roo/instructions.md)")
+  .option("--geminicli", "Import from Gemini CLI (GEMINI.md)")
   .option("-v, --verbose", "Verbose output")
   .action(importCommand);
 
@@ -45,6 +46,7 @@ program
   .option("--cline", "Generate only for Cline")
   .option("--claudecode", "Generate only for Claude Code")
   .option("--roo", "Generate only for Roo Code")
+  .option("--geminicli", "Generate only for Gemini CLI")
   .option("--delete", "Delete all existing files in output directories before generating")
   .option(
     "-b, --base-dir <paths>",
@@ -58,6 +60,7 @@ program
     if (options.cline) tools.push("cline");
     if (options.claudecode) tools.push("claudecode");
     if (options.roo) tools.push("roo");
+    if (options.geminicli) tools.push("geminicli");
 
     const generateOptions: {
       verbose?: boolean;
