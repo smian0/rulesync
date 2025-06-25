@@ -46,28 +46,28 @@ describe("generateGeminiConfig", () => {
     const results = await generateGeminiConfig(mockRules, mockConfig);
 
     expect(results).toHaveLength(2);
-    
+
     // Check memory file
     expect(results[0].tool).toBe("geminicli");
     expect(results[0].filepath).toBe(".gemini/memories/detail-rule.md");
-    expect(results[0].content).toContain("# Detail rule");
+    expect(results[0].content).not.toContain("# Detail rule");
     expect(results[0].content).toContain("This is a detail rule content");
-    
+
     // Check root file
     expect(results[1].tool).toBe("geminicli");
     expect(results[1].filepath).toBe("GEMINI.md");
     expect(results[1].content).toContain("# Gemini CLI Configuration");
     expect(results[1].content).toContain("## Memory Files");
-    expect(results[1].content).toContain(".gemini/memories/detail-rule.md");
+    expect(results[1].content).toContain("@.gemini/memories/detail-rule.md");
     expect(results[1].content).toContain("This is an overview rule content");
   });
 
   it("should generate table of memory files in root file", async () => {
     const results = await generateGeminiConfig(mockRules, mockConfig);
-    const rootFile = results.find(r => r.filepath === "GEMINI.md");
+    const rootFile = results.find((r) => r.filepath === "GEMINI.md");
 
     expect(rootFile?.content).toContain("| File | Description |");
-    expect(rootFile?.content).toContain("| .gemini/memories/detail-rule.md | Detail rule |");
+    expect(rootFile?.content).toContain("| @.gemini/memories/detail-rule.md | Detail rule |");
   });
 
   it("should handle only root rule", async () => {
@@ -112,11 +112,11 @@ describe("generateGeminiConfig", () => {
     const results = await generateGeminiConfig(memoryOnlyRules, mockConfig);
 
     expect(results).toHaveLength(2);
-    
+
     // Memory file
     expect(results[0].filepath).toBe(".gemini/memories/memory-rule.md");
-    expect(results[0].content).toContain("# Memory rule");
-    
+    expect(results[0].content).not.toContain("# Memory rule");
+
     // Root file
     expect(results[1].filepath).toBe("GEMINI.md");
     expect(results[1].content).toContain("# Gemini CLI Configuration");

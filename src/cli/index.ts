@@ -34,6 +34,7 @@ program
   .option("--copilot", "Import from GitHub Copilot (.github/copilot-instructions.md)")
   .option("--cline", "Import from Cline (.cline/instructions.md)")
   .option("--roo", "Import from Roo Code (.roo/instructions.md)")
+  .option("--geminicli", "Import from Gemini CLI (GEMINI.md)")
   .option("-v, --verbose", "Verbose output")
   .action(importCommand);
 

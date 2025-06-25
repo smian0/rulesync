@@ -7,7 +7,7 @@ export async function generateGeminiConfig(
   baseDir?: string
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
-  
+
   // Find root and non-root rules
   const rootRule = rules.find((rule) => rule.frontmatter.root === true);
   const memoryRules = rules.filter((rule) => rule.frontmatter.root === false);
@@ -30,7 +30,7 @@ export async function generateGeminiConfig(
   // Generate root GEMINI.md file
   const rootContent = generateGeminiRootMarkdown(rootRule, memoryRules, baseDir);
   const rootFilepath = baseDir ? join(baseDir, "GEMINI.md") : "GEMINI.md";
-  
+
   outputs.push({
     tool: "geminicli",
     filepath: rootFilepath,
@@ -41,23 +41,13 @@ export async function generateGeminiConfig(
 }
 
 function generateGeminiMemoryMarkdown(rule: ParsedRule): string {
-  const lines: string[] = [];
-  
-  // Add description as header if available
-  if (rule.frontmatter.description) {
-    lines.push(`# ${rule.frontmatter.description}`);
-    lines.push("");
-  }
-
-  // Add content
-  lines.push(rule.content);
-
-  return lines.join("\n");
+  // Just return the content without description header
+  return rule.content;
 }
 
 function generateGeminiRootMarkdown(
-  rootRule: ParsedRule | undefined, 
-  memoryRules: ParsedRule[], 
+  rootRule: ParsedRule | undefined,
+  memoryRules: ParsedRule[],
   _baseDir?: string
 ): string {
   const lines: string[] = [];
@@ -70,9 +60,9 @@ function generateGeminiRootMarkdown(
     lines.push("");
     lines.push("| File | Description |");
     lines.push("|------|-------------|");
-    
+
     for (const rule of memoryRules) {
-      const relativePath = `.gemini/memories/${rule.filename}.md`;
+      const relativePath = `@.gemini/memories/${rule.filename}.md`;
       lines.push(`| ${relativePath} | ${rule.frontmatter.description} |`);
     }
     lines.push("");
@@ -89,7 +79,7 @@ function generateGeminiRootMarkdown(
       lines.push(`### ${rootRule.frontmatter.description}`);
       lines.push("");
     }
-    
+
     lines.push(rootRule.content);
   } else if (memoryRules.length === 0) {
     // Fallback if no rules are provided

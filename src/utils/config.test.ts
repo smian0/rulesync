@@ -12,7 +12,14 @@ describe("config utils", () => {
       expect(config.outputPaths.cline).toBe(".clinerules");
       expect(config.outputPaths.claudecode).toBe(".");
       expect(config.outputPaths.geminicli).toBe(".gemini/memories");
-      expect(config.defaultTargets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"]);
+      expect(config.defaultTargets).toEqual([
+        "copilot",
+        "cursor",
+        "cline",
+        "claudecode",
+        "roo",
+        "geminicli",
+      ]);
       expect(config.watchEnabled).toBe(false);
     });
   });
