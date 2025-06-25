@@ -172,14 +172,17 @@ pnpm-lock.yaml
 **/.github/instructions/
 **/.cursor/rules/
 **/.clinerules/
-**/CLAUDE.md
 **/.roo/rules/
+**/CLAUDE.md
 **/.claude/memories/
+**/GEMINI.md
+**/.gemini/memories/
 
 **/.rulesync/copilot__*
 **/.rulesync/cursor__*
 **/.rulesync/cline__*
 **/.rulesync/roo__*
 **/.rulesync/claudecode__*
+**/.rulesync/geminicli__*
 
 /tmp
