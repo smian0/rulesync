@@ -41,8 +41,8 @@ export async function generateGeminiConfig(
 }
 
 function generateGeminiMemoryMarkdown(rule: ParsedRule): string {
-  // Just return the content without description header
-  return rule.content;
+  // Just return the content without description header and trim leading whitespace
+  return rule.content.trim();
 }
 
 function generateGeminiRootMarkdown(
@@ -52,35 +52,24 @@ function generateGeminiRootMarkdown(
 ): string {
   const lines: string[] = [];
 
-  // Add table of memory files at the beginning
+  // Start with CLAUDE.md style introduction if memory files exist
   if (memoryRules.length > 0) {
-    lines.push("# Gemini CLI Configuration");
+    lines.push("Please also reference the following documents as needed:");
     lines.push("");
-    lines.push("## Memory Files");
-    lines.push("");
-    lines.push("| File | Description |");
-    lines.push("|------|-------------|");
+    lines.push("| Document | Description | File Patterns |");
+    lines.push("|----------|-------------|---------------|");
 
     for (const rule of memoryRules) {
       const relativePath = `@.gemini/memories/${rule.filename}.md`;
-      lines.push(`| ${relativePath} | ${rule.frontmatter.description} |`);
+      lines.push(`| ${relativePath} | ${rule.frontmatter.description} | - |`);
     }
+    lines.push("");
     lines.push("");
   }
 
   // Add root rule content if available
   if (rootRule) {
-    if (rootRule.frontmatter.description && memoryRules.length === 0) {
-      lines.push(`# ${rootRule.frontmatter.description}`);
-      lines.push("");
-    } else if (rootRule.frontmatter.description && memoryRules.length > 0) {
-      lines.push("## Root Configuration");
-      lines.push("");
-      lines.push(`### ${rootRule.frontmatter.description}`);
-      lines.push("");
-    }
-
-    lines.push(rootRule.content);
+    lines.push(rootRule.content.trim());
   } else if (memoryRules.length === 0) {
     // Fallback if no rules are provided
     lines.push("# Gemini CLI Configuration");
