@@ -1,6 +1,6 @@
 ---
 root: false
-targets: ['cursor']
+targets: ['*']
 description: "Cursor project rules specification"
 globs: []
 ---

@@ -9,9 +9,10 @@ export function getDefaultConfig(): Config {
       cline: ".clinerules",
       claudecode: ".",
       roo: ".roo/rules",
+      geminicli: ".gemini/memories",
     },
     watchEnabled: false,
-    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
+    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"],
   };
 }
 

@@ -1,6 +1,6 @@
 ---
 root: false
-targets: ['copilot']
+targets: ['*']
 description: "GitHub Copilot custom instructions specification"
 globs: []
 ---
