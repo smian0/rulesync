@@ -19,6 +19,13 @@ We welcome contributions to rulesync! This document outlines the process for con
 - Node.js 20.0.0 or higher (recommended: 24.0.0+)
 - pnpm 10.12.2+ (recommended) or npm/yarn
 
+### MCP Connection Setup
+
+If you're using Claude Code with MCP (Model Context Protocol), set up the following environment variables:
+
+- `OPENAI_API_KEY` - Required for OpenAI integration
+- `GITHUB_PERSONAL_ACCESS_TOKEN` - Required for GitHub MCP server functionality
+
 ### Development Commands
 
 ```bash

@@ -19,6 +19,13 @@ rulesyncへの貢献を歓迎します！このドキュメントでは、貢献
 - Node.js 20.0.0 以上（推奨: 24.0.0+）
 - pnpm 10.12.2+（推奨）またはnpm/yarn
 
+### MCP接続設定
+
+Claude CodeをMCP（Model Context Protocol）で使用する場合は、以下の環境変数を設定してください：
+
+- `OPENAI_API_KEY` - OpenAI連携に必要
+- `GITHUB_PERSONAL_ACCESS_TOKEN` - GitHub MCPサーバー機能に必要
+
 ### 開発コマンド
 
 ```bash
