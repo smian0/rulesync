@@ -35,7 +35,7 @@
 		"bcheck": "biome check src/",
 		"bcheck:fix": "biome check --write src/",
 		"build": "tsup src/cli/index.ts --format cjs,esm --dts --clean",
-		"check": "pnpm run lint && pnpm run format && pnpm run bcheck && pnpm run typecheck",
+		"check": "pnpm run lint && pnpm run format && pnpm run bcheck && pnpm run typecheck && pnpm run secretlint",
 		"dev": "tsx src/cli/index.ts",
 		"fix": "pnpm run lint:fix && pnpm run format:fix && pnpm run bcheck:fix",
 		"format": "biome format src/",
