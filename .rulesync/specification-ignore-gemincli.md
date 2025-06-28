@@ -1,3 +1,10 @@
+---
+root: false
+targets: ["*"]
+description: "Gemini CLI Coding Assistant の .aiexclude ファイルに関する仕様書"
+globs: ["**/.aiexclude", "**/.gitignore"]
+---
+
 # Gemini CLI Coding Assistant Ignore ファイル仕様
 
 ## ファイルの配置場所とファイル名

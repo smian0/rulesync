@@ -1,3 +1,10 @@
+---
+root: false
+targets: ["cline"]
+description: "Cline VSCode Extension の .clineignore ファイルに関する仕様書"
+globs: ["**/.clineignore"]
+---
+
 # Cline VSCode Extension Ignore ファイル仕様
 
 ## ファイルの配置場所とファイル名

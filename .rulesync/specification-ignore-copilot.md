@@ -1,3 +1,10 @@
+---
+root: false
+targets: ["copilot"]
+description: "GitHub Copilot の Content exclusion 機能に関する仕様書"
+globs: ["**/*.yml", "**/*.yaml"]
+---
+
 # GitHub Copilot Ignore ファイル仕様
 
 ## 重要な前提

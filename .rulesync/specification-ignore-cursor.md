@@ -1,3 +1,10 @@
+---
+root: false
+targets: ["cursor"]
+description: "Cursor IDE の .cursorignore および .cursorindexingignore ファイルに関する仕様書"
+globs: ["**/.cursorignore", "**/.cursorindexingignore"]
+---
+
 # Cursor IDE Ignore ファイル仕様
 
 ## ファイルの配置場所とファイル名

@@ -1,3 +1,10 @@
+---
+root: false
+targets: ["roo"]
+description: "Roocode AI Coding Assistant の .rooignore ファイルに関する仕様書"
+globs: ["**/.rooignore"]
+---
+
 # Roocode AI Coding Assistant Ignore ファイル仕様
 
 ## ファイルの配置場所とファイル名
