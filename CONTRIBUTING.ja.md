@@ -9,7 +9,8 @@ rulesyncへの貢献を歓迎します！このドキュメントでは、貢献
 1. リポジトリをフォーク
 2. フォークをクローン: `git clone https://github.com/your-username/rulesync.git`
 3. 依存関係をインストール: `pnpm install`
-4. 新しいブランチを作成: `git checkout -b feature/your-feature-name`
+4. gitフックをセットアップ: `npx simple-git-hooks`
+5. 新しいブランチを作成: `git checkout -b feature/your-feature-name`
 
 ## 開発環境の設定
 
@@ -160,8 +161,9 @@ rulesync/
 3. 完全なテストスイートを実行: `pnpm test`
 4. コード品質チェックを実行: `pnpm check`
 5. シークレットをチェック: `pnpm secretlint`
-6. 明確なメッセージで変更をコミット
-7. フォークにプッシュしてプルリクエストを作成
+6. gitフックをセットアップ: `npx simple-git-hooks` (初回のみ)
+7. 明確なメッセージで変更をコミット
+8. フォークにプッシュしてプルリクエストを作成
 
 #### コミットメッセージフォーマット
 

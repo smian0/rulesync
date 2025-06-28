@@ -9,7 +9,8 @@ We welcome contributions to rulesync! This document outlines the process for con
 1. Fork the repository
 2. Clone your fork: `git clone https://github.com/your-username/rulesync.git`
 3. Install dependencies: `pnpm install`
-4. Create a new branch: `git checkout -b feature/your-feature-name`
+4. Set up git hooks: `npx simple-git-hooks`
+5. Create a new branch: `git checkout -b feature/your-feature-name`
 
 ## Development Setup
 
@@ -160,8 +161,9 @@ rulesync/
 3. Run the full test suite: `pnpm test`
 4. Run code quality checks: `pnpm check`
 5. Check for secrets: `pnpm secretlint`
-6. Commit your changes with a clear message
-7. Push to your fork and create a pull request
+6. Set up git hooks: `npx simple-git-hooks` (first time only)
+7. Commit your changes with a clear message
+8. Push to your fork and create a pull request
 
 #### Commit Message Format
 
