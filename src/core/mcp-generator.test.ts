@@ -29,13 +29,12 @@ describe("generateMcpConfigurations", () => {
     const outputs = await generateMcpConfigurations(mcpConfig, testDir);
 
     // Should generate for all supported tools by default
-    // Copilot generates 2 files, others generate 1 each
-    expect(outputs).toHaveLength(7);
-    
-    const filepaths = outputs.map(o => o.filepath);
+    // Copilot generates 1 file, others generate 1 each
+    expect(outputs).toHaveLength(6);
+
+    const filepaths = outputs.map((o) => o.filepath);
     expect(filepaths).toContain(join(testDir, ".claude/settings.json"));
-    expect(filepaths).toContain(join(testDir, ".github/copilot/mcp.json"));
-    expect(filepaths).toContain(join(testDir, ".github/copilot/copilot-codingagent-mcp.json"));
+    expect(filepaths).toContain(join(testDir, ".vscode/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".cursor/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".cline/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".roo/mcp.json"));
@@ -45,21 +44,17 @@ describe("generateMcpConfigurations", () => {
   it("should generate configurations for specific targets", async () => {
     const mcpConfig = {
       mcpServers: {
-        "server1": {
+        server1: {
           command: "server1",
         },
       },
     };
 
-    const outputs = await generateMcpConfigurations(
-      mcpConfig,
-      testDir,
-      ["claudecode", "cursor"]
-    );
+    const outputs = await generateMcpConfigurations(mcpConfig, testDir, ["claudecode", "cursor"]);
 
     expect(outputs).toHaveLength(2);
-    
-    const filepaths = outputs.map(o => o.filepath);
+
+    const filepaths = outputs.map((o) => o.filepath);
     expect(filepaths).toContain(join(testDir, ".claude/settings.json"));
     expect(filepaths).toContain(join(testDir, ".cursor/mcp.json"));
   });
@@ -82,14 +77,10 @@ describe("generateMcpConfigurations", () => {
       },
     };
 
-    const outputs = await generateMcpConfigurations(
-      mcpConfig,
-      testDir,
-      ["claudecode", "cursor"]
-    );
+    const outputs = await generateMcpConfigurations(mcpConfig, testDir, ["claudecode", "cursor"]);
 
     // Check Claude configuration
-    const claudeOutput = outputs.find(o => o.filepath.includes(".claude"));
+    const claudeOutput = outputs.find((o) => o.filepath.includes(".claude"));
     expect(claudeOutput).toBeDefined();
     const claudeConfig = JSON.parse(claudeOutput!.content);
     expect(claudeConfig.mcpServers).toHaveProperty("claude-only");
@@ -97,7 +88,7 @@ describe("generateMcpConfigurations", () => {
     expect(claudeConfig.mcpServers).toHaveProperty("all-tools");
 
     // Check Cursor configuration
-    const cursorOutput = outputs.find(o => o.filepath.includes(".cursor"));
+    const cursorOutput = outputs.find((o) => o.filepath.includes(".cursor"));
     expect(cursorOutput).toBeDefined();
     const cursorConfig = JSON.parse(cursorOutput!.content);
     expect(cursorConfig.mcpServers).not.toHaveProperty("claude-only");
@@ -110,25 +101,15 @@ describe("generateMcpConfigurations", () => {
       mcpServers: {},
     };
 
-    const outputs = await generateMcpConfigurations(
-      mcpConfig,
-      testDir,
-      ["copilot"]
-    );
+    const outputs = await generateMcpConfigurations(mcpConfig, testDir, ["copilot"]);
 
-    expect(outputs).toHaveLength(2); // Copilot generates 2 files
-    
+    expect(outputs).toHaveLength(1); // Copilot generates 1 file
+
     // Check editor config
-    const editorOutput = outputs.find(o => o.filepath.includes("mcp.json") && !o.filepath.includes("codingagent"));
+    const editorOutput = outputs.find((o) => o.filepath.includes(".vscode/mcp.json"));
     expect(editorOutput).toBeDefined();
     const editorConfig = JSON.parse(editorOutput!.content);
     expect(editorConfig.servers).toEqual({});
-    
-    // Check codingAgent config
-    const codingAgentOutput = outputs.find(o => o.filepath.includes("codingagent"));
-    expect(codingAgentOutput).toBeDefined();
-    const codingAgentConfig = JSON.parse(codingAgentOutput!.content);
-    expect(codingAgentConfig.mcpServers).toEqual({});
   });
 
   it("should handle MCP configuration from file", async () => {
@@ -136,7 +117,7 @@ describe("generateMcpConfigurations", () => {
     const mcpPath = join(testDir, ".rulesync", ".mcp.json");
     const { mkdir } = await import("node:fs/promises");
     await mkdir(join(testDir, ".rulesync"), { recursive: true });
-    
+
     const mcpContent = {
       mcpServers: {
         "file-server": {
@@ -148,15 +129,11 @@ describe("generateMcpConfigurations", () => {
     await writeFile(mcpPath, JSON.stringify(mcpContent, null, 2));
 
     const parsedConfig = parseMcpConfig(testDir);
-    const outputs = await generateMcpConfigurations(
-      parsedConfig,
-      testDir,
-      ["cline"]
-    );
+    const outputs = await generateMcpConfigurations(parsedConfig, testDir, ["cline"]);
 
     expect(outputs).toHaveLength(1);
     expect(outputs[0].filepath).toBe(join(testDir, ".cline/mcp.json"));
-    
+
     const config = JSON.parse(outputs[0].content);
     expect(config.mcpServers["file-server"]).toEqual({
       command: "server-from-file",
@@ -179,11 +156,7 @@ describe("generateMcpConfigurations", () => {
       },
     };
 
-    const outputs = await generateMcpConfigurations(
-      mcpConfig,
-      testDir,
-      ["roo"]
-    );
+    const outputs = await generateMcpConfigurations(mcpConfig, testDir, ["roo"]);
 
     const config = JSON.parse(outputs[0].content);
     expect(config.mcpServers["complex-server"]).toEqual({
@@ -208,21 +181,13 @@ describe("generateMcpConfigurations", () => {
 
     const baseDir1 = join(testDir, "app1");
     const baseDir2 = join(testDir, "app2");
-    
+
     const { mkdir } = await import("node:fs/promises");
     await mkdir(baseDir1, { recursive: true });
     await mkdir(baseDir2, { recursive: true });
 
-    const outputs1 = await generateMcpConfigurations(
-      mcpConfig,
-      baseDir1,
-      ["claudecode"]
-    );
-    const outputs2 = await generateMcpConfigurations(
-      mcpConfig,
-      baseDir2,
-      ["claudecode"]
-    );
+    const outputs1 = await generateMcpConfigurations(mcpConfig, baseDir1, ["claudecode"]);
+    const outputs2 = await generateMcpConfigurations(mcpConfig, baseDir2, ["claudecode"]);
 
     expect(outputs1[0].filepath).toBe(join(baseDir1, ".claude/settings.json"));
     expect(outputs2[0].filepath).toBe(join(baseDir2, ".claude/settings.json"));
@@ -239,36 +204,29 @@ describe("generateMcpConfigurations", () => {
       },
     };
 
-    const outputs = await generateMcpConfigurations(
-      mcpConfig,
-      testDir,
-      ["claudecode", "copilot", "geminicli"]
-    );
+    const outputs = await generateMcpConfigurations(mcpConfig, testDir, [
+      "claudecode",
+      "copilot",
+      "geminicli",
+    ]);
 
     // Claude uses settings.json with mcpServers
-    const claudeOutput = outputs.find(o => o.filepath.includes(".claude"));
+    const claudeOutput = outputs.find((o) => o.filepath.includes(".claude"));
     expect(claudeOutput!.filepath).toContain("settings.json");
     const claudeConfig = JSON.parse(claudeOutput!.content);
     expect(claudeConfig).toHaveProperty("mcpServers");
 
-    // Copilot generates two files
-    const copilotOutputs = outputs.filter(o => o.filepath.includes(".github/copilot"));
-    expect(copilotOutputs).toHaveLength(2);
-    
+    // Copilot generates one file
+    const copilotOutput = outputs.find((o) => o.filepath.includes(".vscode/mcp.json"));
+    expect(copilotOutput).toBeDefined();
+
     // Check editor config (uses "servers")
-    const editorOutput = copilotOutputs.find(o => !o.filepath.includes("codingagent"));
-    expect(editorOutput!.filepath).toContain("mcp.json");
-    const editorConfig = JSON.parse(editorOutput!.content);
+    expect(copilotOutput!.filepath).toContain(".vscode/mcp.json");
+    const editorConfig = JSON.parse(copilotOutput!.content);
     expect(editorConfig).toHaveProperty("servers");
-    
-    // Check codingAgent config (uses "mcpServers")
-    const codingAgentOutput = copilotOutputs.find(o => o.filepath.includes("codingagent"));
-    expect(codingAgentOutput!.filepath).toContain("copilot-codingagent-mcp.json");
-    const codingAgentConfig = JSON.parse(codingAgentOutput!.content);
-    expect(codingAgentConfig).toHaveProperty("mcpServers");
 
     // Gemini uses settings.json
-    const geminiOutput = outputs.find(o => o.filepath.includes(".gemini"));
+    const geminiOutput = outputs.find((o) => o.filepath.includes(".gemini"));
     expect(geminiOutput!.filepath).toContain("settings.json");
     const geminiConfig = JSON.parse(geminiOutput!.content);
     expect(geminiConfig).toHaveProperty("mcpServers");

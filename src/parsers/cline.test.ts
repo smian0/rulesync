@@ -60,25 +60,19 @@ This is a Node.js application.
       join(clinerulesDirPath, "testing.md"),
       "# Testing Rules\n\nAim for 80% coverage"
     );
-    await writeFile(
-      join(clinerulesDirPath, "readme.txt"),
-      "This should be ignored"
-    );
+    await writeFile(join(clinerulesDirPath, "readme.txt"), "This should be ignored");
 
     const result = await parseClineConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
-    
-    const filenames = result.rules.map(r => r.filename);
+
+    const filenames = result.rules.map((r) => r.filename);
     expect(filenames).toContain("cline-coding-style");
     expect(filenames).toContain("cline-testing");
   });
 
   it("should parse both instructions and rules", async () => {
     await writeFile(clineInstructionsPath, "# Main Instructions");
-    await writeFile(
-      join(clinerulesDirPath, "extra-rules.md"),
-      "# Extra Rules"
-    );
+    await writeFile(join(clinerulesDirPath, "extra-rules.md"), "# Extra Rules");
 
     const result = await parseClineConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
@@ -87,10 +81,7 @@ This is a Node.js application.
   it("should skip empty files", async () => {
     await writeFile(clineInstructionsPath, "");
     await writeFile(join(clinerulesDirPath, "empty.md"), "   \n\t  ");
-    await writeFile(
-      join(clinerulesDirPath, "valid.md"),
-      "# Valid content"
-    );
+    await writeFile(join(clinerulesDirPath, "valid.md"), "# Valid content");
 
     const result = await parseClineConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
@@ -99,7 +90,7 @@ This is a Node.js application.
 
   it("should handle file read errors gracefully", async () => {
     await writeFile(clineInstructionsPath, "# Valid instructions");
-    
+
     // Create a directory with rule file name to cause read error
     const { mkdir } = await import("node:fs/promises");
     await mkdir(join(clinerulesDirPath, "test.md"));
@@ -114,7 +105,7 @@ This is a Node.js application.
   it("should handle missing .clinerules directory", async () => {
     const { rm } = await import("node:fs/promises");
     await rm(clinerulesDirPath, { recursive: true, force: true });
-    
+
     await writeFile(clineInstructionsPath, "# Main Instructions");
 
     const result = await parseClineConfiguration(testDir);
@@ -125,11 +116,8 @@ This is a Node.js application.
   it("should handle missing .cline directory", async () => {
     const { rm } = await import("node:fs/promises");
     await rm(join(testDir, ".cline"), { recursive: true, force: true });
-    
-    await writeFile(
-      join(clinerulesDirPath, "rules.md"),
-      "# Some Rules"
-    );
+
+    await writeFile(join(clinerulesDirPath, "rules.md"), "# Some Rules");
 
     const result = await parseClineConfiguration(testDir);
     expect(result.errors).toEqual([]);
@@ -137,10 +125,7 @@ This is a Node.js application.
   });
 
   it("should generate correct frontmatter for rule files", async () => {
-    await writeFile(
-      join(clinerulesDirPath, "architecture.md"),
-      "# Architecture Guidelines"
-    );
+    await writeFile(join(clinerulesDirPath, "architecture.md"), "# Architecture Guidelines");
 
     const result = await parseClineConfiguration(testDir);
     expect(result.rules[0].frontmatter).toEqual({

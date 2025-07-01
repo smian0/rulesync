@@ -60,15 +60,12 @@ This is a TypeScript project.
       join(instructionsDir, "testing.instructions.md"),
       "# Testing Guidelines\n\nWrite unit tests"
     );
-    await writeFile(
-      join(instructionsDir, "not-instructions.md"),
-      "This should be ignored"
-    );
+    await writeFile(join(instructionsDir, "not-instructions.md"), "This should be ignored");
 
     const result = await parseCopilotConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
-    
-    const filenames = result.rules.map(r => r.filename);
+
+    const filenames = result.rules.map((r) => r.filename);
     expect(filenames).toContain("copilot-typescript");
     expect(filenames).toContain("copilot-testing");
     expect(filenames).not.toContain("copilot-not-instructions");
@@ -76,10 +73,7 @@ This is a TypeScript project.
 
   it("should parse both main file and instructions", async () => {
     await writeFile(copilotPath, "# Main Instructions");
-    await writeFile(
-      join(instructionsDir, "extra.instructions.md"),
-      "# Extra Instructions"
-    );
+    await writeFile(join(instructionsDir, "extra.instructions.md"), "# Extra Instructions");
 
     const result = await parseCopilotConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
@@ -88,10 +82,7 @@ This is a TypeScript project.
   it("should skip empty files", async () => {
     await writeFile(copilotPath, "");
     await writeFile(join(instructionsDir, "empty.instructions.md"), "   \n\t  ");
-    await writeFile(
-      join(instructionsDir, "valid.instructions.md"),
-      "# Valid content"
-    );
+    await writeFile(join(instructionsDir, "valid.instructions.md"), "# Valid content");
 
     const result = await parseCopilotConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
@@ -105,13 +96,13 @@ This is a TypeScript project.
 
     const result = await parseCopilotConfiguration(testDir);
     expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors.some(e => e.includes("Failed to parse"))).toBe(true);
+    expect(result.errors.some((e) => e.includes("Failed to parse"))).toBe(true);
   });
 
   it("should handle missing instructions directory", async () => {
     const { rm } = await import("node:fs/promises");
     await rm(instructionsDir, { recursive: true, force: true });
-    
+
     await writeFile(copilotPath, "# Main Instructions");
 
     const result = await parseCopilotConfiguration(testDir);
@@ -120,10 +111,7 @@ This is a TypeScript project.
   });
 
   it("should generate correct frontmatter for instruction files", async () => {
-    await writeFile(
-      join(instructionsDir, "api-design.instructions.md"),
-      "# API Design Guidelines"
-    );
+    await writeFile(join(instructionsDir, "api-design.instructions.md"), "# API Design Guidelines");
 
     const result = await parseCopilotConfiguration(testDir);
     expect(result.rules[0].frontmatter).toEqual({

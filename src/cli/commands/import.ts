@@ -38,6 +38,11 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   }
 
   const tool = tools[0];
+  if (!tool) {
+    console.error("Error: No tool specified");
+    process.exit(1);
+  }
+
   console.log(`Importing configuration files from ${tool}...`);
 
   try {

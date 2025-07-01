@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { generateClineConfig } from "./cline.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config, ParsedRule } from "../types/index.js";
 import { loadIgnorePatterns } from "../utils/ignore.js";
+import { generateClineConfig } from "./cline.js";
 
 vi.mock("../utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
@@ -51,17 +51,17 @@ describe("generateClineConfig", () => {
   });
 
   it("should generate .clineignore when .rulesyncignore exists", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md", "temp/**/*"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md", "temp/**/*"],
     });
 
     const outputs = await generateClineConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(2);
-    
+
     // Check rule file
     expect(outputs[0].filepath).toBe(".clinerules/test-rule.md");
-    
+
     // Check .clineignore file
     expect(outputs[1]).toEqual({
       tool: "cline",
@@ -78,12 +78,12 @@ describe("generateClineConfig", () => {
     const outputs = await generateClineConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs.every(o => o.filepath !== ".clineignore")).toBe(true);
+    expect(outputs.every((o) => o.filepath !== ".clineignore")).toBe(true);
   });
 
   it("should respect baseDir parameter", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
     });
 
     const outputs = await generateClineConfig([mockRule], mockConfig, "/custom/base");

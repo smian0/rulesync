@@ -1,4 +1,4 @@
-import { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
+import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 
 interface RooConfig {
   mcpServers: Record<string, RooServer>;
@@ -15,32 +15,29 @@ interface RooServer {
   type?: "sse" | "streamable-http";
 }
 
-export function generateRooMcp(
-  config: RulesyncMcpConfig,
-  target: "global" | "project"
-): string {
+export function generateRooMcp(config: RulesyncMcpConfig, target: "global" | "project"): string {
   const rooConfig: RooConfig = {
-    mcpServers: {}
+    mcpServers: {},
   };
 
   const shouldInclude = (server: RulesyncMcpServer): boolean => {
     const targets = server.rulesyncTargets;
-    
+
     // If no targets or empty array, include in all tools
     if (!targets || targets.length === 0) return true;
-    
+
     // If targets is ['*'], include in all tools
-    if (targets.length === 1 && targets[0] === '*') return true;
-    
+    if (targets.length === 1 && targets[0] === "*") return true;
+
     // Otherwise check if 'roo' is in the targets array
-    return targets.includes('roo');
+    return (targets as string[]).includes("roo");
   };
 
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
     if (!shouldInclude(server)) continue;
-    
+
     const rooServer: RooServer = {};
-    
+
     if (server.command) {
       rooServer.command = server.command;
       if (server.args) rooServer.args = server.args;
@@ -55,7 +52,7 @@ export function generateRooMcp(
         rooServer.type = "sse";
       }
     }
-    
+
     if (server.env) {
       rooServer.env = {};
       for (const [key, value] of Object.entries(server.env)) {
@@ -66,22 +63,22 @@ export function generateRooMcp(
         }
       }
     }
-    
+
     if (server.disabled !== undefined) {
       rooServer.disabled = server.disabled;
     }
-    
+
     if (server.alwaysAllow) {
       rooServer.alwaysAllow = server.alwaysAllow;
     }
-    
+
     if (server.networkTimeout !== undefined) {
       rooServer.networkTimeout = Math.max(30000, Math.min(300000, server.networkTimeout));
     }
-    
+
     rooConfig.mcpServers[serverName] = rooServer;
   }
-  
+
   return JSON.stringify(rooConfig, null, 2);
 }
 
@@ -90,15 +87,15 @@ export function generateRooMcpConfiguration(
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.roo/mcp.json` : ".roo/mcp.json";
-  
+
   const config: RooConfig = {
-    mcpServers: {}
+    mcpServers: {},
   };
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
     // Check if this server should be included for roo
     const targets = server.rulesyncTargets;
-    if (targets && !targets.includes("*") && !targets.includes("roo")) {
+    if (targets && !(targets as string[]).includes("*") && !(targets as string[]).includes("roo")) {
       continue;
     }
 
@@ -107,8 +104,10 @@ export function generateRooMcpConfiguration(
     config.mcpServers[serverName] = serverConfig;
   }
 
-  return [{
-    filepath,
-    content: JSON.stringify(config, null, 2) + "\n"
-  }];
+  return [
+    {
+      filepath,
+      content: JSON.stringify(config, null, 2) + "\n",
+    },
+  ];
 }

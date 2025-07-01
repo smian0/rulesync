@@ -1,6 +1,6 @@
-export type McpTransportType = "stdio" | "sse" | "http";
+import type { ToolTarget } from "./rules.js";
 
-export type ToolTarget = "copilot" | "cursor" | "cline" | "claude" | "gemini" | "roo";
+export type McpTransportType = "stdio" | "sse" | "http";
 
 export interface McpServerBase {
   command?: string;

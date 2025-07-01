@@ -29,12 +29,10 @@ export async function generateCopilotConfig(
   // Note: This is unofficial support for community tools
   const ignorePatterns = await loadIgnorePatterns(baseDir);
   if (ignorePatterns.patterns.length > 0) {
-    const copilotIgnorePath = baseDir 
-      ? join(baseDir, ".copilotignore")
-      : ".copilotignore";
-    
+    const copilotIgnorePath = baseDir ? join(baseDir, ".copilotignore") : ".copilotignore";
+
     const copilotIgnoreContent = generateCopilotIgnore(ignorePatterns.patterns);
-    
+
     outputs.push({
       tool: "copilot",
       filepath: copilotIgnorePath,
@@ -70,8 +68,8 @@ function generateCopilotIgnore(patterns: string[]): string {
     "# Note: .copilotignore is not officially supported by GitHub Copilot.",
     "# This file is for use with community tools like copilotignore-vscode extension.",
     "",
-    ...patterns
+    ...patterns,
   ];
-  
+
   return lines.join("\n");
 }

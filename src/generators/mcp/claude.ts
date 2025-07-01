@@ -1,4 +1,4 @@
-import { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
+import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 
 interface ClaudeSettings {
   mcpServers?: Record<string, ClaudeServer>;
@@ -12,12 +12,9 @@ interface ClaudeServer {
   transport?: "sse" | "http";
 }
 
-export function generateClaudeMcp(
-  config: RulesyncMcpConfig,
-  target: "global" | "project"
-): string {
+export function generateClaudeMcp(config: RulesyncMcpConfig, target: "global" | "project"): string {
   const claudeSettings: ClaudeSettings = {
-    mcpServers: {}
+    mcpServers: {},
   };
 
   const shouldInclude = (server: RulesyncMcpServer): boolean => {
@@ -25,21 +22,21 @@ export function generateClaudeMcp(
     if (!server.rulesyncTargets || server.rulesyncTargets.length === 0) {
       return true;
     }
-    
+
     // If rulesyncTargets is ['*'], include in all tools
     if (server.rulesyncTargets.length === 1 && server.rulesyncTargets[0] === "*") {
       return true;
     }
-    
+
     // Check if 'claude' is in the rulesyncTargets array
-    return server.rulesyncTargets.includes("claude");
+    return (server.rulesyncTargets as string[]).includes("claude");
   };
 
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
     if (!shouldInclude(server)) continue;
-    
+
     const claudeServer: ClaudeServer = {};
-    
+
     if (server.command) {
       claudeServer.command = server.command;
       if (server.args) claudeServer.args = server.args;
@@ -54,14 +51,14 @@ export function generateClaudeMcp(
         claudeServer.transport = "sse";
       }
     }
-    
+
     if (server.env) {
       claudeServer.env = server.env;
     }
-    
+
     claudeSettings.mcpServers![serverName] = claudeServer;
   }
-  
+
   return JSON.stringify(claudeSettings, null, 2);
 }
 
@@ -70,9 +67,9 @@ export function generateClaudeMcpConfiguration(
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.claude/settings.json` : ".claude/settings.json";
-  
+
   const settings: ClaudeSettings = {
-    mcpServers: {}
+    mcpServers: {},
   };
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
@@ -87,8 +84,10 @@ export function generateClaudeMcpConfiguration(
     settings.mcpServers![serverName] = serverConfig;
   }
 
-  return [{
-    filepath,
-    content: JSON.stringify(settings, null, 2) + "\n"
-  }];
+  return [
+    {
+      filepath,
+      content: JSON.stringify(settings, null, 2) + "\n",
+    },
+  ];
 }

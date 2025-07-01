@@ -19,26 +19,26 @@ describe("generateGeminiCliMcpConfiguration", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].filepath).toBe(".gemini/settings.json");
-    
+
     const config = JSON.parse(result[0].content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
   it("should filter servers by rulesyncTargets", () => {
     const mcpServers = {
-      "server1": {
+      server1: {
         command: "server1",
         rulesyncTargets: ["geminicli", "claude"],
       },
-      "server2": {
+      server2: {
         command: "server2",
         rulesyncTargets: ["claude"],
       },
-      "server3": {
+      server3: {
         command: "server3",
         rulesyncTargets: ["*"],
       },
-      "server4": {
+      server4: {
         command: "server4",
         // No targets means all tools
       },
@@ -111,9 +111,9 @@ describe("generateGeminiCliMcpConfiguration", () => {
       "http-advanced": {
         url: "https://api.service.com/v1/mcp",
         headers: {
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9",
+          Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9",
           "X-Client-ID": "gemini-cli",
-          "Accept": "application/json",
+          Accept: "application/json",
           "X-Request-ID": "uuid-here",
         },
       },
@@ -123,7 +123,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     const config = JSON.parse(result[0].content);
 
     expect(Object.keys(config.mcpServers)).toHaveLength(4);
-    
+
     // Check basic configurations
     expect(config.mcpServers["stdio-basic"]).toEqual({
       command: "basic-server",
@@ -131,7 +131,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     expect(config.mcpServers["http-basic"]).toEqual({
       url: "http://localhost:3000",
     });
-    
+
     // Check advanced configurations
     expect(config.mcpServers["stdio-advanced"]).toEqual({
       command: "advanced-server",
@@ -145,9 +145,9 @@ describe("generateGeminiCliMcpConfiguration", () => {
     expect(config.mcpServers["http-advanced"]).toEqual({
       url: "https://api.service.com/v1/mcp",
       headers: {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9",
+        Authorization: "Bearer eyJhbGciOiJIUzI1NiJ9",
         "X-Client-ID": "gemini-cli",
-        "Accept": "application/json",
+        Accept: "application/json",
         "X-Request-ID": "uuid-here",
       },
     });
@@ -166,17 +166,17 @@ describe("generateGeminiCliMcpConfiguration", () => {
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers);
-    
+
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain("  \"mcpServers\": {");
-    expect(result[0].content).toContain("    \"formatted-server\": {");
-    expect(result[0].content).toContain("      \"command\": \"server\"");
-    expect(result[0].content).toContain("      \"args\": [");
-    expect(result[0].content).toContain("        \"--arg1\",");
-    expect(result[0].content).toContain("        \"--arg2\"");
-    expect(result[0].content).toContain("      \"env\": {");
-    expect(result[0].content).toContain("        \"VAR1\": \"value1\",");
-    expect(result[0].content).toContain("        \"VAR2\": \"value2\"");
+    expect(result[0].content).toContain('  "mcpServers": {');
+    expect(result[0].content).toContain('    "formatted-server": {');
+    expect(result[0].content).toContain('      "command": "server"');
+    expect(result[0].content).toContain('      "args": [');
+    expect(result[0].content).toContain('        "--arg1",');
+    expect(result[0].content).toContain('        "--arg2"');
+    expect(result[0].content).toContain('      "env": {');
+    expect(result[0].content).toContain('        "VAR1": "value1",');
+    expect(result[0].content).toContain('        "VAR2": "value2"');
   });
 
   it("should handle environment variables with special values", () => {

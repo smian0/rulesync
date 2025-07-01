@@ -57,7 +57,12 @@ export async function parseClaudeConfiguration(
     errors.push(`Failed to parse Claude configuration: ${errorMessage}`);
   }
 
-  return { rules, errors, ignorePatterns, mcpServers };
+  return {
+    rules,
+    errors,
+    ...(ignorePatterns && { ignorePatterns }),
+    ...(mcpServers && { mcpServers }),
+  };
 }
 
 function parseClaudeMainFile(content: string, filepath: string): ParsedRule | null {
@@ -176,5 +181,9 @@ async function parseClaudeSettings(settingsPath: string): Promise<ClaudeSettings
     errors.push(`Failed to parse settings.json: ${errorMessage}`);
   }
 
-  return { ignorePatterns, mcpServers, errors };
+  return {
+    errors,
+    ...(ignorePatterns && { ignorePatterns }),
+    ...(mcpServers && { mcpServers }),
+  };
 }

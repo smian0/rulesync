@@ -19,22 +19,22 @@ describe("generateCursorMcpConfiguration", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].filepath).toBe(".cursor/mcp.json");
-    
+
     const config = JSON.parse(result[0].content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
   it("should filter servers by rulesyncTargets", () => {
     const mcpServers = {
-      "server1": {
+      server1: {
         command: "server1",
         rulesyncTargets: ["cursor", "claude"],
       },
-      "server2": {
+      server2: {
         command: "server2",
         rulesyncTargets: ["claude"],
       },
-      "server3": {
+      server3: {
         command: "server3",
         rulesyncTargets: ["*"],
       },
@@ -51,7 +51,7 @@ describe("generateCursorMcpConfiguration", () => {
 
   it("should include servers without rulesyncTargets", () => {
     const mcpServers = {
-      "server1": {
+      server1: {
         command: "server1",
       },
     };
@@ -64,7 +64,7 @@ describe("generateCursorMcpConfiguration", () => {
 
   it("should exclude rulesyncTargets from output", () => {
     const mcpServers = {
-      "server1": {
+      server1: {
         command: "server1",
         args: ["--stdio"],
         rulesyncTargets: ["cursor"],
@@ -101,17 +101,17 @@ describe("generateCursorMcpConfiguration", () => {
 
   it("should format JSON with proper indentation", () => {
     const mcpServers = {
-      "server": {
+      server: {
         command: "test",
         args: ["arg1", "arg2"],
       },
     };
 
     const result = generateCursorMcpConfiguration(mcpServers);
-    
+
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain("  \"mcpServers\": {");
-    expect(result[0].content).toContain("    \"server\": {");
-    expect(result[0].content).toContain("      \"command\": \"test\"");
+    expect(result[0].content).toContain('  "mcpServers": {');
+    expect(result[0].content).toContain('    "server": {');
+    expect(result[0].content).toContain('      "command": "test"');
   });
 });

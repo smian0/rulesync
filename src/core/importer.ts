@@ -5,8 +5,8 @@ import {
   parseClineConfiguration,
   parseCopilotConfiguration,
   parseCursorConfiguration,
-  parseRooConfiguration,
   parseGeminiConfiguration,
+  parseRooConfiguration,
 } from "../parsers/index.js";
 import type { ParsedRule, ToolTarget } from "../types/index.js";
 import { fileExists, writeFileContent } from "../utils/index.js";

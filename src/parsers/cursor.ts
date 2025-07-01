@@ -155,5 +155,10 @@ export async function parseCursorConfiguration(
     }
   }
 
-  return { rules, errors, ignorePatterns, mcpServers };
+  return {
+    rules,
+    errors,
+    ...(ignorePatterns && { ignorePatterns }),
+    ...(mcpServers && { mcpServers }),
+  };
 }

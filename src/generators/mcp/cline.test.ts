@@ -11,7 +11,7 @@ describe("generateClineMcpConfiguration", () => {
       },
       "custom-server": {
         url: "http://localhost:3000/mcp",
-        headers: { "Authorization": "Bearer token" },
+        headers: { Authorization: "Bearer token" },
       },
     };
 
@@ -19,26 +19,26 @@ describe("generateClineMcpConfiguration", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].filepath).toBe(".cline/mcp.json");
-    
+
     const config = JSON.parse(result[0].content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
   it("should filter servers by rulesyncTargets", () => {
     const mcpServers = {
-      "server1": {
+      server1: {
         command: "server1",
         rulesyncTargets: ["cline", "cursor"],
       },
-      "server2": {
+      server2: {
         command: "server2",
         rulesyncTargets: ["cursor"],
       },
-      "server3": {
+      server3: {
         command: "server3",
         rulesyncTargets: ["*"],
       },
-      "server4": {
+      server4: {
         command: "server4",
         // No targets means all tools
       },
@@ -101,7 +101,7 @@ describe("generateClineMcpConfiguration", () => {
       "http-server": {
         url: "https://api.service.com/mcp",
         headers: {
-          "Authorization": "Bearer token",
+          Authorization: "Bearer token",
           "Content-Type": "application/json",
         },
       },
@@ -131,7 +131,7 @@ describe("generateClineMcpConfiguration", () => {
 
   it("should format JSON with proper indentation", () => {
     const mcpServers = {
-      "server": {
+      server: {
         command: "test",
         args: ["arg1", "arg2"],
         env: {
@@ -142,13 +142,13 @@ describe("generateClineMcpConfiguration", () => {
     };
 
     const result = generateClineMcpConfiguration(mcpServers);
-    
+
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain("  \"mcpServers\": {");
-    expect(result[0].content).toContain("    \"server\": {");
-    expect(result[0].content).toContain("      \"command\": \"test\"");
-    expect(result[0].content).toContain("      \"args\": [");
-    expect(result[0].content).toContain("        \"arg1\",");
-    expect(result[0].content).toContain("      \"env\": {");
+    expect(result[0].content).toContain('  "mcpServers": {');
+    expect(result[0].content).toContain('    "server": {');
+    expect(result[0].content).toContain('      "command": "test"');
+    expect(result[0].content).toContain('      "args": [');
+    expect(result[0].content).toContain('        "arg1",');
+    expect(result[0].content).toContain('      "env": {');
   });
 });

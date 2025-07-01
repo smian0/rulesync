@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { generateCopilotConfig } from "./copilot.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config, ParsedRule } from "../types/index.js";
 import { loadIgnorePatterns } from "../utils/ignore.js";
+import { generateCopilotConfig } from "./copilot.js";
 
 vi.mock("../utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
@@ -46,22 +46,22 @@ describe("generateCopilotConfig", () => {
     expect(outputs[0]).toEqual({
       tool: "copilot",
       filepath: ".github/instructions/test-rule.instructions.md",
-      content: expect.stringContaining("description: \"Test rule\""),
+      content: expect.stringContaining('description: "Test rule"'),
     });
   });
 
   it("should generate .copilotignore when .rulesyncignore exists", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md", "temp/**/*"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md", "temp/**/*"],
     });
 
     const outputs = await generateCopilotConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(2);
-    
+
     // Check rule file
     expect(outputs[0].filepath).toBe(".github/instructions/test-rule.instructions.md");
-    
+
     // Check .copilotignore file
     expect(outputs[1]).toEqual({
       tool: "copilot",
@@ -79,12 +79,12 @@ describe("generateCopilotConfig", () => {
     const outputs = await generateCopilotConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs.every(o => o.filepath !== ".copilotignore")).toBe(true);
+    expect(outputs.every((o) => o.filepath !== ".copilotignore")).toBe(true);
   });
 
   it("should respect baseDir parameter", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
     });
 
     const outputs = await generateCopilotConfig([mockRule], mockConfig, "/custom/base");

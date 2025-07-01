@@ -8,11 +8,12 @@ export function getDefaultConfig(): Config {
       cursor: ".cursor/rules",
       cline: ".clinerules",
       claudecode: ".",
+      claude: ".",
       roo: ".roo/rules",
       geminicli: ".gemini/memories",
     },
     watchEnabled: false,
-    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"],
+    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "claude", "roo", "geminicli"],
   };
 }
 

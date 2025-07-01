@@ -29,11 +29,11 @@ export async function findFiles(
     const filtered = files
       .filter((file) => file.endsWith(extension))
       .map((file) => join(dir, file));
-    
+
     if (ignorePatterns && ignorePatterns.length > 0) {
       return filterIgnoredFiles(filtered, ignorePatterns);
     }
-    
+
     return filtered;
   } catch {
     return [];

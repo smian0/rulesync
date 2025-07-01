@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { generateRooConfig } from "./roo.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config, ParsedRule } from "../types/index.js";
 import { loadIgnorePatterns } from "../utils/ignore.js";
+import { generateRooConfig } from "./roo.js";
 
 vi.mock("../utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
@@ -51,17 +51,17 @@ describe("generateRooConfig", () => {
   });
 
   it("should generate .rooignore when .rulesyncignore exists", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md", "temp/**/*"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md", "temp/**/*"],
     });
 
     const outputs = await generateRooConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(2);
-    
+
     // Check rule file
     expect(outputs[0].filepath).toBe(".roo/rules/test-rule.md");
-    
+
     // Check .rooignore file
     expect(outputs[1]).toEqual({
       tool: "roo",
@@ -78,12 +78,12 @@ describe("generateRooConfig", () => {
     const outputs = await generateRooConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs.every(o => o.filepath !== ".rooignore")).toBe(true);
+    expect(outputs.every((o) => o.filepath !== ".rooignore")).toBe(true);
   });
 
   it("should respect baseDir parameter", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
     });
 
     const outputs = await generateRooConfig([mockRule], mockConfig, "/custom/base");

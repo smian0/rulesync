@@ -1,6 +1,6 @@
-import { readFileContent, fileExists } from "./file.js";
-import micromatch from "micromatch";
 import { join } from "node:path";
+import micromatch from "micromatch";
+import { fileExists, readFileContent } from "./file.js";
 
 interface IgnorePatterns {
   patterns: string[];
@@ -14,7 +14,7 @@ export async function loadIgnorePatterns(baseDir: string = process.cwd()): Promi
   }
 
   const ignorePath = join(baseDir, ".rulesyncignore");
-  
+
   if (!(await fileExists(ignorePath))) {
     cachedIgnorePatterns = { patterns: [] };
     return cachedIgnorePatterns;
@@ -45,17 +45,19 @@ export function isFileIgnored(filepath: string, ignorePatterns: string[]): boole
   }
 
   // Check for negation patterns
-  const negationPatterns = ignorePatterns.filter(p => p.startsWith("!"));
-  const positivePatterns = ignorePatterns.filter(p => !p.startsWith("!"));
+  const negationPatterns = ignorePatterns.filter((p) => p.startsWith("!"));
+  const positivePatterns = ignorePatterns.filter((p) => !p.startsWith("!"));
 
   // First check if file matches any positive pattern
-  const isIgnored = positivePatterns.length > 0 && micromatch.isMatch(filepath, positivePatterns, {
-    dot: true,
-  });
+  const isIgnored =
+    positivePatterns.length > 0 &&
+    micromatch.isMatch(filepath, positivePatterns, {
+      dot: true,
+    });
 
   // If ignored, check if any negation pattern excludes it
   if (isIgnored && negationPatterns.length > 0) {
-    const negationPatternsWithoutPrefix = negationPatterns.map(p => p.substring(1));
+    const negationPatternsWithoutPrefix = negationPatterns.map((p) => p.substring(1));
     return !micromatch.isMatch(filepath, negationPatternsWithoutPrefix, {
       dot: true,
     });

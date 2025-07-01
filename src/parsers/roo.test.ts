@@ -60,25 +60,19 @@ This is a React TypeScript project.
       join(rooRulesDir, "performance.md"),
       "# Performance Guidelines\n\nMemoize expensive computations"
     );
-    await writeFile(
-      join(rooRulesDir, "notes.txt"),
-      "This should be ignored"
-    );
+    await writeFile(join(rooRulesDir, "notes.txt"), "This should be ignored");
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
-    
-    const filenames = result.rules.map(r => r.filename);
+
+    const filenames = result.rules.map((r) => r.filename);
     expect(filenames).toContain("roo-react-patterns");
     expect(filenames).toContain("roo-performance");
   });
 
   it("should parse both instructions and rules", async () => {
     await writeFile(rooInstructionsPath, "# Main Instructions");
-    await writeFile(
-      join(rooRulesDir, "additional.md"),
-      "# Additional Rules"
-    );
+    await writeFile(join(rooRulesDir, "additional.md"), "# Additional Rules");
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
@@ -87,10 +81,7 @@ This is a React TypeScript project.
   it("should skip empty files", async () => {
     await writeFile(rooInstructionsPath, "");
     await writeFile(join(rooRulesDir, "empty.md"), "   \n\t  ");
-    await writeFile(
-      join(rooRulesDir, "valid.md"),
-      "# Valid content\n\nSome rules here"
-    );
+    await writeFile(join(rooRulesDir, "valid.md"), "# Valid content\n\nSome rules here");
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
@@ -99,7 +90,7 @@ This is a React TypeScript project.
 
   it("should handle file read errors gracefully", async () => {
     await writeFile(rooInstructionsPath, "# Valid instructions");
-    
+
     // Create a directory with rule file name to cause read error
     const { mkdir } = await import("node:fs/promises");
     await mkdir(join(rooRulesDir, "test.md"));
@@ -114,7 +105,7 @@ This is a React TypeScript project.
   it("should handle missing rules directory", async () => {
     const { rm } = await import("node:fs/promises");
     await rm(rooRulesDir, { recursive: true, force: true });
-    
+
     await writeFile(rooInstructionsPath, "# Main Instructions");
 
     const result = await parseRooConfiguration(testDir);
@@ -134,10 +125,7 @@ This is a React TypeScript project.
   });
 
   it("should generate correct frontmatter for rule files", async () => {
-    await writeFile(
-      join(rooRulesDir, "state-management.md"),
-      "# State Management Guidelines"
-    );
+    await writeFile(join(rooRulesDir, "state-management.md"), "# State Management Guidelines");
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules[0].frontmatter).toEqual({
@@ -150,14 +138,8 @@ This is a React TypeScript project.
   });
 
   it("should handle special characters in filenames", async () => {
-    await writeFile(
-      join(rooRulesDir, "api-integration.md"),
-      "# API Integration"
-    );
-    await writeFile(
-      join(rooRulesDir, "ui_components.md"),
-      "# UI Components"
-    );
+    await writeFile(join(rooRulesDir, "api-integration.md"), "# API Integration");
+    await writeFile(join(rooRulesDir, "ui_components.md"), "# UI Components");
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules).toHaveLength(2);

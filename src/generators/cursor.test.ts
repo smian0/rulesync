@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { generateCursorConfig } from "./cursor.js";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { Config, ParsedRule } from "../types/index.js";
 import { loadIgnorePatterns } from "../utils/ignore.js";
+import { generateCursorConfig } from "./cursor.js";
 
 vi.mock("../utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
@@ -51,17 +51,17 @@ describe("generateCursorConfig", () => {
   });
 
   it("should generate .cursorignore when .rulesyncignore exists", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md", "temp/**/*"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md", "temp/**/*"],
     });
 
     const outputs = await generateCursorConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(2);
-    
+
     // Check rule file
     expect(outputs[0].filepath).toBe(".cursor/rules/test-rule.mdc");
-    
+
     // Check .cursorignore file
     expect(outputs[1]).toEqual({
       tool: "cursor",
@@ -78,12 +78,12 @@ describe("generateCursorConfig", () => {
     const outputs = await generateCursorConfig([mockRule], mockConfig);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs.every(o => o.filepath !== ".cursorignore")).toBe(true);
+    expect(outputs.every((o) => o.filepath !== ".cursorignore")).toBe(true);
   });
 
   it("should respect baseDir parameter", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
     });
 
     const outputs = await generateCursorConfig([mockRule], mockConfig, "/custom/base");

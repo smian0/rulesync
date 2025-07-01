@@ -19,26 +19,26 @@ describe("generateRooMcpConfiguration", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].filepath).toBe(".roo/mcp.json");
-    
+
     const config = JSON.parse(result[0].content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
   it("should filter servers by rulesyncTargets", () => {
     const mcpServers = {
-      "server1": {
+      server1: {
         command: "server1",
         rulesyncTargets: ["roo", "claude"],
       },
-      "server2": {
+      server2: {
         command: "server2",
         rulesyncTargets: ["claude", "cursor"],
       },
-      "server3": {
+      server3: {
         command: "server3",
         rulesyncTargets: ["*"],
       },
-      "server4": {
+      server4: {
         command: "server4",
         // No targets means all tools
       },
@@ -129,9 +129,9 @@ describe("generateRooMcpConfiguration", () => {
       "http-server": {
         url: "https://api.example.com/mcp/v2",
         headers: {
-          "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+          Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
           "X-API-Version": "2.0",
-          "Accept": "application/json",
+          Accept: "application/json",
         },
       },
     };
@@ -151,16 +151,16 @@ describe("generateRooMcpConfiguration", () => {
     expect(config.mcpServers["http-server"]).toEqual({
       url: "https://api.example.com/mcp/v2",
       headers: {
-        "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
+        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9",
         "X-API-Version": "2.0",
-        "Accept": "application/json",
+        Accept: "application/json",
       },
     });
   });
 
   it("should format JSON with proper indentation", () => {
     const mcpServers = {
-      "server": {
+      server: {
         url: "http://example.com",
         headers: {
           "X-Header-1": "value1",
@@ -170,13 +170,13 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    
+
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain("  \"mcpServers\": {");
-    expect(result[0].content).toContain("    \"server\": {");
-    expect(result[0].content).toContain("      \"url\": \"http://example.com\"");
-    expect(result[0].content).toContain("      \"headers\": {");
-    expect(result[0].content).toContain("        \"X-Header-1\": \"value1\"");
+    expect(result[0].content).toContain('  "mcpServers": {');
+    expect(result[0].content).toContain('    "server": {');
+    expect(result[0].content).toContain('      "url": "http://example.com"');
+    expect(result[0].content).toContain('      "headers": {');
+    expect(result[0].content).toContain('        "X-Header-1": "value1"');
   });
 
   it("should handle server names with special characters", () => {
@@ -184,7 +184,7 @@ describe("generateRooMcpConfiguration", () => {
       "server-with-dash": {
         command: "server1",
       },
-      "server_with_underscore": {
+      server_with_underscore: {
         command: "server2",
       },
       "server.with.dots": {

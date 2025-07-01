@@ -1,6 +1,6 @@
-import { describe, it, expect } from "vitest";
+import { describe, expect, it } from "vitest";
+import type { RulesyncMcpConfig } from "../../types/mcp.js";
 import { generateCopilotMcp } from "./copilot.js";
-import { RulesyncMcpConfig } from "../../types/mcp.js";
 
 describe("generateCopilotMcp", () => {
   it("should generate Copilot Coding Agent config", () => {
@@ -9,9 +9,9 @@ describe("generateCopilotMcp", () => {
         "test-server": {
           command: "node",
           args: ["server.js"],
-          env: { API_KEY: "COPILOT_MCP_SECRET" }
-        }
-      }
+          env: { API_KEY: "COPILOT_MCP_SECRET" },
+        },
+      },
     };
 
     const result = generateCopilotMcp(config, "codingAgent");
@@ -22,9 +22,9 @@ describe("generateCopilotMcp", () => {
         "test-server": {
           command: "node",
           args: ["server.js"],
-          env: { API_KEY: "COPILOT_MCP_SECRET" }
-        }
-      }
+          env: { API_KEY: "COPILOT_MCP_SECRET" },
+        },
+      },
     });
   });
 
@@ -34,9 +34,9 @@ describe("generateCopilotMcp", () => {
         "test-server": {
           command: "node",
           args: ["server.js"],
-          env: { API_KEY: "MY_SECRET_KEY" }
-        }
-      }
+          env: { API_KEY: "MY_SECRET_KEY" },
+        },
+      },
     };
 
     const result = generateCopilotMcp(config, "editor");
@@ -47,14 +47,16 @@ describe("generateCopilotMcp", () => {
         "test-server": {
           command: "node",
           args: ["server.js"],
-          env: { API_KEY: "${input:test-server_API_KEY}" }
-        }
+          env: { API_KEY: "${input:test-server_API_KEY}" },
+        },
       },
-      inputs: [{
-        id: "test-server_API_KEY",
-        type: "password",
-        description: "API_KEY for test-server"
-      }]
+      inputs: [
+        {
+          id: "test-server_API_KEY",
+          type: "password",
+          description: "API_KEY for test-server",
+        },
+      ],
     });
   });
 
@@ -63,9 +65,9 @@ describe("generateCopilotMcp", () => {
       mcpServers: {
         "http-server": {
           httpUrl: "http://localhost:3000",
-          tools: ["*"]
-        }
-      }
+          tools: ["*"],
+        },
+      },
     };
 
     const result = generateCopilotMcp(config, "editor");
@@ -75,9 +77,9 @@ describe("generateCopilotMcp", () => {
       servers: {
         "http-server": {
           url: "http://localhost:3000",
-          tools: ["*"]
-        }
-      }
+          tools: ["*"],
+        },
+      },
     });
   });
 
@@ -87,9 +89,9 @@ describe("generateCopilotMcp", () => {
         "test-server": {
           command: "node",
           args: ["server.js"],
-          alwaysAllow: ["tool1", "tool2"]
-        }
-      }
+          alwaysAllow: ["tool1", "tool2"],
+        },
+      },
     };
 
     const result = generateCopilotMcp(config, "codingAgent");
@@ -101,9 +103,9 @@ describe("generateCopilotMcp", () => {
   it("should respect rulesyncTargets configuration", () => {
     const config: RulesyncMcpConfig = {
       mcpServers: {
-        "server1": { command: "node", args: ["s1.js"], rulesyncTargets: ["cursor"] },
-        "server2": { command: "node", args: ["s2.js"], rulesyncTargets: ["copilot"] }
-      }
+        server1: { command: "node", args: ["s1.js"], rulesyncTargets: ["cursor"] },
+        server2: { command: "node", args: ["s2.js"], rulesyncTargets: ["copilot"] },
+      },
     };
 
     const result = generateCopilotMcp(config, "codingAgent");

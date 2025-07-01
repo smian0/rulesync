@@ -123,8 +123,11 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
     }
 
     for (const baseDir of baseDirs) {
-      const mcpResults = await generateMcpConfigs(process.cwd(), baseDir === process.cwd() ? undefined : baseDir);
-      
+      const mcpResults = await generateMcpConfigs(
+        process.cwd(),
+        baseDir === process.cwd() ? undefined : baseDir
+      );
+
       if (mcpResults.length === 0) {
         if (options.verbose) {
           console.log(`No MCP configuration found for ${baseDir}`);

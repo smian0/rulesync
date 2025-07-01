@@ -1,4 +1,4 @@
-import { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
+import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 
 interface CursorConfig {
   mcpServers: Record<string, CursorServer>;
@@ -13,32 +13,29 @@ interface CursorServer {
   type?: "sse" | "streamable-http";
 }
 
-export function generateCursorMcp(
-  config: RulesyncMcpConfig,
-  target: "global" | "project"
-): string {
+export function generateCursorMcp(config: RulesyncMcpConfig, target: "global" | "project"): string {
   const cursorConfig: CursorConfig = {
-    mcpServers: {}
+    mcpServers: {},
   };
 
   const shouldInclude = (server: RulesyncMcpServer): boolean => {
     const targets = server.rulesyncTargets;
-    
+
     // If no targets or empty array, include in all tools
     if (!targets || targets.length === 0) return true;
-    
+
     // If targets is ['*'], include in all tools
-    if (targets.length === 1 && targets[0] === '*') return true;
-    
+    if (targets.length === 1 && targets[0] === "*") return true;
+
     // Otherwise check if 'cursor' is in the targets array
-    return targets.includes('cursor');
+    return (targets as string[]).includes("cursor");
   };
 
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
     if (!shouldInclude(server)) continue;
-    
+
     const cursorServer: CursorServer = {};
-    
+
     if (server.command) {
       cursorServer.command = server.command;
       if (server.args) cursorServer.args = server.args;
@@ -53,18 +50,18 @@ export function generateCursorMcp(
         cursorServer.type = "sse";
       }
     }
-    
+
     if (server.env) {
       cursorServer.env = server.env;
     }
-    
+
     if (server.cwd) {
       cursorServer.cwd = server.cwd;
     }
-    
+
     cursorConfig.mcpServers[serverName] = cursorServer;
   }
-  
+
   return JSON.stringify(cursorConfig, null, 2);
 }
 
@@ -73,15 +70,19 @@ export function generateCursorMcpConfiguration(
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.cursor/mcp.json` : ".cursor/mcp.json";
-  
+
   const config: CursorConfig = {
-    mcpServers: {}
+    mcpServers: {},
   };
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
     // Check if this server should be included for cursor
     const targets = server.rulesyncTargets;
-    if (targets && !targets.includes("*") && !targets.includes("cursor")) {
+    if (
+      targets &&
+      !(targets as string[]).includes("*") &&
+      !(targets as string[]).includes("cursor")
+    ) {
       continue;
     }
 
@@ -90,8 +91,10 @@ export function generateCursorMcpConfiguration(
     config.mcpServers[serverName] = serverConfig;
   }
 
-  return [{
-    filepath,
-    content: JSON.stringify(config, null, 2) + "\n"
-  }];
+  return [
+    {
+      filepath,
+      content: JSON.stringify(config, null, 2) + "\n",
+    },
+  ];
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { importCommand } from "./import";
 import * as importer from "../../core/importer";
+import { importCommand } from "./import";
 
 vi.mock("../../core/importer");
 
@@ -27,9 +27,7 @@ describe("import command", () => {
   });
 
   it("should reject multiple tools being specified", async () => {
-    await expect(
-      importCommand({ claudecode: true, cursor: true })
-    ).rejects.toThrow("process.exit");
+    await expect(importCommand({ claudecode: true, cursor: true })).rejects.toThrow("process.exit");
     expect(console.error).toHaveBeenCalledWith(
       "❌ Only one tool can be specified at a time. Please run the import command separately for each tool."
     );
@@ -49,12 +47,8 @@ describe("import command", () => {
       tool: "claudecode",
       verbose: false,
     });
-    expect(console.log).toHaveBeenCalledWith(
-      "Importing configuration files from claudecode..."
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      "✅ Imported 3 rule(s) from claudecode"
-    );
+    expect(console.log).toHaveBeenCalledWith("Importing configuration files from claudecode...");
+    expect(console.log).toHaveBeenCalledWith("✅ Imported 3 rule(s) from claudecode");
   });
 
   it("should display ignore file creation message", async () => {
@@ -121,23 +115,19 @@ describe("import command", () => {
   });
 
   it("should handle exceptions during import", async () => {
-    vi.spyOn(importer, "importConfiguration").mockRejectedValueOnce(
-      new Error("Unexpected error")
-    );
+    vi.spyOn(importer, "importConfiguration").mockRejectedValueOnce(new Error("Unexpected error"));
 
     await expect(importCommand({ roo: true })).rejects.toThrow("process.exit");
-    expect(console.error).toHaveBeenCalledWith(
-      "❌ Error importing from roo: Unexpected error"
-    );
+    expect(console.error).toHaveBeenCalledWith("❌ Error importing from roo: Unexpected error");
   });
 
   it("should support all tool types", async () => {
     const tools = ["claudecode", "cursor", "copilot", "cline", "roo", "geminicli"];
-    
+
     for (const tool of tools) {
       vi.resetAllMocks();
       vi.spyOn(console, "log").mockImplementation(() => {});
-      
+
       const mockResult = {
         success: true,
         rulesCreated: 1,

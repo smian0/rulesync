@@ -1,9 +1,9 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateClaudecodeConfig } from "../../src/generators/claudecode.js";
 import type { ParsedRule } from "../../src/types/index.js";
 import { getDefaultConfig } from "../../src/utils/config.js";
-import { loadIgnorePatterns } from "../../src/utils/ignore.js";
 import { fileExists, readFileContent, writeFileContent } from "../../src/utils/file.js";
+import { loadIgnorePatterns } from "../../src/utils/ignore.js";
 
 vi.mock("../../src/utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
@@ -162,8 +162,8 @@ describe("claudecode generator", () => {
   });
 
   it("should update settings.json when .rulesyncignore exists", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md", "temp/**/*"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md", "temp/**/*"],
     });
     vi.mocked(fileExists).mockResolvedValue(false);
 
@@ -180,21 +180,23 @@ describe("claudecode generator", () => {
   });
 
   it("should merge with existing settings.json", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
     });
     vi.mocked(fileExists).mockResolvedValue(true);
-    vi.mocked(readFileContent).mockResolvedValue(JSON.stringify({
-      permissions: {
-        deny: ["Bash(sudo:*)"]
-      }
-    }));
+    vi.mocked(readFileContent).mockResolvedValue(
+      JSON.stringify({
+        permissions: {
+          deny: ["Bash(sudo:*)"],
+        },
+      })
+    );
 
     await generateClaudecodeConfig(mockRules, config);
 
     const callArgs = vi.mocked(writeFileContent).mock.calls[0];
     const settingsContent = JSON.parse(callArgs[1] as string);
-    
+
     expect(settingsContent.permissions.deny).toContain("Bash(sudo:*)");
     expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
   });
@@ -211,8 +213,8 @@ describe("claudecode generator", () => {
   });
 
   it("should respect baseDir parameter for settings.json", async () => {
-    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
-      patterns: ["*.test.md"] 
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
     });
     vi.mocked(fileExists).mockResolvedValue(false);
 

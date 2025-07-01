@@ -70,18 +70,24 @@ This is the real content after the table.`;
 
   it("should parse memory files", async () => {
     await writeFile(claudeFilePath, "# Main config");
-    await writeFile(join(memoryDir, "coding-standards.md"), "# Coding Standards\n\nUse strict mode");
-    await writeFile(join(memoryDir, "architecture.md"), "# Architecture\n\nFollow clean architecture");
+    await writeFile(
+      join(memoryDir, "coding-standards.md"),
+      "# Coding Standards\n\nUse strict mode"
+    );
+    await writeFile(
+      join(memoryDir, "architecture.md"),
+      "# Architecture\n\nFollow clean architecture"
+    );
 
     const result = await parseClaudeConfiguration(testDir);
     expect(result.rules).toHaveLength(3);
-    
-    const memoryRules = result.rules.filter(r => r.filename.includes("memory"));
+
+    const memoryRules = result.rules.filter((r) => r.filename.includes("memory"));
     expect(memoryRules).toHaveLength(2);
-    
-    const contents = memoryRules.map(r => r.content);
-    expect(contents.some(c => c.includes("Use strict mode"))).toBe(true);
-    expect(contents.some(c => c.includes("Follow clean architecture"))).toBe(true);
+
+    const contents = memoryRules.map((r) => r.content);
+    expect(contents.some((c) => c.includes("Use strict mode"))).toBe(true);
+    expect(contents.some((c) => c.includes("Follow clean architecture"))).toBe(true);
   });
 
   it("should skip empty memory files", async () => {
@@ -91,7 +97,7 @@ This is the real content after the table.`;
     await writeFile(join(memoryDir, "valid.md"), "# Valid content");
 
     const result = await parseClaudeConfiguration(testDir);
-    const memoryRules = result.rules.filter(r => r.filename.includes("memory"));
+    const memoryRules = result.rules.filter((r) => r.filename.includes("memory"));
     expect(memoryRules).toHaveLength(1);
     expect(memoryRules[0].filename).toContain("valid");
   });
@@ -113,11 +119,7 @@ This is the real content after the table.`;
     await writeFile(settingsPath, JSON.stringify(settings, null, 2));
 
     const result = await parseClaudeConfiguration(testDir);
-    expect(result.ignorePatterns).toEqual([
-      "node_modules/**",
-      ".env",
-      "secrets/*",
-    ]);
+    expect(result.ignorePatterns).toEqual(["node_modules/**", ".env", "secrets/*"]);
   });
 
   it("should parse settings.json and extract MCP servers", async () => {
@@ -196,12 +198,7 @@ This is the real content after the table.`;
     await writeFile(settingsPath, JSON.stringify(settings, null, 2));
 
     const result = await parseClaudeConfiguration(testDir);
-    expect(result.ignorePatterns).toEqual([
-      "**/*.test.ts",
-      "~/.ssh/**",
-      "tmp/**/*",
-      ".git/**",
-    ]);
+    expect(result.ignorePatterns).toEqual(["**/*.test.ts", "~/.ssh/**", "tmp/**/*", ".git/**"]);
   });
 
   it("should handle settings.json without permissions section", async () => {

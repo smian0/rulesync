@@ -68,7 +68,12 @@ export async function parseGeminiConfiguration(
     errors.push(`Failed to parse Gemini configuration: ${errorMessage}`);
   }
 
-  return { rules, errors, ignorePatterns, mcpServers };
+  return {
+    rules,
+    errors,
+    ...(ignorePatterns && { ignorePatterns }),
+    ...(mcpServers && { mcpServers }),
+  };
 }
 
 function parseGeminiMainFile(content: string, filepath: string): ParsedRule | null {
@@ -171,7 +176,10 @@ async function parseGeminiSettings(settingsPath: string): Promise<GeminiSettings
     errors.push(`Failed to parse settings.json: ${errorMessage}`);
   }
 
-  return { mcpServers, errors };
+  return {
+    errors,
+    ...(mcpServers && { mcpServers }),
+  };
 }
 
 async function parseAiexclude(aiexcludePath: string): Promise<string[]> {

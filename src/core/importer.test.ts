@@ -1,8 +1,8 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { importConfiguration } from "./importer";
 import * as parsers from "../parsers";
+import { importConfiguration } from "./importer";
 
 vi.mock("../parsers");
 
@@ -19,7 +19,7 @@ describe("importConfiguration", () => {
 
   afterEach(async () => {
     const { rm, chmod } = await import("node:fs/promises");
-    
+
     // Restore permissions before cleanup
     try {
       await chmod(testDir, 0o755);
@@ -27,7 +27,7 @@ describe("importConfiguration", () => {
     } catch {
       // Ignore permission errors during cleanup
     }
-    
+
     await rm(testDir, { recursive: true, force: true });
   });
 
@@ -62,10 +62,7 @@ describe("importConfiguration", () => {
     expect(result.rulesCreated).toBe(1);
     expect(result.errors).toEqual([]);
 
-    const createdFile = await readFile(
-      join(rulesDir, "claudecode__main.md"),
-      "utf-8"
-    );
+    const createdFile = await readFile(join(rulesDir, "claudecode__main.md"), "utf-8");
     expect(createdFile).toContain("root: false");
     expect(createdFile).toContain("# Main content");
   });
@@ -108,14 +105,8 @@ describe("importConfiguration", () => {
 
     expect(result.rulesCreated).toBe(2);
 
-    const file1 = await readFile(
-      join(rulesDir, "cursor__rules.md"),
-      "utf-8"
-    );
-    const file2 = await readFile(
-      join(rulesDir, "cursor__rules-1.md"),
-      "utf-8"
-    );
+    const file1 = await readFile(join(rulesDir, "cursor__rules.md"), "utf-8");
+    const file2 = await readFile(join(rulesDir, "cursor__rules-1.md"), "utf-8");
     expect(file1).toContain("Content 1");
     expect(file2).toContain("Content 2");
   });
@@ -134,10 +125,7 @@ describe("importConfiguration", () => {
 
     expect(result.ignoreFileCreated).toBe(true);
 
-    const ignoreContent = await readFile(
-      join(testDir, ".rulesyncignore"),
-      "utf-8"
-    );
+    const ignoreContent = await readFile(join(testDir, ".rulesyncignore"), "utf-8");
     expect(ignoreContent).toBe("node_modules/**\n*.env\ndist/**\n");
   });
 
@@ -162,10 +150,7 @@ describe("importConfiguration", () => {
 
     expect(result.mcpFileCreated).toBe(true);
 
-    const mcpContent = await readFile(
-      join(rulesDir, ".mcp.json"),
-      "utf-8"
-    );
+    const mcpContent = await readFile(join(rulesDir, ".mcp.json"), "utf-8");
     const parsed = JSON.parse(mcpContent);
     expect(parsed.mcpServers).toEqual(mcpServers);
   });
@@ -215,17 +200,13 @@ describe("importConfiguration", () => {
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("Importing cline configuration from")
     );
-    expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("✅ Created rule file:")
-    );
+    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("✅ Created rule file:"));
 
     consoleSpy.mockRestore();
   });
 
   it("should handle parser exceptions", async () => {
-    vi.spyOn(parsers, "parseRooConfiguration").mockRejectedValueOnce(
-      new Error("Parser crashed")
-    );
+    vi.spyOn(parsers, "parseRooConfiguration").mockRejectedValueOnce(new Error("Parser crashed"));
 
     const result = await importConfiguration({
       tool: "roo",
@@ -234,9 +215,7 @@ describe("importConfiguration", () => {
 
     expect(result.success).toBe(false);
     expect(result.rulesCreated).toBe(0);
-    expect(result.errors).toContain(
-      "Failed to parse roo configuration: Parser crashed"
-    );
+    expect(result.errors).toContain("Failed to parse roo configuration: Parser crashed");
   });
 
   it("should handle unsupported tools", async () => {
@@ -337,7 +316,7 @@ describe("importConfiguration", () => {
     });
 
     expect(result.ignoreFileCreated).toBe(false);
-    expect(result.errors.some(e => e.includes("Failed to create .rulesyncignore"))).toBe(true);
+    expect(result.errors.some((e) => e.includes("Failed to create .rulesyncignore"))).toBe(true);
 
     // Restore permissions
     await chmod(testDir, 0o755);
@@ -360,7 +339,7 @@ describe("importConfiguration", () => {
     });
 
     expect(result.mcpFileCreated).toBe(false);
-    expect(result.errors.some(e => e.includes("Failed to create .mcp.json"))).toBe(true);
+    expect(result.errors.some((e) => e.includes("Failed to create .mcp.json"))).toBe(true);
 
     // Restore permissions
     await chmod(rulesDir, 0o755);
@@ -389,11 +368,11 @@ describe("importConfiguration", () => {
     expect(consoleSpy).toHaveBeenCalledWith(
       expect.stringContaining("Importing claudecode configuration from")
     );
-    
+
     // Check that the ignore and MCP creation logs were called
-    const calls = consoleSpy.mock.calls.map(call => call[0]);
-    expect(calls.some(msg => msg.includes("Created .rulesyncignore with 2 patterns"))).toBe(true);
-    expect(calls.some(msg => msg.includes("Created .mcp.json with 2 servers"))).toBe(true);
+    const calls = consoleSpy.mock.calls.map((call) => call[0]);
+    expect(calls.some((msg) => msg.includes("Created .rulesyncignore with 2 patterns"))).toBe(true);
+    expect(calls.some((msg) => msg.includes("Created .mcp.json with 2 servers"))).toBe(true);
 
     consoleSpy.mockRestore();
   });

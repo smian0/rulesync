@@ -17,6 +17,7 @@ describe("config utils", () => {
         "cursor",
         "cline",
         "claudecode",
+        "claude",
         "roo",
         "geminicli",
       ]);
@@ -29,7 +30,15 @@ describe("config utils", () => {
 
     it("should resolve * to all default targets", () => {
       const targets = resolveTargets(["*"], config);
-      expect(targets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"]);
+      expect(targets).toEqual([
+        "copilot",
+        "cursor",
+        "cline",
+        "claudecode",
+        "claude",
+        "roo",
+        "geminicli",
+      ]);
     });
 
     it("should return specific targets as-is", () => {
