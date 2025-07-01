@@ -375,6 +375,79 @@ Common validation rules:
 - File patterns (globs) use valid syntax
 - Target tools are recognized values
 
+## MCP (Model Context Protocol) Support
+
+rulesync can also manage MCP server configurations for supported AI tools. This allows you to configure language servers and other MCP-compatible services once and deploy them across multiple AI coding assistants.
+
+### Supported MCP Tools
+
+- **Claude Code** (`.mcp.json` for project, `~/.claude/settings.json` for global)
+- **GitHub Copilot** (`.vscode/mcp.json`)
+- **Cursor** (`.cursor/mcp.json` for project, `~/.cursor/mcp.json` for global)
+- **Cline** (`.cline/mcp.json`)
+- **Gemini CLI** (`.gemini/settings.json` for project, `~/.gemini/settings.json` for global)
+- **Roo Code** (`.roo/mcp.json`)
+
+### MCP Configuration
+
+Create a `.rulesync/.mcp.json` file in your project:
+
+```json
+{
+  "mcpServers": {
+    "typescript-language-server": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "rulesyncTargets": ["claude", "cursor", "copilot"]
+    },
+    "eslint-server": {
+      "command": "vscode-eslint-language-server",
+      "args": ["--stdio"],
+      "rulesyncTargets": ["*"]
+    },
+    "custom-api-server": {
+      "url": "http://localhost:3000/mcp",
+      "env": {
+        "API_KEY": "${API_KEY}"
+      },
+      "rulesyncTargets": ["claude"]
+    }
+  }
+}
+```
+
+### MCP Configuration Fields
+
+- **`mcpServers`**: Object containing MCP server configurations
+  - **`command`**: Executable command for stdio-based servers
+  - **`args`**: Command arguments
+  - **`url`**: URL for HTTP/SSE-based servers
+  - **`env`**: Environment variables to pass to the server
+  - **`rulesyncTargets`**: Array of tool names to deploy this server to
+    - Use specific tool names: `["claude", "cursor", "copilot"]`
+    - Use `["*"]` to deploy to all supported tools
+    - If omitted, server is deployed to all tools by default
+
+### Generating MCP Configurations
+
+MCP configurations are generated alongside rule files:
+
+```bash
+# Generate both rules and MCP configurations
+npx rulesync generate
+
+# Generate only for specific tools
+npx rulesync generate --claudecode --cursor
+
+# Generate in specific directories (monorepo)
+npx rulesync generate --base-dir ./packages/frontend
+```
+
+The MCP configurations will be generated in the appropriate locations for each tool, and the tools will automatically load them when started.
+
 ## License
 
 MIT License

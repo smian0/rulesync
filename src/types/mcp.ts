@@ -1,5 +1,7 @@
 export type McpTransportType = "stdio" | "sse" | "http";
 
+export type ToolTarget = "copilot" | "cursor" | "cline" | "claude" | "gemini" | "roo";
+
 export interface McpServerBase {
   command?: string;
   args?: string[];
@@ -17,39 +19,14 @@ export interface McpServerBase {
   tools?: string[];
 }
 
+export interface RulesyncMcpServer extends McpServerBase {
+  rulesyncTargets?: ToolTarget[] | ["*"];
+}
+
 export interface McpConfig {
   mcpServers: Record<string, McpServerBase>;
 }
 
-export interface McpToolConfig {
-  copilot?: {
-    global?: boolean;
-    codingAgent?: boolean;
-    editor?: boolean;
-  };
-  cursor?: {
-    global?: boolean;
-    project?: boolean;
-  };
-  cline?: {
-    global?: boolean;
-    project?: boolean;
-  };
-  claude?: {
-    global?: boolean;
-    project?: boolean;
-  };
-  gemini?: {
-    global?: boolean;
-    project?: boolean;
-  };
-  roo?: {
-    global?: boolean;
-    project?: boolean;
-  };
-}
-
 export interface RulesyncMcpConfig {
-  servers: Record<string, McpServerBase>;
-  tools?: McpToolConfig;
+  mcpServers: Record<string, RulesyncMcpServer>;
 }

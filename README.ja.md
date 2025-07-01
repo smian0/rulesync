@@ -375,6 +375,79 @@ npx rulesync validate
 - ファイルパターン（globs）が有効な構文を使用
 - ターゲットツールが認識される値である
 
+## MCP（Model Context Protocol）サポート
+
+rulesyncは、対応するAIツール用のMCPサーバー設定も管理できます。これにより、言語サーバーやその他のMCP互換サービスを一度設定すれば、複数のAIコーディングアシスタントにデプロイできます。
+
+### MCPをサポートするツール
+
+- **Claude Code** (プロジェクト用`.mcp.json`、グローバル用`~/.claude/settings.json`)
+- **GitHub Copilot** (`.vscode/mcp.json`)
+- **Cursor** (プロジェクト用`.cursor/mcp.json`、グローバル用`~/.cursor/mcp.json`)
+- **Cline** (`.cline/mcp.json`)
+- **Gemini CLI** (プロジェクト用`.gemini/settings.json`、グローバル用`~/.gemini/settings.json`)
+- **Roo Code** (`.roo/mcp.json`)
+
+### MCP設定
+
+プロジェクトに`.rulesync/.mcp.json`ファイルを作成：
+
+```json
+{
+  "mcpServers": {
+    "typescript-language-server": {
+      "command": "typescript-language-server",
+      "args": ["--stdio"],
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "rulesyncTargets": ["claude", "cursor", "copilot"]
+    },
+    "eslint-server": {
+      "command": "vscode-eslint-language-server",
+      "args": ["--stdio"],
+      "rulesyncTargets": ["*"]
+    },
+    "custom-api-server": {
+      "url": "http://localhost:3000/mcp",
+      "env": {
+        "API_KEY": "${API_KEY}"
+      },
+      "rulesyncTargets": ["claude"]
+    }
+  }
+}
+```
+
+### MCP設定フィールド
+
+- **`mcpServers`**: MCPサーバー設定を含むオブジェクト
+  - **`command`**: stdioベースのサーバー用の実行可能コマンド
+  - **`args`**: コマンド引数
+  - **`url`**: HTTP/SSEベースのサーバー用URL
+  - **`env`**: サーバーに渡す環境変数
+  - **`rulesyncTargets`**: このサーバーをデプロイするツール名の配列
+    - 特定のツール名を使用: `["claude", "cursor", "copilot"]`
+    - すべてのサポートツールにデプロイするには`["*"]`を使用
+    - 省略した場合、デフォルトですべてのツールにデプロイ
+
+### MCP設定の生成
+
+MCP設定はルールファイルと一緒に生成されます：
+
+```bash
+# ルールとMCP設定の両方を生成
+npx rulesync generate
+
+# 特定のツールのみ生成
+npx rulesync generate --claudecode --cursor
+
+# 特定のディレクトリに生成（monorepo）
+npx rulesync generate --base-dir ./packages/frontend
+```
+
+MCP設定は各ツールの適切な場所に生成され、ツールは起動時に自動的にそれらを読み込みます。
+
 ## ライセンス
 
 MIT License

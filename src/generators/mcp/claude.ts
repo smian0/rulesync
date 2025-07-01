@@ -1,4 +1,4 @@
-import { McpServerBase, RulesyncMcpConfig } from "../../types/mcp.js";
+import { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 
 interface ClaudeSettings {
   mcpServers?: Record<string, ClaudeServer>;
@@ -20,18 +20,23 @@ export function generateClaudeMcp(
     mcpServers: {}
   };
 
-  const shouldInclude = (serverName: string): boolean => {
-    const toolConfig = config.tools?.claude;
-    if (!toolConfig) return true;
+  const shouldInclude = (server: RulesyncMcpServer): boolean => {
+    // If no rulesyncTargets specified, include in all tools
+    if (!server.rulesyncTargets || server.rulesyncTargets.length === 0) {
+      return true;
+    }
     
-    if (target === "global" && toolConfig.global === false) return false;
-    if (target === "project" && toolConfig.project === false) return false;
+    // If rulesyncTargets is ['*'], include in all tools
+    if (server.rulesyncTargets.length === 1 && server.rulesyncTargets[0] === "*") {
+      return true;
+    }
     
-    return true;
+    // Check if 'claude' is in the rulesyncTargets array
+    return server.rulesyncTargets.includes("claude");
   };
 
-  for (const [serverName, server] of Object.entries(config.servers)) {
-    if (!shouldInclude(serverName)) continue;
+  for (const [serverName, server] of Object.entries(config.mcpServers)) {
+    if (!shouldInclude(server)) continue;
     
     const claudeServer: ClaudeServer = {};
     

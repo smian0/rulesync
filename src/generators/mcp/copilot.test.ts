@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { generateCopilotMcp } from "../copilot.js";
-import { RulesyncMcpConfig } from "../../../types/mcp.js";
+import { generateCopilotMcp } from "./copilot.js";
+import { RulesyncMcpConfig } from "../../types/mcp.js";
 
 describe("generateCopilotMcp", () => {
   it("should generate Copilot Coding Agent config", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "test-server": {
           command: "node",
           args: ["server.js"],
@@ -30,7 +30,7 @@ describe("generateCopilotMcp", () => {
 
   it("should generate Copilot Editor config with inputs", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "test-server": {
           command: "node",
           args: ["server.js"],
@@ -60,7 +60,7 @@ describe("generateCopilotMcp", () => {
 
   it("should handle URL-based servers", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "http-server": {
           httpUrl: "http://localhost:3000",
           tools: ["*"]
@@ -83,7 +83,7 @@ describe("generateCopilotMcp", () => {
 
   it("should convert alwaysAllow to tools", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "test-server": {
           command: "node",
           args: ["server.js"],
@@ -98,20 +98,18 @@ describe("generateCopilotMcp", () => {
     expect(parsed.mcpServers["test-server"].tools).toEqual(["tool1", "tool2"]);
   });
 
-  it("should respect tools configuration", () => {
+  it("should respect rulesyncTargets configuration", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
-        "server1": { command: "node", args: ["s1.js"] },
-        "server2": { command: "node", args: ["s2.js"] }
-      },
-      tools: {
-        copilot: { codingAgent: false, editor: true }
+      mcpServers: {
+        "server1": { command: "node", args: ["s1.js"], rulesyncTargets: ["cursor"] },
+        "server2": { command: "node", args: ["s2.js"], rulesyncTargets: ["copilot"] }
       }
     };
 
     const result = generateCopilotMcp(config, "codingAgent");
     const parsed = JSON.parse(result);
 
-    expect(parsed.mcpServers).toEqual({});
+    expect(Object.keys(parsed.mcpServers)).toHaveLength(1);
+    expect(parsed.mcpServers).toHaveProperty("server2");
   });
 });

@@ -1,11 +1,11 @@
 import { describe, it, expect } from "vitest";
-import { generateClaudeMcp } from "../claude.js";
-import { RulesyncMcpConfig } from "../../../types/mcp.js";
+import { generateClaudeMcp } from "./claude.js";
+import { RulesyncMcpConfig } from "../../types/mcp.js";
 
 describe("generateClaudeMcp", () => {
   it("should generate Claude MCP config for stdio transport", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "test-server": {
           command: "node",
           args: ["server.js"],
@@ -30,7 +30,7 @@ describe("generateClaudeMcp", () => {
 
   it("should generate Claude MCP config for SSE transport", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "sse-server": {
           url: "http://localhost:3000",
           transport: "sse"
@@ -53,7 +53,7 @@ describe("generateClaudeMcp", () => {
 
   it("should generate Claude MCP config for HTTP transport", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "http-server": {
           httpUrl: "http://localhost:3000",
           env: { API_KEY: "test-key" }
@@ -75,26 +75,24 @@ describe("generateClaudeMcp", () => {
     });
   });
 
-  it("should respect tools configuration for global target", () => {
+  it("should respect rulesyncTargets configuration", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
-        "server1": { command: "node", args: ["s1.js"] },
-        "server2": { command: "node", args: ["s2.js"] }
-      },
-      tools: {
-        claude: { global: false, project: true }
+      mcpServers: {
+        "server1": { command: "node", args: ["s1.js"], rulesyncTargets: ["cursor"] },
+        "server2": { command: "node", args: ["s2.js"], rulesyncTargets: ["claude"] }
       }
     };
 
     const result = generateClaudeMcp(config, "global");
     const parsed = JSON.parse(result);
 
-    expect(parsed.mcpServers).toEqual({});
+    expect(Object.keys(parsed.mcpServers)).toHaveLength(1);
+    expect(parsed.mcpServers).toHaveProperty("server2");
   });
 
   it("should include all servers when tools config is not specified", () => {
     const config: RulesyncMcpConfig = {
-      servers: {
+      mcpServers: {
         "server1": { command: "node", args: ["s1.js"] },
         "server2": { command: "python", args: ["s2.py"] }
       }

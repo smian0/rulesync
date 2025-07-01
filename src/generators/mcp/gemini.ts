@@ -1,4 +1,4 @@
-import { RulesyncMcpConfig } from "../../types/mcp.js";
+import { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 
 interface GeminiSettings {
   mcpServers: Record<string, GeminiServer>;
@@ -22,18 +22,21 @@ export function generateGeminiMcp(
     mcpServers: {}
   };
 
-  const shouldInclude = (serverName: string): boolean => {
-    const toolConfig = config.tools?.gemini;
-    if (!toolConfig) return true;
+  const shouldInclude = (server: RulesyncMcpServer): boolean => {
+    const targets = server.rulesyncTargets;
     
-    if (target === "global" && toolConfig.global === false) return false;
-    if (target === "project" && toolConfig.project === false) return false;
+    // If no targets or empty array, include in all tools
+    if (!targets || targets.length === 0) return true;
     
-    return true;
+    // If targets is ['*'], include in all tools
+    if (targets.length === 1 && targets[0] === '*') return true;
+    
+    // Otherwise check if 'gemini' is in the targets array
+    return targets.includes('gemini');
   };
 
-  for (const [serverName, server] of Object.entries(config.servers)) {
-    if (!shouldInclude(serverName)) continue;
+  for (const [serverName, server] of Object.entries(config.mcpServers)) {
+    if (!shouldInclude(server)) continue;
     
     const geminiServer: GeminiServer = {};
     

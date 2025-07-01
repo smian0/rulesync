@@ -1,4 +1,4 @@
-import { RulesyncMcpConfig } from "../../types/mcp.js";
+import { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 
 interface CopilotEditorConfig {
   servers: Record<string, CopilotServer>;
@@ -27,22 +27,25 @@ export function generateCopilotMcp(
   config: RulesyncMcpConfig,
   target: "codingAgent" | "editor"
 ): string {
-  const shouldInclude = (serverName: string): boolean => {
-    const toolConfig = config.tools?.copilot;
-    if (!toolConfig) return true;
+  const shouldInclude = (server: RulesyncMcpServer): boolean => {
+    const targets = server.rulesyncTargets;
     
-    if (target === "codingAgent" && toolConfig.codingAgent === false) return false;
-    if (target === "editor" && toolConfig.editor === false) return false;
+    // If no targets or empty array, include in all tools
+    if (!targets || targets.length === 0) return true;
     
-    return true;
+    // If targets is ['*'], include in all tools
+    if (targets.length === 1 && targets[0] === '*') return true;
+    
+    // Otherwise check if 'copilot' is in the targets array
+    return targets.includes('copilot');
   };
 
   const servers: Record<string, CopilotServer> = {};
   const inputs: CopilotInput[] = [];
   const inputMap = new Map<string, string>();
 
-  for (const [serverName, server] of Object.entries(config.servers)) {
-    if (!shouldInclude(serverName)) continue;
+  for (const [serverName, server] of Object.entries(config.mcpServers)) {
+    if (!shouldInclude(server)) continue;
     
     const copilotServer: CopilotServer = {};
     

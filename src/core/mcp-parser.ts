@@ -11,13 +11,24 @@ export function parseMcpConfig(projectRoot: string): RulesyncMcpConfig | null {
 
   try {
     const content = fs.readFileSync(mcpPath, "utf-8");
-    const config = JSON.parse(content) as RulesyncMcpConfig;
+    const rawConfig = JSON.parse(content) as any;
     
-    if (!config.servers || typeof config.servers !== "object") {
-      throw new Error("Invalid mcp.json: 'servers' field must be an object");
+    // Handle legacy 'servers' field and migrate to 'mcpServers'
+    if (rawConfig.servers && !rawConfig.mcpServers) {
+      rawConfig.mcpServers = rawConfig.servers;
+      delete rawConfig.servers;
     }
     
-    return config;
+    if (!rawConfig.mcpServers || typeof rawConfig.mcpServers !== "object") {
+      throw new Error("Invalid mcp.json: 'mcpServers' field must be an object");
+    }
+    
+    // Remove deprecated 'tools' field if present
+    if (rawConfig.tools) {
+      delete rawConfig.tools;
+    }
+    
+    return rawConfig as RulesyncMcpConfig;
   } catch (error) {
     throw new Error(`Failed to parse mcp.json: ${error instanceof Error ? error.message : String(error)}`);
   }

@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import fs from "fs";
 import path from "path";
-import { parseMcpConfig } from "../mcp-parser.js";
+import { parseMcpConfig } from "./mcp-parser.js";
 
 describe("parseMcpConfig", () => {
   const testDir = path.join(process.cwd(), ".test-rulesync");
@@ -34,7 +34,9 @@ describe("parseMcpConfig", () => {
     fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig, null, 2));
     
     const result = parseMcpConfig(testDir);
-    expect(result).toEqual(mcpConfig);
+    expect(result).toEqual({
+      mcpServers: mcpConfig.servers
+    });
   });
 
   it("should parse mcp.json with tools configuration", () => {
@@ -54,7 +56,9 @@ describe("parseMcpConfig", () => {
     fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig, null, 2));
     
     const result = parseMcpConfig(testDir);
-    expect(result).toEqual(mcpConfig);
+    expect(result).toEqual({
+      mcpServers: mcpConfig.servers
+    });
   });
 
   it("should throw error for invalid JSON", () => {
@@ -67,13 +71,13 @@ describe("parseMcpConfig", () => {
     const mcpConfig = { notServers: {} };
     fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig));
     
-    expect(() => parseMcpConfig(testDir)).toThrow("Invalid mcp.json: 'servers' field must be an object");
+    expect(() => parseMcpConfig(testDir)).toThrow("Invalid mcp.json: 'mcpServers' field must be an object");
   });
 
   it("should throw error when servers field is not an object", () => {
     const mcpConfig = { servers: "not-an-object" };
     fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig));
     
-    expect(() => parseMcpConfig(testDir)).toThrow("Invalid mcp.json: 'servers' field must be an object");
+    expect(() => parseMcpConfig(testDir)).toThrow("Invalid mcp.json: 'mcpServers' field must be an object");
   });
 });
