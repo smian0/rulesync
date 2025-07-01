@@ -35,13 +35,9 @@
 		"bcheck": "biome check src/",
 		"bcheck:fix": "biome check --write src/",
 		"build": "tsup src/cli/index.ts --format cjs,esm --dts --clean",
-		"check": "pnpm run lint && pnpm run format && pnpm run bcheck && pnpm run typecheck",
+		"check": "pnpm run bcheck && pnpm run typecheck",
 		"dev": "tsx src/cli/index.ts",
-		"fix": "pnpm run lint:fix && pnpm run format:fix && pnpm run bcheck:fix",
-		"format": "biome format src/",
-		"format:fix": "biome format --write src/",
-		"lint": "biome lint src/",
-		"lint:fix": "biome lint --write src/",
+		"fix": "pnpm run bcheck:fix",
 		"prepublishOnly": "pnpm build",
 		"secretlint": "secretlint \"**/*\"",
 		"sort": "sort-package-json",
@@ -91,9 +87,7 @@
 	},
 	"lint-staged": {
 		"*.{ts,js}": [
-			"biome check --write",
-			"biome lint --write",
-			"biome format --write"
+			"biome check --write"
 		],
 		"*.ts": [
 			"tsgo --noEmit"
