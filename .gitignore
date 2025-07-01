@@ -184,6 +184,13 @@ pnpm-lock.yaml
 **/.gemini/memories/
 **/.aiexclude
 
+**/.mcp.json
+**/.cursor/mcp.json
+**/.cline/mcp.json
+**/.vscode/mcp.json
+**/.gemini/settings.json
+**/.roo/mcp.json
+
 **/.rulesync/copilot__*
 **/.rulesync/cursor__*
 **/.rulesync/cline__*

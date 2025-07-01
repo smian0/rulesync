@@ -1,4 +1,5 @@
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
+import { generateMcpConfigs } from "../../core/mcp-generator.js";
 import type { ToolTarget } from "../../types/index.js";
 import {
   fileExists,
@@ -115,6 +116,32 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
     }
 
     console.log(`\n🎉 Successfully generated ${totalOutputs} configuration file(s)!`);
+
+    // Generate MCP configurations
+    if (options.verbose) {
+      console.log("\nGenerating MCP configurations...");
+    }
+
+    for (const baseDir of baseDirs) {
+      const mcpResults = await generateMcpConfigs(process.cwd(), baseDir === process.cwd() ? undefined : baseDir);
+      
+      if (mcpResults.length === 0) {
+        if (options.verbose) {
+          console.log(`No MCP configuration found for ${baseDir}`);
+        }
+        continue;
+      }
+
+      for (const result of mcpResults) {
+        if (result.status === "success") {
+          console.log(`✅ Generated ${result.tool} MCP configuration: ${result.path}`);
+        } else if (result.status === "error") {
+          console.error(`❌ Failed to generate ${result.tool} MCP configuration: ${result.error}`);
+        } else if (options.verbose && result.status === "skipped") {
+          console.log(`⏭️  Skipped ${result.tool} MCP configuration (no servers configured)`);
+        }
+      }
+    }
   } catch (error) {
     console.error("❌ Failed to generate configurations:", error);
     process.exit(1);

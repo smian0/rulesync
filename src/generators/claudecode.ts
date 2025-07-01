@@ -116,7 +116,7 @@ async function updateClaudeSettings(settingsPath: string, ignorePatterns: string
     if (!match) return true;
     
     // Remove if it's one of our patterns
-    return !ignorePatterns.includes(match[1]);
+    return !ignorePatterns.includes(match[1] ?? "");
   });
 
   // Add new Read() rules

@@ -1,0 +1,133 @@
+import path from "path";
+import os from "os";
+import { parseMcpConfig } from "./mcp-parser.js";
+import { writeFileContent } from "../utils/file.js";
+import {
+  generateClaudeMcp,
+  generateCopilotMcp,
+  generateCursorMcp,
+  generateClineMcp,
+  generateGeminiMcp,
+  generateRooMcp
+} from "../generators/mcp/index.js";
+
+export interface McpGenerationResult {
+  tool: string;
+  path: string;
+  status: "success" | "skipped" | "error";
+  error?: string;
+}
+
+export async function generateMcpConfigs(
+  projectRoot: string,
+  baseDir?: string
+): Promise<McpGenerationResult[]> {
+  const results: McpGenerationResult[] = [];
+  const targetRoot = baseDir || projectRoot;
+  
+  const config = parseMcpConfig(projectRoot);
+  if (!config) {
+    return results;
+  }
+
+  const generators = [
+    {
+      tool: "claude-project",
+      path: path.join(targetRoot, ".mcp.json"),
+      generate: () => generateClaudeMcp(config, "project")
+    },
+    {
+      tool: "copilot-editor",
+      path: path.join(targetRoot, ".vscode", "mcp.json"),
+      generate: () => generateCopilotMcp(config, "editor")
+    },
+    {
+      tool: "cursor-project",
+      path: path.join(targetRoot, ".cursor", "mcp.json"),
+      generate: () => generateCursorMcp(config, "project")
+    },
+    {
+      tool: "cline-project",
+      path: path.join(targetRoot, ".cline", "mcp.json"),
+      generate: () => generateClineMcp(config, "project")
+    },
+    {
+      tool: "gemini-project",
+      path: path.join(targetRoot, ".gemini", "settings.json"),
+      generate: () => generateGeminiMcp(config, "project")
+    },
+    {
+      tool: "roo-project",
+      path: path.join(targetRoot, ".roo", "mcp.json"),
+      generate: () => generateRooMcp(config, "project")
+    }
+  ];
+
+  if (!baseDir) {
+    generators.push(
+      {
+        tool: "claude-global",
+        path: path.join(os.homedir(), ".claude", "settings.json"),
+        generate: () => generateClaudeMcp(config, "global")
+      },
+      {
+        tool: "cursor-global",
+        path: path.join(os.homedir(), ".cursor", "mcp.json"),
+        generate: () => generateCursorMcp(config, "global")
+      },
+      {
+        tool: "gemini-global",
+        path: path.join(os.homedir(), ".gemini", "settings.json"),
+        generate: () => generateGeminiMcp(config, "global")
+      }
+    );
+  }
+
+  for (const generator of generators) {
+    try {
+      const content = generator.generate();
+      const parsed = JSON.parse(content);
+      
+      if (generator.tool.includes("claude") || 
+          generator.tool.includes("cline") || 
+          generator.tool.includes("cursor") ||
+          generator.tool.includes("gemini") ||
+          generator.tool.includes("roo")) {
+        if (!parsed.mcpServers || Object.keys(parsed.mcpServers).length === 0) {
+          results.push({
+            tool: generator.tool,
+            path: generator.path,
+            status: "skipped"
+          });
+          continue;
+        }
+      } else if (generator.tool.includes("copilot")) {
+        const key = generator.tool.includes("codingAgent") ? "mcpServers" : "servers";
+        if (!parsed[key] || Object.keys(parsed[key]).length === 0) {
+          results.push({
+            tool: generator.tool,
+            path: generator.path,
+            status: "skipped"
+          });
+          continue;
+        }
+      }
+      
+      await writeFileContent(generator.path, content);
+      results.push({
+        tool: generator.tool,
+        path: generator.path,
+        status: "success"
+      });
+    } catch (error) {
+      results.push({
+        tool: generator.tool,
+        path: generator.path,
+        status: "error",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  }
+
+  return results;
+}
