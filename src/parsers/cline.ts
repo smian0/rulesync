@@ -8,7 +8,7 @@ export interface ClineImportResult {
 }
 
 export async function parseClineConfiguration(
-  baseDir: string = process.cwd()
+  baseDir: string = process.cwd(),
 ): Promise<ClineImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];

@@ -6,16 +6,16 @@ export interface GeminiImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
-  mcpServers?: Record<string, any>;
+  mcpServers?: Record<string, unknown>;
 }
 
 export async function parseGeminiConfiguration(
-  baseDir: string = process.cwd()
+  baseDir: string = process.cwd(),
 ): Promise<GeminiImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, any> | undefined;
+  let mcpServers: Record<string, unknown> | undefined;
 
   // Check for GEMINI.md file
   const geminiFilePath = join(baseDir, "GEMINI.md");
@@ -88,7 +88,7 @@ function parseGeminiMainFile(content: string, filepath: string): ParsedRule | nu
         index > 0 &&
         line.trim() === "" &&
         lines[index - 1]?.includes("|") &&
-        !lines[index + 1]?.includes("|")
+        !lines[index + 1]?.includes("|"),
     );
     if (tableEndIndex !== -1) {
       contentStartIndex = tableEndIndex + 1;
@@ -155,13 +155,13 @@ async function parseGeminiMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
 
 interface GeminiSettingsResult {
   ignorePatterns?: string[];
-  mcpServers?: Record<string, any>;
+  mcpServers?: Record<string, unknown>;
   errors: string[];
 }
 
 async function parseGeminiSettings(settingsPath: string): Promise<GeminiSettingsResult> {
   const errors: string[] = [];
-  let mcpServers: Record<string, any> | undefined;
+  let mcpServers: Record<string, unknown> | undefined;
 
   try {
     const content = await readFileContent(settingsPath);

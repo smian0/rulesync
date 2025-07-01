@@ -9,7 +9,7 @@ export interface CopilotImportResult {
 }
 
 export async function parseCopilotConfiguration(
-  baseDir: string = process.cwd()
+  baseDir: string = process.cwd(),
 ): Promise<CopilotImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
@@ -83,7 +83,7 @@ export async function parseCopilotConfiguration(
 
   if (rules.length === 0) {
     errors.push(
-      "No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)"
+      "No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)",
     );
   }
 

@@ -119,7 +119,7 @@ describe("statusCommand", () => {
     await statusCommand();
 
     expect(console.log).toHaveBeenCalledWith(
-      "\n💡 Run 'rulesync generate' to update configuration files"
+      "\n💡 Run 'rulesync generate' to update configuration files",
     );
   });
 
@@ -130,7 +130,7 @@ describe("statusCommand", () => {
 
     expect(console.log).toHaveBeenCalledWith("\n📋 Rules: 0 total");
     expect(console.log).not.toHaveBeenCalledWith(
-      "\n💡 Run 'rulesync generate' to update configuration files"
+      "\n💡 Run 'rulesync generate' to update configuration files",
     );
   });
 

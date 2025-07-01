@@ -24,7 +24,7 @@ export async function validateRules(rules: ParsedRule[]): Promise<ValidationResu
   const rootRules = rules.filter((rule) => rule.frontmatter.root === true);
   if (rootRules.length > 1) {
     errors.push(
-      `Multiple root rules found: ${rootRules.map((r) => r.filename).join(", ")}. Only one root rule is allowed.`
+      `Multiple root rules found: ${rootRules.map((r) => r.filename).join(", ")}. Only one root rule is allowed.`,
     );
   }
 

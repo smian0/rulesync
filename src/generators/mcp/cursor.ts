@@ -16,7 +16,7 @@ interface CursorServer {
 
 export function generateCursorMcp(
   config: RulesyncMcpConfig,
-  _target: "global" | "project"
+  _target: "global" | "project",
 ): string {
   const cursorConfig: CursorConfig = {
     mcpServers: {},
@@ -57,8 +57,8 @@ export function generateCursorMcp(
 }
 
 export function generateCursorMcpConfiguration(
-  mcpServers: Record<string, any>, // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  baseDir: string = ""
+  mcpServers: Record<string, unknown>,
+  baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.cursor/mcp.json` : ".cursor/mcp.json";
 

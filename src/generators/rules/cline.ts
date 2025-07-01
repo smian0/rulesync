@@ -5,7 +5,7 @@ import { loadIgnorePatterns } from "../../utils/ignore.js";
 export async function generateClineConfig(
   rules: ParsedRule[],
   config: Config,
-  baseDir?: string
+  baseDir?: string,
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 

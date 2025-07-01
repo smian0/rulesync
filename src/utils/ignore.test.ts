@@ -115,7 +115,7 @@ temp/
 
       expect(patterns.patterns).toEqual([]);
       expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining("Failed to read .rulesyncignore")
+        expect.stringContaining("Failed to read .rulesyncignore"),
       );
 
       consoleSpy.mockRestore();

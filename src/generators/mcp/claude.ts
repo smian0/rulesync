@@ -15,7 +15,7 @@ interface ClaudeServer {
 
 export function generateClaudeMcp(
   config: RulesyncMcpConfig,
-  _target: "global" | "project"
+  _target: "global" | "project",
 ): string {
   const claudeSettings: ClaudeSettings = {
     mcpServers: {},
@@ -57,7 +57,7 @@ export function generateClaudeMcp(
 
 export function generateClaudeMcpConfiguration(
   mcpServers: Record<string, RulesyncMcpServer>,
-  baseDir: string = ""
+  baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.claude/settings.json` : ".claude/settings.json";
 

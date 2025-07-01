@@ -84,11 +84,11 @@ describe("generateCommand", () => {
       mockRules,
       mockConfig,
       undefined,
-      process.cwd()
+      process.cwd(),
     );
     expect(mockWriteFileContent).toHaveBeenCalledWith(
       ".github/instructions/test.md",
-      "Generated content"
+      "Generated content",
     );
   });
 
@@ -97,7 +97,7 @@ describe("generateCommand", () => {
 
     await expect(generateCommand()).rejects.toThrow("process.exit called");
     expect(console.error).toHaveBeenCalledWith(
-      "❌ .rulesync directory not found. Run 'rulesync init' first."
+      "❌ .rulesync directory not found. Run 'rulesync init' first.",
     );
   });
 
@@ -131,7 +131,7 @@ describe("generateCommand", () => {
       mockRules,
       mockConfig,
       ["copilot"],
-      process.cwd()
+      process.cwd(),
     );
   });
 
@@ -141,7 +141,7 @@ describe("generateCommand", () => {
     await expect(generateCommand()).rejects.toThrow("process.exit called");
     expect(console.error).toHaveBeenCalledWith(
       "❌ Failed to generate configurations:",
-      expect.any(Error)
+      expect.any(Error),
     );
   });
 

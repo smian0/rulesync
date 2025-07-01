@@ -49,7 +49,7 @@ export async function addCommand(filename: string): Promise<void> {
     console.log(`📝 Edit the file to customize your rules.`);
   } catch (error) {
     console.error(
-      `❌ Failed to create rule file: ${error instanceof Error ? error.message : String(error)}`
+      `❌ Failed to create rule file: ${error instanceof Error ? error.message : String(error)}`,
     );
     process.exit(3); // ファイルI/Oエラー
   }

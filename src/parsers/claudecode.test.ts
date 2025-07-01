@@ -72,11 +72,11 @@ This is the real content after the table.`;
     await writeFile(claudeFilePath, "# Main config");
     await writeFile(
       join(memoryDir, "coding-standards.md"),
-      "# Coding Standards\n\nUse strict mode"
+      "# Coding Standards\n\nUse strict mode",
     );
     await writeFile(
       join(memoryDir, "architecture.md"),
-      "# Architecture\n\nFollow clean architecture"
+      "# Architecture\n\nFollow clean architecture",
     );
 
     const result = await parseClaudeConfiguration(testDir);

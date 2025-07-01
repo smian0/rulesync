@@ -1,5 +1,5 @@
-import { watch } from "chokidar";
 import type { FSWatcher } from "chokidar";
+import { watch } from "chokidar";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDefaultConfig } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";

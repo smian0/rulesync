@@ -71,8 +71,8 @@ export function generateRooMcp(config: RulesyncMcpConfig, _target: "global" | "p
 }
 
 export function generateRooMcpConfiguration(
-  mcpServers: Record<string, any>, // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  baseDir: string = ""
+  mcpServers: Record<string, unknown>,
+  baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.roo/mcp.json` : ".roo/mcp.json";
 

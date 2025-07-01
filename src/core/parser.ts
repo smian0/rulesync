@@ -33,7 +33,7 @@ export async function parseRulesFromDirectory(aiRulesDir: string): Promise<Parse
   if (rootRules.length > 1) {
     const rootRuleFiles = rootRules.map((rule) => rule.filepath).join(", ");
     throw new Error(
-      `Multiple root rules found: ${rootRuleFiles}. Only one rule can have root: true.`
+      `Multiple root rules found: ${rootRuleFiles}. Only one rule can have root: true.`,
     );
   }
 
@@ -62,7 +62,7 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   if (!data || typeof data !== "object") {
     if (!data) {
       throw new Error(
-        `Missing frontmatter in ${filepath}: file must contain YAML frontmatter with required fields (root, targets, description, globs)`
+        `Missing frontmatter in ${filepath}: file must contain YAML frontmatter with required fields (root, targets, description, globs)`,
       );
     }
     throw new Error(`Invalid frontmatter in ${filepath}: frontmatter must be a valid YAML object`);
@@ -73,7 +73,7 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   // Check if the object is completely empty
   if (Object.keys(obj).length === 0) {
     throw new Error(
-      `Missing frontmatter in ${filepath}: file must contain YAML frontmatter with required fields (root, targets, description, globs)`
+      `Missing frontmatter in ${filepath}: file must contain YAML frontmatter with required fields (root, targets, description, globs)`,
     );
   }
 
@@ -83,19 +83,19 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   }
   if (typeof obj.root !== "boolean") {
     throw new Error(
-      `Invalid "root" field in ${filepath}: must be a boolean (true or false), got ${typeof obj.root}`
+      `Invalid "root" field in ${filepath}: must be a boolean (true or false), got ${typeof obj.root}`,
     );
   }
 
   // Validate targets
   if (obj.targets === undefined) {
     throw new Error(
-      `Missing required field "targets" in ${filepath}: must be an array like ["*"] or ["copilot", "cursor"]`
+      `Missing required field "targets" in ${filepath}: must be an array like ["*"] or ["copilot", "cursor"]`,
     );
   }
   if (!Array.isArray(obj.targets)) {
     throw new Error(
-      `Invalid "targets" field in ${filepath}: must be an array, got ${typeof obj.targets}`
+      `Invalid "targets" field in ${filepath}: must be an array, got ${typeof obj.targets}`,
     );
   }
 
@@ -103,7 +103,7 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   for (const target of obj.targets) {
     if (typeof target !== "string" || !validTargets.includes(target)) {
       throw new Error(
-        `Invalid target "${target}" in ${filepath}: must be one of ${validTargets.join(", ")}`
+        `Invalid target "${target}" in ${filepath}: must be one of ${validTargets.join(", ")}`,
       );
     }
   }
@@ -111,31 +111,31 @@ function validateFrontmatter(data: unknown, filepath: string): void {
   // Validate description
   if (obj.description === undefined) {
     throw new Error(
-      `Missing required field "description" in ${filepath}: must be a descriptive string`
+      `Missing required field "description" in ${filepath}: must be a descriptive string`,
     );
   }
   if (!obj.description || typeof obj.description !== "string") {
     throw new Error(
-      `Invalid "description" field in ${filepath}: must be a non-empty string, got ${typeof obj.description}`
+      `Invalid "description" field in ${filepath}: must be a non-empty string, got ${typeof obj.description}`,
     );
   }
 
   // Validate globs
   if (obj.globs === undefined) {
     throw new Error(
-      `Missing required field "globs" in ${filepath}: must be an array of file patterns like ["**/*.ts"]`
+      `Missing required field "globs" in ${filepath}: must be an array of file patterns like ["**/*.ts"]`,
     );
   }
   if (!Array.isArray(obj.globs)) {
     throw new Error(
-      `Invalid "globs" field in ${filepath}: must be an array, got ${typeof obj.globs}`
+      `Invalid "globs" field in ${filepath}: must be an array, got ${typeof obj.globs}`,
     );
   }
 
   for (const glob of obj.globs) {
     if (typeof glob !== "string") {
       throw new Error(
-        `Invalid glob pattern in ${filepath}: all globs must be strings, got ${typeof glob}`
+        `Invalid glob pattern in ${filepath}: all globs must be strings, got ${typeof glob}`,
       );
     }
   }

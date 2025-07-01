@@ -21,7 +21,7 @@ export interface McpGenerationResult {
 
 export async function generateMcpConfigs(
   projectRoot: string,
-  baseDir?: string
+  baseDir?: string,
 ): Promise<McpGenerationResult[]> {
   const results: McpGenerationResult[] = [];
   const targetRoot = baseDir || projectRoot;
@@ -80,7 +80,7 @@ export async function generateMcpConfigs(
         tool: "gemini-global",
         path: path.join(os.homedir(), ".gemini", "settings.json"),
         generate: () => generateGeminiCliMcp(config, "global"),
-      }
+      },
     );
   }
 
@@ -138,7 +138,7 @@ export async function generateMcpConfigs(
 export async function generateMcpConfigurations(
   mcpConfig: RulesyncMcpConfig,
   baseDir: string,
-  targetTools?: string[]
+  targetTools?: string[],
 ): Promise<Array<{ filepath: string; content: string; tool: string }>> {
   const outputs: Array<{ filepath: string; content: string; tool: string }> = [];
 
@@ -146,7 +146,7 @@ export async function generateMcpConfigurations(
     string,
     (
       servers: Record<string, RulesyncMcpServer>,
-      dir: string
+      dir: string,
     ) => Promise<Array<{ filepath: string; content: string }>>
   > = {
     claudecode: async (servers, dir) =>
@@ -162,7 +162,7 @@ export async function generateMcpConfigurations(
     geminicli: async (servers, dir) =>
       (await import("../generators/mcp/geminicli.js")).generateGeminiCliMcpConfiguration(
         servers,
-        dir
+        dir,
       ),
   };
 

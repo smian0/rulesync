@@ -50,7 +50,7 @@ program
   .option("--delete", "Delete all existing files in output directories before generating")
   .option(
     "-b, --base-dir <paths>",
-    "Base directories to generate files (comma-separated for multiple paths)"
+    "Base directories to generate files (comma-separated for multiple paths)",
   )
   .option("-v, --verbose", "Verbose output")
   .action(async (options) => {

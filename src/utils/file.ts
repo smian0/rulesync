@@ -1,14 +1,14 @@
 import { readdir, rm } from "node:fs/promises";
 import { join } from "node:path";
-import { filterIgnoredFiles } from "./ignore.js";
 import { ensureDir, fileExists, readFileContent, writeFileContent } from "./file-ops.js";
+import { filterIgnoredFiles } from "./ignore.js";
 
 export { ensureDir, fileExists, readFileContent, writeFileContent };
 
 export async function findFiles(
   dir: string,
   extension: string = ".md",
-  ignorePatterns?: string[]
+  ignorePatterns?: string[],
 ): Promise<string[]> {
   try {
     const files = await readdir(dir);
@@ -25,7 +25,6 @@ export async function findFiles(
     return [];
   }
 }
-
 
 export async function removeDirectory(dirPath: string): Promise<void> {
   // Safety check: prevent deletion of dangerous paths

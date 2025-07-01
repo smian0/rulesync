@@ -6,16 +6,16 @@ export interface ClaudeImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
-  mcpServers?: Record<string, any>;
+  mcpServers?: Record<string, unknown>;
 }
 
 export async function parseClaudeConfiguration(
-  baseDir: string = process.cwd()
+  baseDir: string = process.cwd(),
 ): Promise<ClaudeImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, any> | undefined;
+  let mcpServers: Record<string, unknown> | undefined;
 
   // Check for CLAUDE.md file
   const claudeFilePath = join(baseDir, "CLAUDE.md");
@@ -77,7 +77,7 @@ function parseClaudeMainFile(content: string, filepath: string): ParsedRule | nu
         index > 0 &&
         line.trim() === "" &&
         lines[index - 1]?.includes("|") &&
-        !lines[index + 1]?.includes("|")
+        !lines[index + 1]?.includes("|"),
     );
     if (tableEndIndex !== -1) {
       contentStartIndex = tableEndIndex + 1;
@@ -144,37 +144,46 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
 
 interface ClaudeSettingsResult {
   ignorePatterns?: string[];
-  mcpServers?: Record<string, any>;
+  mcpServers?: Record<string, unknown>;
   errors: string[];
 }
 
 async function parseClaudeSettings(settingsPath: string): Promise<ClaudeSettingsResult> {
   const errors: string[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, any> | undefined;
+  let mcpServers: Record<string, unknown> | undefined;
 
   try {
     const content = await readFileContent(settingsPath);
     const settings = JSON.parse(content);
 
     // Extract ignore patterns from permissions.deny
-    if (settings.permissions?.deny) {
-      const readPatterns = settings.permissions.deny
-        .filter((rule: string) => rule.startsWith("Read(") && rule.endsWith(")"))
-        .map((rule: string) => {
-          const match = rule.match(/^Read\((.+)\)$/);
-          return match ? match[1] : null;
-        })
-        .filter((pattern: string | null): pattern is string => pattern !== null);
+    if (typeof settings === "object" && settings !== null && "permissions" in settings) {
+      const permissions = settings.permissions as Record<string, unknown>;
+      if (permissions && "deny" in permissions && Array.isArray(permissions.deny)) {
+        const readPatterns = permissions.deny
+          .filter(
+            (rule): rule is string =>
+              typeof rule === "string" && rule.startsWith("Read(") && rule.endsWith(")"),
+          )
+          .map((rule) => {
+            const match = rule.match(/^Read\((.+)\)$/);
+            return match ? match[1] : null;
+          })
+          .filter((pattern): pattern is string => pattern !== null);
 
-      if (readPatterns.length > 0) {
-        ignorePatterns = readPatterns;
+        if (readPatterns.length > 0) {
+          ignorePatterns = readPatterns;
+        }
       }
     }
 
     // Extract MCP servers
-    if (settings.mcpServers && Object.keys(settings.mcpServers).length > 0) {
-      mcpServers = settings.mcpServers;
+    if (typeof settings === "object" && settings !== null && "mcpServers" in settings) {
+      const servers = settings.mcpServers;
+      if (servers && typeof servers === "object" && Object.keys(servers).length > 0) {
+        mcpServers = servers as Record<string, unknown>;
+      }
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);

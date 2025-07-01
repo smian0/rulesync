@@ -72,7 +72,7 @@ describe("parseMcpConfig", () => {
     fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig));
 
     expect(() => parseMcpConfig(testDir)).toThrow(
-      "Invalid mcp.json: 'mcpServers' field must be an object"
+      "Invalid mcp.json: 'mcpServers' field must be an object",
     );
   });
 
@@ -81,7 +81,7 @@ describe("parseMcpConfig", () => {
     fs.writeFileSync(mcpPath, JSON.stringify(mcpConfig));
 
     expect(() => parseMcpConfig(testDir)).toThrow(
-      "Invalid mcp.json: 'mcpServers' field must be an object"
+      "Invalid mcp.json: 'mcpServers' field must be an object",
     );
   });
 });

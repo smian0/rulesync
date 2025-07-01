@@ -79,7 +79,7 @@ This rule applies to all files using the asterisk wildcard without quotes.
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
       expect(rule.frontmatter.description).toBe("Cursor rule: docs-maintenance");
       expect(rule.content.trim()).toBe(
-        "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes."
+        "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.",
       );
       expect(rule.filename).toBe("cursor-docs-maintenance");
     });
@@ -156,7 +156,7 @@ This is a legacy .cursorrules file.
       expect(rule.frontmatter.description).toBe("Cursor IDE configuration rules");
       expect(rule.frontmatter.globs).toEqual(["**/*"]);
       expect(rule.content.trim()).toBe(
-        "# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file."
+        "# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file.",
       );
       expect(rule.filename).toBe("cursor-rules");
     });

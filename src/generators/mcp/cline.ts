@@ -60,7 +60,7 @@ export function generateClineMcp(config: RulesyncMcpConfig, _target: "global" | 
 
 export function generateClineMcpConfiguration(
   mcpServers: Record<string, RulesyncMcpServer>,
-  baseDir: string = ""
+  baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.cline/mcp.json` : ".cline/mcp.json";
 

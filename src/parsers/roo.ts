@@ -8,7 +8,7 @@ export interface RooImportResult {
 }
 
 export async function parseRooConfiguration(
-  baseDir: string = process.cwd()
+  baseDir: string = process.cwd(),
 ): Promise<RooImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];

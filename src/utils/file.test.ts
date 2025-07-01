@@ -171,7 +171,7 @@ describe("file utilities", () => {
       expect(mockRm).toHaveBeenCalledWith("/path/to/dir", { recursive: true, force: true });
       expect(consoleSpy).toHaveBeenCalledWith(
         "Failed to remove directory /path/to/dir:",
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();
@@ -235,7 +235,7 @@ describe("file utilities", () => {
       expect(mockRm).toHaveBeenCalledWith("/path/to/file.txt");
       expect(consoleSpy).toHaveBeenCalledWith(
         "Failed to remove file /path/to/file.txt:",
-        expect.any(Error)
+        expect.any(Error),
       );
 
       consoleSpy.mockRestore();

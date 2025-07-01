@@ -46,10 +46,10 @@ describe("addCommand", () => {
     expect(mockWriteFile).toHaveBeenCalledWith(
       path.join(".rulesync", "test-rule.md"),
       expect.stringContaining("root: false"),
-      "utf8"
+      "utf8",
     );
     expect(console.log).toHaveBeenCalledWith(
-      `✅ Created rule file: ${path.join(".rulesync", "test-rule.md")}`
+      `✅ Created rule file: ${path.join(".rulesync", "test-rule.md")}`,
     );
     expect(console.log).toHaveBeenCalledWith("📝 Edit the file to customize your rules.");
   });
@@ -60,7 +60,7 @@ describe("addCommand", () => {
     expect(mockWriteFile).toHaveBeenCalledWith(
       path.join(".rulesync", "test-rule.md"),
       expect.stringContaining('description: "Rules for test-rule"'),
-      "utf8"
+      "utf8",
     );
   });
 
@@ -70,9 +70,9 @@ describe("addCommand", () => {
     expect(mockWriteFile).toHaveBeenCalledWith(
       expect.any(String),
       expect.stringMatching(
-        /---\nroot: false\ntargets: \["\*"\]\ndescription: "Rules for typescript-rules"\nglobs: \[\]\n---\n\n# Typescript-rules Rules\n\nAdd your rules here\.\n/
+        /---\nroot: false\ntargets: \["\*"\]\ndescription: "Rules for typescript-rules"\nglobs: \[\]\n---\n\n# Typescript-rules Rules\n\nAdd your rules here\.\n/,
       ),
-      "utf8"
+      "utf8",
     );
   });
 
@@ -105,7 +105,7 @@ describe("addCommand", () => {
     expect(mockWriteFile).toHaveBeenCalledWith(
       expect.any(String),
       expect.stringContaining("# MyRule Rules"),
-      "utf8"
+      "utf8",
     );
   });
 });

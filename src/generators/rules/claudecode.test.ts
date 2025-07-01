@@ -70,10 +70,10 @@ describe("claudecode generator", () => {
     expect(outputs[0].content).not.toContain("Generated from rulesync configuration");
     expect(outputs[0].content).toContain("| Document | Description | File Patterns |");
     expect(outputs[0].content).toContain(
-      "| @.claude/memories/architecture-rule.md | Detail architecture rule | **/*.tsx |"
+      "| @.claude/memories/architecture-rule.md | Detail architecture rule | **/*.tsx |",
     );
     expect(outputs[0].content).toContain(
-      "| @.claude/memories/naming-rule.md | Detail naming rule | **/*.js |"
+      "| @.claude/memories/naming-rule.md | Detail naming rule | **/*.js |",
     );
   });
 
@@ -84,10 +84,10 @@ describe("claudecode generator", () => {
     expect(outputs[0].content).toContain("Use TypeScript for all new code.");
     expect(outputs[0].content).toContain("| Document | Description | File Patterns |");
     expect(outputs[0].content).toContain(
-      "| @.claude/memories/architecture-rule.md | Detail architecture rule | **/*.tsx |"
+      "| @.claude/memories/architecture-rule.md | Detail architecture rule | **/*.tsx |",
     );
     expect(outputs[0].content).toContain(
-      "| @.claude/memories/naming-rule.md | Detail naming rule | **/*.js |"
+      "| @.claude/memories/naming-rule.md | Detail naming rule | **/*.js |",
     );
 
     // Detail rules should be in separate memory files
@@ -171,11 +171,11 @@ describe("claudecode generator", () => {
 
     expect(writeFileContent).toHaveBeenCalledWith(
       ".claude/settings.json",
-      expect.stringContaining('"Read(*.test.md)"')
+      expect.stringContaining('"Read(*.test.md)"'),
     );
     expect(writeFileContent).toHaveBeenCalledWith(
       ".claude/settings.json",
-      expect.stringContaining('"Read(temp/**/*)"')
+      expect.stringContaining('"Read(temp/**/*)"'),
     );
   });
 
@@ -189,7 +189,7 @@ describe("claudecode generator", () => {
         permissions: {
           deny: ["Bash(sudo:*)"],
         },
-      })
+      }),
     );
 
     await generateClaudecodeConfig(mockRules, config);
@@ -208,7 +208,7 @@ describe("claudecode generator", () => {
 
     expect(writeFileContent).not.toHaveBeenCalledWith(
       expect.stringContaining("settings.json"),
-      expect.any(String)
+      expect.any(String),
     );
   });
 
@@ -222,7 +222,7 @@ describe("claudecode generator", () => {
 
     expect(writeFileContent).toHaveBeenCalledWith(
       "/custom/base/.claude/settings.json",
-      expect.stringContaining('"Read(*.test.md)"')
+      expect.stringContaining('"Read(*.test.md)"'),
     );
   });
 });

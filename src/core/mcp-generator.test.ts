@@ -108,7 +108,7 @@ describe("generateMcpConfigurations", () => {
 
     // Check editor config
     const editorOutput = outputs.find(
-      (o) => o.filepath.includes("mcp.json") && !o.filepath.includes("codingagent")
+      (o) => o.filepath.includes("mcp.json") && !o.filepath.includes("codingagent"),
     );
     expect(editorOutput).toBeDefined();
     const editorConfig = JSON.parse(editorOutput?.content);
@@ -221,7 +221,7 @@ describe("generateMcpConfigurations", () => {
 
     // Copilot generates two files
     const copilotOutputs = outputs.filter(
-      (o) => o.filepath.includes(".copilot") || o.filepath.includes(".vscode")
+      (o) => o.filepath.includes(".copilot") || o.filepath.includes(".vscode"),
     );
     expect(copilotOutputs).toHaveLength(2);
 

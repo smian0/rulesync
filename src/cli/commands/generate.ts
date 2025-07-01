@@ -125,7 +125,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
     for (const baseDir of baseDirs) {
       const mcpResults = await generateMcpConfigs(
         process.cwd(),
-        baseDir === process.cwd() ? undefined : baseDir
+        baseDir === process.cwd() ? undefined : baseDir,
       );
 
       if (mcpResults.length === 0) {

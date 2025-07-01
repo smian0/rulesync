@@ -31,7 +31,7 @@ export function parseMcpConfig(projectRoot: string): RulesyncMcpConfig | null {
     return { mcpServers: rawConfig.mcpServers } as RulesyncMcpConfig;
   } catch (error) {
     throw new Error(
-      `Failed to parse mcp.json: ${error instanceof Error ? error.message : String(error)}`
+      `Failed to parse mcp.json: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }

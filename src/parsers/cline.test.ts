@@ -22,7 +22,7 @@ describe("parseClineConfiguration", () => {
   it("should return error when no configuration files found", async () => {
     const result = await parseClineConfiguration(testDir);
     expect(result.errors).toContain(
-      "No Cline configuration files found (.cline/instructions.md or .clinerules/*.md)"
+      "No Cline configuration files found (.cline/instructions.md or .clinerules/*.md)",
     );
     expect(result.rules).toEqual([]);
   });
@@ -54,11 +54,11 @@ This is a Node.js application.
   it("should parse .clinerules directory files", async () => {
     await writeFile(
       join(clinerulesDirPath, "coding-style.md"),
-      "# Coding Style\n\nUse 2 spaces for indentation"
+      "# Coding Style\n\nUse 2 spaces for indentation",
     );
     await writeFile(
       join(clinerulesDirPath, "testing.md"),
-      "# Testing Rules\n\nAim for 80% coverage"
+      "# Testing Rules\n\nAim for 80% coverage",
     );
     await writeFile(join(clinerulesDirPath, "readme.txt"), "This should be ignored");
 

@@ -73,7 +73,7 @@ describe("validateCommand", () => {
 
     await expect(validateCommand()).rejects.toThrow("process.exit called");
     expect(console.error).toHaveBeenCalledWith(
-      "❌ .rulesync directory not found. Run 'rulesync init' first."
+      "❌ .rulesync directory not found. Run 'rulesync init' first.",
     );
   });
 

@@ -11,7 +11,7 @@ export async function generateConfigurations(
   rules: ParsedRule[],
   config: Config,
   targetTools?: ToolTarget[],
-  baseDir?: string
+  baseDir?: string,
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
   const toolsToGenerate = targetTools || config.defaultTargets;
@@ -20,7 +20,7 @@ export async function generateConfigurations(
   const rootFiles = rules.filter((rule) => rule.frontmatter.root === true);
   if (rootFiles.length === 0) {
     console.warn(
-      "⚠️  Warning: No files with 'root: true' found. This may result in incomplete configurations."
+      "⚠️  Warning: No files with 'root: true' found. This may result in incomplete configurations.",
     );
   }
 
@@ -52,7 +52,7 @@ async function generateForTool(
   tool: ToolTarget,
   rules: ParsedRule[],
   config: Config,
-  baseDir?: string
+  baseDir?: string,
 ): Promise<GeneratedOutput[] | null> {
   switch (tool) {
     case "copilot":

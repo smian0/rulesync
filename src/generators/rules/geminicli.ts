@@ -5,7 +5,7 @@ import { loadIgnorePatterns } from "../../utils/ignore.js";
 export async function generateGeminiConfig(
   rules: ParsedRule[],
   config: Config,
-  baseDir?: string
+  baseDir?: string,
 ): Promise<GeneratedOutput[]> {
   const outputs: GeneratedOutput[] = [];
 
@@ -63,7 +63,7 @@ function generateGeminiMemoryMarkdown(rule: ParsedRule): string {
 function generateGeminiRootMarkdown(
   rootRule: ParsedRule | undefined,
   memoryRules: ParsedRule[],
-  _baseDir?: string
+  _baseDir?: string,
 ): string {
   const lines: string[] = [];
 

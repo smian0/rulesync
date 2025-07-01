@@ -22,7 +22,7 @@ describe("parseRooConfiguration", () => {
   it("should return error when no configuration files found", async () => {
     const result = await parseRooConfiguration(testDir);
     expect(result.errors).toContain(
-      "No Roo Code configuration files found (.roo/instructions.md or .roo/rules/*.md)"
+      "No Roo Code configuration files found (.roo/instructions.md or .roo/rules/*.md)",
     );
     expect(result.rules).toEqual([]);
   });
@@ -54,11 +54,11 @@ This is a React TypeScript project.
   it("should parse .roo/rules directory files", async () => {
     await writeFile(
       join(rooRulesDir, "react-patterns.md"),
-      "# React Patterns\n\nUse custom hooks for state logic"
+      "# React Patterns\n\nUse custom hooks for state logic",
     );
     await writeFile(
       join(rooRulesDir, "performance.md"),
-      "# Performance Guidelines\n\nMemoize expensive computations"
+      "# Performance Guidelines\n\nMemoize expensive computations",
     );
     await writeFile(join(rooRulesDir, "notes.txt"), "This should be ignored");
 
@@ -119,7 +119,7 @@ This is a React TypeScript project.
 
     const result = await parseRooConfiguration(testDir);
     expect(result.errors).toContain(
-      "No Roo Code configuration files found (.roo/instructions.md or .roo/rules/*.md)"
+      "No Roo Code configuration files found (.roo/instructions.md or .roo/rules/*.md)",
     );
     expect(result.rules).toEqual([]);
   });

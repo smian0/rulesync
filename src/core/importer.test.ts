@@ -198,7 +198,7 @@ describe("importConfiguration", () => {
     });
 
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Importing cline configuration from")
+      expect.stringContaining("Importing cline configuration from"),
     );
     expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining("✅ Created rule file:"));
 
@@ -367,7 +367,7 @@ describe("importConfiguration", () => {
 
     // Check that verbose log was called for importing
     expect(consoleSpy).toHaveBeenCalledWith(
-      expect.stringContaining("Importing claudecode configuration from")
+      expect.stringContaining("Importing claudecode configuration from"),
     );
 
     // Check that the ignore and MCP creation logs were called

@@ -29,7 +29,7 @@ describe("initCommand", () => {
     expect(console.log).toHaveBeenCalledWith("\nNext steps:");
     expect(console.log).toHaveBeenCalledWith("1. Edit rule files in .rulesync/");
     expect(console.log).toHaveBeenCalledWith(
-      "2. Run 'rulesync generate' to create configuration files"
+      "2. Run 'rulesync generate' to create configuration files",
     );
   });
 
@@ -38,15 +38,15 @@ describe("initCommand", () => {
 
     expect(mockWriteFileContent).toHaveBeenCalledWith(
       join(".rulesync", "overview.md"),
-      expect.stringContaining("root: true")
+      expect.stringContaining("root: true"),
     );
     expect(mockWriteFileContent).toHaveBeenCalledWith(
       join(".rulesync", "frontend.md"),
-      expect.stringContaining("root: false")
+      expect.stringContaining("root: false"),
     );
     expect(mockWriteFileContent).toHaveBeenCalledWith(
       join(".rulesync", "backend.md"),
-      expect.stringContaining("root: false")
+      expect.stringContaining("root: false"),
     );
 
     expect(console.log).toHaveBeenCalledWith("Created .rulesync/overview.md");
@@ -82,7 +82,7 @@ describe("initCommand", () => {
     await initCommand();
 
     const overviewCall = mockWriteFileContent.mock.calls.find((call) =>
-      call[0].includes("overview.md")
+      call[0].includes("overview.md"),
     );
     expect(overviewCall).toBeDefined();
     expect(overviewCall?.[1]).toContain("root: true");
@@ -94,14 +94,14 @@ describe("initCommand", () => {
     await initCommand();
 
     const frontendCall = mockWriteFileContent.mock.calls.find((call) =>
-      call[0].includes("frontend.md")
+      call[0].includes("frontend.md"),
     );
     expect(frontendCall).toBeDefined();
     expect(frontendCall?.[1]).toContain("root: false");
     expect(frontendCall?.[1]).toContain("Frontend development rules");
 
     const backendCall = mockWriteFileContent.mock.calls.find((call) =>
-      call[0].includes("backend.md")
+      call[0].includes("backend.md"),
     );
     expect(backendCall).toBeDefined();
     expect(backendCall?.[1]).toContain("root: false");

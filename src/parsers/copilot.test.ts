@@ -22,7 +22,7 @@ describe("parseCopilotConfiguration", () => {
   it("should return error when no configuration files found", async () => {
     const result = await parseCopilotConfiguration(testDir);
     expect(result.errors).toContain(
-      "No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)"
+      "No Copilot configuration files found (.github/copilot-instructions.md or .github/instructions/*.instructions.md)",
     );
     expect(result.rules).toEqual([]);
   });
@@ -54,11 +54,11 @@ This is a TypeScript project.
   it("should parse instructions directory files", async () => {
     await writeFile(
       join(instructionsDir, "typescript.instructions.md"),
-      "# TypeScript Rules\n\nUse strict mode"
+      "# TypeScript Rules\n\nUse strict mode",
     );
     await writeFile(
       join(instructionsDir, "testing.instructions.md"),
-      "# Testing Guidelines\n\nWrite unit tests"
+      "# Testing Guidelines\n\nWrite unit tests",
     );
     await writeFile(join(instructionsDir, "not-instructions.md"), "This should be ignored");
 

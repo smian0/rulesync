@@ -26,7 +26,7 @@ interface CopilotInput {
 
 export function generateCopilotMcp(
   config: RulesyncMcpConfig,
-  target: "codingAgent" | "editor"
+  target: "codingAgent" | "editor",
 ): string {
   const servers: Record<string, CopilotServer> = {};
   const inputs: CopilotInput[] = [];
@@ -88,7 +88,7 @@ export function generateCopilotMcp(
 
 export function generateCopilotMcpConfiguration(
   mcpServers: Record<string, RulesyncMcpServer>,
-  baseDir: string = ""
+  baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
   const configs: Array<{ filepath: string; content: string }> = [];
 

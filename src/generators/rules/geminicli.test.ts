@@ -66,7 +66,7 @@ describe("generateGeminiConfig", () => {
     expect(results[1].tool).toBe("geminicli");
     expect(results[1].filepath).toBe("GEMINI.md");
     expect(results[1].content).toContain(
-      "Please also reference the following documents as needed:"
+      "Please also reference the following documents as needed:",
     );
     expect(results[1].content).toContain("| Document | Description | File Patterns |");
     expect(results[1].content).toContain("@.gemini/memories/detail-rule.md");
@@ -79,7 +79,7 @@ describe("generateGeminiConfig", () => {
 
     expect(rootFile?.content).toContain("| Document | Description | File Patterns |");
     expect(rootFile?.content).toContain(
-      "| @.gemini/memories/detail-rule.md | Detail rule | **/*.md |"
+      "| @.gemini/memories/detail-rule.md | Detail rule | **/*.md |",
     );
   });
 
@@ -104,7 +104,7 @@ describe("generateGeminiConfig", () => {
     expect(results[0].filepath).toBe("GEMINI.md");
     expect(results[0].content).toContain("This is root only content");
     expect(results[0].content).not.toContain(
-      "Please also reference the following documents as needed:"
+      "Please also reference the following documents as needed:",
     );
   });
 
@@ -134,7 +134,7 @@ describe("generateGeminiConfig", () => {
     // Root file
     expect(results[1].filepath).toBe("GEMINI.md");
     expect(results[1].content).toContain(
-      "Please also reference the following documents as needed:"
+      "Please also reference the following documents as needed:",
     );
     expect(results[1].content).toContain("| Document | Description | File Patterns |");
     expect(results[1].content).not.toContain("This is memory rule content");

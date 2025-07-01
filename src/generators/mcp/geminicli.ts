@@ -17,7 +17,7 @@ interface GeminiServer {
 
 export function generateGeminiCliMcp(
   config: RulesyncMcpConfig,
-  _target: "global" | "project"
+  _target: "global" | "project",
 ): string {
   const geminiSettings: GeminiSettings = {
     mcpServers: {},
@@ -66,7 +66,7 @@ export function generateGeminiCliMcp(
 
 export function generateGeminiCliMcpConfiguration(
   mcpServers: Record<string, RulesyncMcpServer>,
-  baseDir: string = ""
+  baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.gemini/settings.json` : ".gemini/settings.json";
 

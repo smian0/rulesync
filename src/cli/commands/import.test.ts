@@ -22,14 +22,14 @@ describe("import command", () => {
   it("should require at least one tool to be specified", async () => {
     await expect(importCommand({})).rejects.toThrow("process.exit");
     expect(console.error).toHaveBeenCalledWith(
-      "❌ Please specify one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo, --geminicli)"
+      "❌ Please specify one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo, --geminicli)",
     );
   });
 
   it("should reject multiple tools being specified", async () => {
     await expect(importCommand({ claudecode: true, cursor: true })).rejects.toThrow("process.exit");
     expect(console.error).toHaveBeenCalledWith(
-      "❌ Only one tool can be specified at a time. Please run the import command separately for each tool."
+      "❌ Only one tool can be specified at a time. Please run the import command separately for each tool.",
     );
   });
 
@@ -63,7 +63,7 @@ describe("import command", () => {
     await importCommand({ cursor: true });
 
     expect(console.log).toHaveBeenCalledWith(
-      "✅ Created .rulesyncignore file from ignore patterns"
+      "✅ Created .rulesyncignore file from ignore patterns",
     );
   });
 
@@ -79,7 +79,7 @@ describe("import command", () => {
     await importCommand({ claudecode: true });
 
     expect(console.log).toHaveBeenCalledWith(
-      "✅ Created .rulesync/.mcp.json file from MCP configuration"
+      "✅ Created .rulesync/.mcp.json file from MCP configuration",
     );
   });
 
@@ -94,7 +94,7 @@ describe("import command", () => {
     await importCommand({ copilot: true });
 
     expect(console.warn).toHaveBeenCalledWith(
-      "⚠️  Failed to import from copilot: Failed to parse configuration"
+      "⚠️  Failed to import from copilot: Failed to parse configuration",
     );
   });
 

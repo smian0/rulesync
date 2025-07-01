@@ -1,6 +1,6 @@
 import { basename, join } from "node:path";
 import matter from "gray-matter";
-import { load, DEFAULT_SCHEMA, FAILSAFE_SCHEMA } from "js-yaml";
+import { DEFAULT_SCHEMA, FAILSAFE_SCHEMA, load } from "js-yaml";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -8,7 +8,7 @@ export interface CursorImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
-  mcpServers?: Record<string, any>;
+  mcpServers?: Record<string, unknown>;
 }
 
 // Custom gray-matter options for more lenient YAML parsing
@@ -39,12 +39,12 @@ const customMatterOptions = {
 };
 
 export async function parseCursorConfiguration(
-  baseDir: string = process.cwd()
+  baseDir: string = process.cwd(),
 ): Promise<CursorImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, any> | undefined;
+  let mcpServers: Record<string, unknown> | undefined;
 
   // Check for .cursorrules file (legacy)
   const cursorFilePath = join(baseDir, ".cursorrules");

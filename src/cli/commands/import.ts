@@ -25,14 +25,14 @@ export async function importCommand(options: ImportOptions = {}): Promise<void> 
   // Validate that exactly one tool is selected
   if (tools.length === 0) {
     console.error(
-      "❌ Please specify one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo, --geminicli)"
+      "❌ Please specify one tool to import from (--claudecode, --cursor, --copilot, --cline, --roo, --geminicli)",
     );
     process.exit(1);
   }
 
   if (tools.length > 1) {
     console.error(
-      "❌ Only one tool can be specified at a time. Please run the import command separately for each tool."
+      "❌ Only one tool can be specified at a time. Please run the import command separately for each tool.",
     );
     process.exit(1);
   }
