@@ -20,7 +20,8 @@
       "Bash(pnpm publish:*)",
       "Bash(git remote add:*)",
       "Bash(git remote set-url:*)",
-      "Bash(gh:*)"
+      "Bash(gh:*)",
+      "Read(tmp/**/*)"
     ]
   }
 }
