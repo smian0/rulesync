@@ -380,7 +380,7 @@ rulesyncは、対応するAIツール用のMCPサーバー設定も管理でき�
 
 ### MCPをサポートするツール
 
-- **Claude Code** (プロジェクト用`.mcp.json`)
+- **Claude Code** (`.mcp.json`)
 - **GitHub Copilot** (`.vscode/mcp.json`)
 - **Cursor** (`.cursor/mcp.json`)
 - **Cline** (`.cline/mcp.json`)
