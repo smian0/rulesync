@@ -394,25 +394,15 @@ rulesyncは、対応するAIツール用のMCPサーバー設定も管理でき�
 ```json
 {
   "mcpServers": {
-    "typescript-language-server": {
-      "command": "typescript-language-server",
-      "args": ["--stdio"],
-      "env": {
-        "NODE_ENV": "development"
-      },
-      "rulesyncTargets": ["claude", "cursor", "copilot"]
-    },
-    "eslint-server": {
-      "command": "vscode-eslint-language-server",
-      "args": ["--stdio"],
+    "github": {
+      "command": "docker",
+      "args": [
+        "run", "-i", "--rm",
+        "-e", "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "ghcr.io/github/github-mcp-server"
+      ],
+      "env": {},
       "rulesyncTargets": ["*"]
-    },
-    "custom-api-server": {
-      "url": "http://localhost:3000/mcp",
-      "env": {
-        "API_KEY": "${API_KEY}"
-      },
-      "rulesyncTargets": ["claude"]
     }
   }
 }
