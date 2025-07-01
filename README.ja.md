@@ -278,6 +278,33 @@ npx rulesync gitignore
 └── custom.md           # プロジェクト固有ルール (root: false)
 ```
 
+### .rulesyncignoreでファイルを除外
+
+プロジェクトルートに`.rulesyncignore`ファイルを作成することで、特定のルールファイルを処理から除外できます。このファイルはgitignoreスタイルのパターンを使用します。
+
+`.rulesyncignore`の例：
+```
+# テスト用ルールファイルを無視
+**/*.test.md
+
+# 一時ファイルを無視
+tmp/**/*
+
+# ドラフトルールを無視
+draft-*.md
+*-draft.md
+```
+
+`.rulesyncignore`が存在する場合、rulesyncは：
+1. 処理時にマッチするファイルをスキップ
+2. ツール固有のignoreファイルを生成：
+   - Cursor用の`.cursorignore`
+   - Cline用の`.clineignore`
+   - Roo Code用の`.rooignore`
+   - GitHub Copilot用の`.copilotignore`（コミュニティツール用）
+   - Gemini CLI用の`.aiexclude`
+   - Claude Code用に`.claude/settings.json`のpermissions.denyに`Read()`ルールを追加
+
 ### フロントマタースキーマ
 
 各ルールファイルには以下のフィールドを含むフロントマターが必要です：

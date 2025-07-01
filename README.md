@@ -278,6 +278,33 @@ npx rulesync gitignore
 └── custom.md           # Project-specific rules (root: false)
 ```
 
+### Excluding Files with .rulesyncignore
+
+You can exclude specific rule files from being processed by creating a `.rulesyncignore` file in your project root. This file uses gitignore-style patterns.
+
+Example `.rulesyncignore`:
+```
+# Ignore test rule files
+**/*.test.md
+
+# Ignore temporary files
+tmp/**/*
+
+# Ignore draft rules
+draft-*.md
+*-draft.md
+```
+
+When `.rulesyncignore` exists, rulesync will:
+1. Skip matching files during rule processing
+2. Generate tool-specific ignore files:
+   - `.cursorignore` for Cursor
+   - `.clineignore` for Cline
+   - `.rooignore` for Roo Code
+   - `.copilotignore` for GitHub Copilot (community tools)
+   - `.aiexclude` for Gemini CLI
+   - Update `.claude/settings.json` permissions.deny with `Read()` rules for Claude Code
+
 ### Frontmatter Schema
 
 Each rule file must include frontmatter with the following fields:
