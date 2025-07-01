@@ -84,3 +84,31 @@ export function generateRooMcp(
   
   return JSON.stringify(rooConfig, null, 2);
 }
+
+export function generateRooMcpConfiguration(
+  mcpServers: Record<string, any>,
+  baseDir: string = ""
+): Array<{ filepath: string; content: string }> {
+  const filepath = baseDir ? `${baseDir}/.roo/mcp.json` : ".roo/mcp.json";
+  
+  const config: RooConfig = {
+    mcpServers: {}
+  };
+
+  for (const [serverName, server] of Object.entries(mcpServers)) {
+    // Check if this server should be included for roo
+    const targets = server.rulesyncTargets;
+    if (targets && !targets.includes("*") && !targets.includes("roo")) {
+      continue;
+    }
+
+    // Clone server config and remove rulesyncTargets
+    const { rulesyncTargets, ...serverConfig } = server;
+    config.mcpServers[serverName] = serverConfig;
+  }
+
+  return [{
+    filepath,
+    content: JSON.stringify(config, null, 2) + "\n"
+  }];
+}

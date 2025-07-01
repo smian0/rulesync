@@ -60,10 +60,7 @@ If you already have AI tool configurations, you can import them into rulesync fo
 
 1. **Import existing configurations:**
    ```bash
-   # Import from multiple tools at once
-   npx rulesync import --claudecode --cursor --copilot
-   
-   # Or import from specific tools
+   # Import from specific tools (only one tool can be specified at a time)
    npx rulesync import --claudecode  # From CLAUDE.md and .claude/memories/*.md
    npx rulesync import --cursor      # From .cursorrules and .cursor/rules/*.mdc
    npx rulesync import --copilot     # From .github/copilot-instructions.md
@@ -226,8 +223,10 @@ npx rulesync import --cline      # Import from .cline/instructions.md
 npx rulesync import --roo        # Import from .roo/instructions.md
 npx rulesync import --geminicli  # Import from GEMINI.md and .gemini/memories/*.md
 
-# Import from multiple tools
-npx rulesync import --claudecode --cursor --copilot
+# Import each tool individually
+npx rulesync import --claudecode
+npx rulesync import --cursor
+npx rulesync import --copilot
 
 # Verbose output during import
 npx rulesync import --claudecode --verbose

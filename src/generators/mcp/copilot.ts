@@ -97,3 +97,42 @@ export function generateCopilotMcp(
     return JSON.stringify(config, null, 2);
   }
 }
+
+export function generateCopilotMcpConfiguration(
+  mcpServers: Record<string, any>,
+  baseDir: string = ""
+): Array<{ filepath: string; content: string }> {
+  const configs: Array<{ filepath: string; content: string }> = [];
+  
+  // Filter servers for copilot
+  const copilotServers: Record<string, any> = {};
+  for (const [serverName, server] of Object.entries(mcpServers)) {
+    const targets = server.rulesyncTargets;
+    if (!targets || targets.includes("*") || targets.includes("copilot")) {
+      const { rulesyncTargets, ...serverConfig } = server;
+      copilotServers[serverName] = serverConfig;
+    }
+  }
+  
+  // Always generate configs even if empty
+  
+  // Generate .github/copilot/mcp.json
+  const editorConfig = {
+    servers: copilotServers
+  };
+  configs.push({
+    filepath: baseDir ? `${baseDir}/.github/copilot/mcp.json` : ".github/copilot/mcp.json",
+    content: JSON.stringify(editorConfig, null, 2) + "\n"
+  });
+  
+  // Generate .github/copilot/copilot-codingagent-mcp.json
+  const codingAgentConfig = {
+    mcpServers: copilotServers
+  };
+  configs.push({
+    filepath: baseDir ? `${baseDir}/.github/copilot/copilot-codingagent-mcp.json` : ".github/copilot/copilot-codingagent-mcp.json",
+    content: JSON.stringify(codingAgentConfig, null, 2) + "\n"
+  });
+  
+  return configs;
+}

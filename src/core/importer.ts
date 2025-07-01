@@ -6,6 +6,7 @@ import {
   parseCopilotConfiguration,
   parseCursorConfiguration,
   parseRooConfiguration,
+  parseGeminiConfiguration,
 } from "../parsers/index.js";
 import type { ParsedRule, ToolTarget } from "../types/index.js";
 import { fileExists, writeFileContent } from "../utils/index.js";
@@ -21,12 +22,16 @@ export interface ImportResult {
   success: boolean;
   rulesCreated: number;
   errors: string[];
+  ignoreFileCreated?: boolean;
+  mcpFileCreated?: boolean;
 }
 
 export async function importConfiguration(options: ImportOptions): Promise<ImportResult> {
   const { tool, baseDir = process.cwd(), rulesDir = ".rulesync", verbose = false } = options;
   const errors: string[] = [];
   let rules: ParsedRule[] = [];
+  let ignorePatterns: string[] | undefined;
+  let mcpServers: Record<string, any> | undefined;
 
   if (verbose) {
     console.log(`Importing ${tool} configuration from ${baseDir}...`);
@@ -39,12 +44,16 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
         const claudeResult = await parseClaudeConfiguration(baseDir);
         rules = claudeResult.rules;
         errors.push(...claudeResult.errors);
+        ignorePatterns = claudeResult.ignorePatterns;
+        mcpServers = claudeResult.mcpServers;
         break;
       }
       case "cursor": {
         const cursorResult = await parseCursorConfiguration(baseDir);
         rules = cursorResult.rules;
         errors.push(...cursorResult.errors);
+        ignorePatterns = cursorResult.ignorePatterns;
+        mcpServers = cursorResult.mcpServers;
         break;
       }
       case "copilot": {
@@ -65,6 +74,14 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
         errors.push(...rooResult.errors);
         break;
       }
+      case "geminicli": {
+        const geminiResult = await parseGeminiConfiguration(baseDir);
+        rules = geminiResult.rules;
+        errors.push(...geminiResult.errors);
+        ignorePatterns = geminiResult.ignorePatterns;
+        mcpServers = geminiResult.mcpServers;
+        break;
+      }
       default:
         errors.push(`Unsupported tool: ${tool}`);
         return { success: false, rulesCreated: 0, errors };
@@ -75,7 +92,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
     return { success: false, rulesCreated: 0, errors };
   }
 
-  if (rules.length === 0) {
+  if (rules.length === 0 && !ignorePatterns && !mcpServers) {
     return { success: false, rulesCreated: 0, errors };
   }
 
@@ -111,10 +128,46 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
     }
   }
 
+  // Create .rulesyncignore file if ignore patterns exist
+  let ignoreFileCreated = false;
+  if (ignorePatterns && ignorePatterns.length > 0) {
+    try {
+      const rulesyncignorePath = join(baseDir, ".rulesyncignore");
+      const ignoreContent = ignorePatterns.join("\n") + "\n";
+      await writeFileContent(rulesyncignorePath, ignoreContent);
+      ignoreFileCreated = true;
+      if (verbose) {
+        console.log(`✅ Created .rulesyncignore with ${ignorePatterns.length} patterns`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to create .rulesyncignore: ${errorMessage}`);
+    }
+  }
+
+  // Create .mcp.json file if MCP servers exist
+  let mcpFileCreated = false;
+  if (mcpServers && Object.keys(mcpServers).length > 0) {
+    try {
+      const mcpPath = join(baseDir, rulesDir, ".mcp.json");
+      const mcpContent = JSON.stringify({ mcpServers }, null, 2) + "\n";
+      await writeFileContent(mcpPath, mcpContent);
+      mcpFileCreated = true;
+      if (verbose) {
+        console.log(`✅ Created .mcp.json with ${Object.keys(mcpServers).length} servers`);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to create .mcp.json: ${errorMessage}`);
+    }
+  }
+
   return {
-    success: rulesCreated > 0,
+    success: rulesCreated > 0 || ignoreFileCreated || mcpFileCreated,
     rulesCreated,
     errors,
+    ignoreFileCreated,
+    mcpFileCreated,
   };
 }
 

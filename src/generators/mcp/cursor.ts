@@ -67,3 +67,31 @@ export function generateCursorMcp(
   
   return JSON.stringify(cursorConfig, null, 2);
 }
+
+export function generateCursorMcpConfiguration(
+  mcpServers: Record<string, any>,
+  baseDir: string = ""
+): Array<{ filepath: string; content: string }> {
+  const filepath = baseDir ? `${baseDir}/.cursor/mcp.json` : ".cursor/mcp.json";
+  
+  const config: CursorConfig = {
+    mcpServers: {}
+  };
+
+  for (const [serverName, server] of Object.entries(mcpServers)) {
+    // Check if this server should be included for cursor
+    const targets = server.rulesyncTargets;
+    if (targets && !targets.includes("*") && !targets.includes("cursor")) {
+      continue;
+    }
+
+    // Clone server config and remove rulesyncTargets
+    const { rulesyncTargets, ...serverConfig } = server;
+    config.mcpServers[serverName] = serverConfig;
+  }
+
+  return [{
+    filepath,
+    content: JSON.stringify(config, null, 2) + "\n"
+  }];
+}

@@ -14,7 +14,7 @@ interface GeminiServer {
   trust?: boolean;
 }
 
-export function generateGeminiMcp(
+export function generateGeminiCliMcp(
   config: RulesyncMcpConfig,
   target: "global" | "project"
 ): string {
@@ -31,8 +31,8 @@ export function generateGeminiMcp(
     // If targets is ['*'], include in all tools
     if (targets.length === 1 && targets[0] === '*') return true;
     
-    // Otherwise check if 'gemini' is in the targets array
-    return targets.includes('gemini');
+    // Otherwise check if 'geminicli' is in the targets array
+    return targets.includes('geminicli');
   };
 
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
@@ -74,4 +74,32 @@ export function generateGeminiMcp(
   }
   
   return JSON.stringify(geminiSettings, null, 2);
+}
+
+export function generateGeminiCliMcpConfiguration(
+  mcpServers: Record<string, any>,
+  baseDir: string = ""
+): Array<{ filepath: string; content: string }> {
+  const filepath = baseDir ? `${baseDir}/.gemini/settings.json` : ".gemini/settings.json";
+  
+  const config: GeminiSettings = {
+    mcpServers: {}
+  };
+
+  for (const [serverName, server] of Object.entries(mcpServers)) {
+    // Check if this server should be included for geminicli
+    const targets = server.rulesyncTargets;
+    if (targets && !targets.includes("*") && !targets.includes("geminicli")) {
+      continue;
+    }
+
+    // Clone server config and remove rulesyncTargets
+    const { rulesyncTargets, ...serverConfig } = server;
+    config.mcpServers[serverName] = serverConfig;
+  }
+
+  return [{
+    filepath,
+    content: JSON.stringify(config, null, 2) + "\n"
+  }];
 }

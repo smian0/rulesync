@@ -2,48 +2,48 @@ import { basename, join } from "node:path";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
-export interface ClaudeImportResult {
+export interface GeminiImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
   mcpServers?: Record<string, any>;
 }
 
-export async function parseClaudeConfiguration(
+export async function parseGeminiConfiguration(
   baseDir: string = process.cwd()
-): Promise<ClaudeImportResult> {
+): Promise<GeminiImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
   let mcpServers: Record<string, any> | undefined;
 
-  // Check for CLAUDE.md file
-  const claudeFilePath = join(baseDir, "CLAUDE.md");
-  if (!(await fileExists(claudeFilePath))) {
-    errors.push("CLAUDE.md file not found");
+  // Check for GEMINI.md file
+  const geminiFilePath = join(baseDir, "GEMINI.md");
+  if (!(await fileExists(geminiFilePath))) {
+    errors.push("GEMINI.md file not found");
     return { rules, errors };
   }
 
   try {
-    const claudeContent = await readFileContent(claudeFilePath);
+    const geminiContent = await readFileContent(geminiFilePath);
 
-    // Parse main CLAUDE.md content
-    const mainRule = parseClaudeMainFile(claudeContent, claudeFilePath);
+    // Parse main GEMINI.md content
+    const mainRule = parseGeminiMainFile(geminiContent, geminiFilePath);
     if (mainRule) {
       rules.push(mainRule);
     }
 
     // Parse memory files if they exist
-    const memoryDir = join(baseDir, ".claude", "memories");
+    const memoryDir = join(baseDir, ".gemini", "memories");
     if (await fileExists(memoryDir)) {
-      const memoryRules = await parseClaudeMemoryFiles(memoryDir);
+      const memoryRules = await parseGeminiMemoryFiles(memoryDir);
       rules.push(...memoryRules);
     }
 
     // Parse settings.json if it exists
-    const settingsPath = join(baseDir, ".claude", "settings.json");
+    const settingsPath = join(baseDir, ".gemini", "settings.json");
     if (await fileExists(settingsPath)) {
-      const settingsResult = await parseClaudeSettings(settingsPath);
+      const settingsResult = await parseGeminiSettings(settingsPath);
       if (settingsResult.ignorePatterns) {
         ignorePatterns = settingsResult.ignorePatterns;
       }
@@ -52,15 +52,26 @@ export async function parseClaudeConfiguration(
       }
       errors.push(...settingsResult.errors);
     }
+
+    // Check for .aiexclude file
+    const aiexcludePath = join(baseDir, ".aiexclude");
+    if (await fileExists(aiexcludePath)) {
+      const aiexcludePatterns = await parseAiexclude(aiexcludePath);
+      if (aiexcludePatterns.length > 0) {
+        ignorePatterns = ignorePatterns
+          ? [...ignorePatterns, ...aiexcludePatterns]
+          : aiexcludePatterns;
+      }
+    }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    errors.push(`Failed to parse Claude configuration: ${errorMessage}`);
+    errors.push(`Failed to parse Gemini configuration: ${errorMessage}`);
   }
 
   return { rules, errors, ignorePatterns, mcpServers };
 }
 
-function parseClaudeMainFile(content: string, filepath: string): ParsedRule | null {
+function parseGeminiMainFile(content: string, filepath: string): ParsedRule | null {
   // Extract the main content, excluding the reference table
   const lines = content.split("\n");
   let contentStartIndex = 0;
@@ -87,20 +98,20 @@ function parseClaudeMainFile(content: string, filepath: string): ParsedRule | nu
 
   const frontmatter: RuleFrontmatter = {
     root: false,
-    targets: ["claudecode"],
-    description: "Main Claude Code configuration",
+    targets: ["geminicli"],
+    description: "Main Gemini CLI configuration",
     globs: ["**/*"],
   };
 
   return {
     frontmatter,
     content: mainContent,
-    filename: "claude-main",
+    filename: "gemini-main",
     filepath,
   };
 }
 
-async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> {
+async function parseGeminiMemoryFiles(memoryDir: string): Promise<ParsedRule[]> {
   const rules: ParsedRule[] = [];
 
   try {
@@ -116,7 +127,7 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
           const filename = basename(file, ".md");
           const frontmatter: RuleFrontmatter = {
             root: false,
-            targets: ["claudecode"],
+            targets: ["geminicli"],
             description: `Memory file: ${filename}`,
             globs: ["**/*"],
           };
@@ -124,7 +135,7 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
           rules.push({
             frontmatter,
             content: content.trim(),
-            filename: `claude-memory-${filename}`,
+            filename: `gemini-memory-${filename}`,
             filepath: filePath,
           });
         }
@@ -137,35 +148,19 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
   return rules;
 }
 
-interface ClaudeSettingsResult {
+interface GeminiSettingsResult {
   ignorePatterns?: string[];
   mcpServers?: Record<string, any>;
   errors: string[];
 }
 
-async function parseClaudeSettings(settingsPath: string): Promise<ClaudeSettingsResult> {
+async function parseGeminiSettings(settingsPath: string): Promise<GeminiSettingsResult> {
   const errors: string[] = [];
-  let ignorePatterns: string[] | undefined;
   let mcpServers: Record<string, any> | undefined;
 
   try {
     const content = await readFileContent(settingsPath);
     const settings = JSON.parse(content);
-
-    // Extract ignore patterns from permissions.deny
-    if (settings.permissions?.deny) {
-      const readPatterns = settings.permissions.deny
-        .filter((rule: string) => rule.startsWith("Read(") && rule.endsWith(")"))
-        .map((rule: string) => {
-          const match = rule.match(/^Read\((.+)\)$/);
-          return match ? match[1] : null;
-        })
-        .filter((pattern: string | null): pattern is string => pattern !== null);
-
-      if (readPatterns.length > 0) {
-        ignorePatterns = readPatterns;
-      }
-    }
 
     // Extract MCP servers
     if (settings.mcpServers && Object.keys(settings.mcpServers).length > 0) {
@@ -176,5 +171,18 @@ async function parseClaudeSettings(settingsPath: string): Promise<ClaudeSettings
     errors.push(`Failed to parse settings.json: ${errorMessage}`);
   }
 
-  return { ignorePatterns, mcpServers, errors };
+  return { mcpServers, errors };
+}
+
+async function parseAiexclude(aiexcludePath: string): Promise<string[]> {
+  try {
+    const content = await readFileContent(aiexcludePath);
+    const patterns = content
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line && !line.startsWith("#"));
+    return patterns;
+  } catch (_error) {
+    return [];
+  }
 }

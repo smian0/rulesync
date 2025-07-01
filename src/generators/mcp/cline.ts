@@ -68,3 +68,31 @@ export function generateClineMcp(
   
   return JSON.stringify(clineConfig, null, 2);
 }
+
+export function generateClineMcpConfiguration(
+  mcpServers: Record<string, any>,
+  baseDir: string = ""
+): Array<{ filepath: string; content: string }> {
+  const filepath = baseDir ? `${baseDir}/.cline/mcp.json` : ".cline/mcp.json";
+  
+  const config: ClineConfig = {
+    mcpServers: {}
+  };
+
+  for (const [serverName, server] of Object.entries(mcpServers)) {
+    // Check if this server should be included for cline
+    const targets = server.rulesyncTargets;
+    if (targets && !targets.includes("*") && !targets.includes("cline")) {
+      continue;
+    }
+
+    // Clone server config and remove rulesyncTargets
+    const { rulesyncTargets, ...serverConfig } = server;
+    config.mcpServers[serverName] = serverConfig;
+  }
+
+  return [{
+    filepath,
+    content: JSON.stringify(config, null, 2) + "\n"
+  }];
+}

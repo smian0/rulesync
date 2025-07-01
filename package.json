@@ -45,9 +45,9 @@
 		"prepublishOnly": "pnpm build",
 		"secretlint": "secretlint \"**/*\"",
 		"sort": "sort-package-json",
-		"test": "vitest",
-		"test:coverage": "vitest --coverage",
-		"test:watch": "vitest --watch",
+		"test": "vitest run --silent",
+		"test:coverage": "vitest run --coverage --silent",
+		"test:watch": "vitest --silent",
 		"typecheck": "tsgo --noEmit",
 		"generate": "pnpm run dev generate"
 	},

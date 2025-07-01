@@ -7,7 +7,7 @@ import {
   generateCopilotMcp,
   generateCursorMcp,
   generateClineMcp,
-  generateGeminiMcp,
+  generateGeminiCliMcp,
   generateRooMcp
 } from "../generators/mcp/index.js";
 
@@ -54,7 +54,7 @@ export async function generateMcpConfigs(
     {
       tool: "gemini-project",
       path: path.join(targetRoot, ".gemini", "settings.json"),
-      generate: () => generateGeminiMcp(config, "project")
+      generate: () => generateGeminiCliMcp(config, "project")
     },
     {
       tool: "roo-project",
@@ -78,7 +78,7 @@ export async function generateMcpConfigs(
       {
         tool: "gemini-global",
         path: path.join(os.homedir(), ".gemini", "settings.json"),
-        generate: () => generateGeminiMcp(config, "global")
+        generate: () => generateGeminiCliMcp(config, "global")
       }
     );
   }
@@ -130,4 +130,34 @@ export async function generateMcpConfigs(
   }
 
   return results;
+}
+
+export async function generateMcpConfigurations(
+  mcpConfig: any,
+  baseDir: string,
+  targetTools?: string[]
+): Promise<Array<{ filepath: string; content: string; tool: string }>> {
+  const outputs: Array<{ filepath: string; content: string; tool: string }> = [];
+  
+  const toolMap: Record<string, (servers: any, dir: string) => Promise<Array<{ filepath: string; content: string }>>> = {
+    claudecode: async (servers, dir) => (await import("../generators/mcp/claude.js")).generateClaudeMcpConfiguration(servers, dir),
+    copilot: async (servers, dir) => (await import("../generators/mcp/copilot.js")).generateCopilotMcpConfiguration(servers, dir),
+    cursor: async (servers, dir) => (await import("../generators/mcp/cursor.js")).generateCursorMcpConfiguration(servers, dir),
+    cline: async (servers, dir) => (await import("../generators/mcp/cline.js")).generateClineMcpConfiguration(servers, dir),
+    roo: async (servers, dir) => (await import("../generators/mcp/roo.js")).generateRooMcpConfiguration(servers, dir),
+    geminicli: async (servers, dir) => (await import("../generators/mcp/geminicli.js")).generateGeminiCliMcpConfiguration(servers, dir),
+  };
+  
+  const tools = targetTools || Object.keys(toolMap);
+  
+  for (const tool of tools) {
+    if (toolMap[tool]) {
+      const results = await toolMap[tool](mcpConfig.mcpServers || {}, baseDir);
+      for (const result of results) {
+        outputs.push({ ...result, tool });
+      }
+    }
+  }
+  
+  return outputs;
 }

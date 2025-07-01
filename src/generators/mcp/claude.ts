@@ -64,3 +64,31 @@ export function generateClaudeMcp(
   
   return JSON.stringify(claudeSettings, null, 2);
 }
+
+export function generateClaudeMcpConfiguration(
+  mcpServers: Record<string, any>,
+  baseDir: string = ""
+): Array<{ filepath: string; content: string }> {
+  const filepath = baseDir ? `${baseDir}/.claude/settings.json` : ".claude/settings.json";
+  
+  const settings: ClaudeSettings = {
+    mcpServers: {}
+  };
+
+  for (const [serverName, server] of Object.entries(mcpServers)) {
+    // Check if this server should be included for claude
+    const targets = server.rulesyncTargets;
+    if (targets && !targets.includes("*") && !targets.includes("claudecode")) {
+      continue;
+    }
+
+    // Clone server config and remove rulesyncTargets
+    const { rulesyncTargets, ...serverConfig } = server;
+    settings.mcpServers![serverName] = serverConfig;
+  }
+
+  return [{
+    filepath,
+    content: JSON.stringify(settings, null, 2) + "\n"
+  }];
+}

@@ -60,10 +60,7 @@ yarn global add rulesync
 
 1. **既存設定をインポート:**
    ```bash
-   # 複数のツールから一度にインポート
-   npx rulesync import --claudecode --cursor --copilot
-   
-   # または特定のツールからインポート
+   # 特定のツールからインポート（一度に1つのツールのみ指定可能）
    npx rulesync import --claudecode  # CLAUDE.mdと.claude/memories/*.mdから
    npx rulesync import --cursor      # .cursorrulesと.cursor/rules/*.mdcから
    npx rulesync import --copilot     # .github/copilot-instructions.mdから
@@ -226,8 +223,10 @@ npx rulesync import --cline      # .cline/instructions.mdからインポート
 npx rulesync import --roo        # .roo/instructions.mdからインポート
 npx rulesync import --geminicli  # GEMINI.mdと.gemini/memories/*.mdからインポート
 
-# 複数のツールからインポート
-npx rulesync import --claudecode --cursor --copilot
+# 各ツールを個別にインポート
+npx rulesync import --claudecode
+npx rulesync import --cursor
+npx rulesync import --copilot
 
 # インポート時の詳細出力
 npx rulesync import --claudecode --verbose

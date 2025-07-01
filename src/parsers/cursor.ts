@@ -7,6 +7,8 @@ import { fileExists, readFileContent } from "../utils/index.js";
 export interface CursorImportResult {
   rules: ParsedRule[];
   errors: string[];
+  ignorePatterns?: string[];
+  mcpServers?: Record<string, any>;
 }
 
 // Custom gray-matter options for more lenient YAML parsing
@@ -41,6 +43,8 @@ export async function parseCursorConfiguration(
 ): Promise<CursorImportResult> {
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
+  let ignorePatterns: string[] | undefined;
+  let mcpServers: Record<string, any> | undefined;
 
   // Check for .cursorrules file (legacy)
   const cursorFilePath = join(baseDir, ".cursorrules");
@@ -118,5 +122,38 @@ export async function parseCursorConfiguration(
     errors.push("No Cursor configuration files found (.cursorrules or .cursor/rules/*.mdc)");
   }
 
-  return { rules, errors };
+  // Check for .cursorignore file
+  const cursorIgnorePath = join(baseDir, ".cursorignore");
+  if (await fileExists(cursorIgnorePath)) {
+    try {
+      const content = await readFileContent(cursorIgnorePath);
+      const patterns = content
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line && !line.startsWith("#"));
+      if (patterns.length > 0) {
+        ignorePatterns = patterns;
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse .cursorignore: ${errorMessage}`);
+    }
+  }
+
+  // Check for .cursor/mcp.json file
+  const cursorMcpPath = join(baseDir, ".cursor", "mcp.json");
+  if (await fileExists(cursorMcpPath)) {
+    try {
+      const content = await readFileContent(cursorMcpPath);
+      const mcp = JSON.parse(content);
+      if (mcp.mcpServers && Object.keys(mcp.mcpServers).length > 0) {
+        mcpServers = mcp.mcpServers;
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(`Failed to parse .cursor/mcp.json: ${errorMessage}`);
+    }
+  }
+
+  return { rules, errors, ignorePatterns, mcpServers };
 }
