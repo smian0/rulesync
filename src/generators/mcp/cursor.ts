@@ -1,4 +1,4 @@
-import type { RulesyncMcpConfig } from "../../types/mcp.js";
+import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 import { shouldIncludeServer } from "../../utils/mcp-helpers.js";
 
 interface CursorConfig {
@@ -67,13 +67,21 @@ export function generateCursorMcpConfiguration(
   };
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
+    // Type guard to ensure server is an object
+    if (!server || typeof server !== "object") {
+      continue;
+    }
+
+    // Cast to RulesyncMcpServer for type safety
+    const serverObj = server as RulesyncMcpServer;
+
     // Check if this server should be included for cursor
-    if (!shouldIncludeServer(server, "cursor")) {
+    if (!shouldIncludeServer(serverObj, "cursor")) {
       continue;
     }
 
     // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets: _rulesyncTargets, ...serverConfig } = server;
+    const { rulesyncTargets: _rulesyncTargets, ...serverConfig } = serverObj;
     config.mcpServers[serverName] = serverConfig;
   }
 

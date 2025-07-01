@@ -1,12 +1,13 @@
 import { basename, join } from "node:path";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
+import type { RulesyncMcpServer } from "../types/mcp.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
 export interface ClaudeImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
-  mcpServers?: Record<string, unknown>;
+  mcpServers?: Record<string, RulesyncMcpServer>;
 }
 
 export async function parseClaudeConfiguration(
@@ -15,7 +16,7 @@ export async function parseClaudeConfiguration(
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, unknown> | undefined;
+  let mcpServers: Record<string, RulesyncMcpServer> | undefined;
 
   // Check for CLAUDE.md file
   const claudeFilePath = join(baseDir, "CLAUDE.md");
@@ -144,14 +145,14 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
 
 interface ClaudeSettingsResult {
   ignorePatterns?: string[];
-  mcpServers?: Record<string, unknown>;
+  mcpServers?: Record<string, RulesyncMcpServer>;
   errors: string[];
 }
 
 async function parseClaudeSettings(settingsPath: string): Promise<ClaudeSettingsResult> {
   const errors: string[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, unknown> | undefined;
+  let mcpServers: Record<string, RulesyncMcpServer> | undefined;
 
   try {
     const content = await readFileContent(settingsPath);
@@ -182,7 +183,7 @@ async function parseClaudeSettings(settingsPath: string): Promise<ClaudeSettings
     if (typeof settings === "object" && settings !== null && "mcpServers" in settings) {
       const servers = settings.mcpServers;
       if (servers && typeof servers === "object" && Object.keys(servers).length > 0) {
-        mcpServers = servers as Record<string, unknown>;
+        mcpServers = servers as Record<string, RulesyncMcpServer>;
       }
     }
   } catch (error) {

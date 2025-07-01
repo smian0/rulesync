@@ -2,13 +2,14 @@ import { basename, join } from "node:path";
 import matter from "gray-matter";
 import { DEFAULT_SCHEMA, FAILSAFE_SCHEMA, load } from "js-yaml";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
+import type { RulesyncMcpServer } from "../types/mcp.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
 export interface CursorImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
-  mcpServers?: Record<string, unknown>;
+  mcpServers?: Record<string, RulesyncMcpServer>;
 }
 
 // Custom gray-matter options for more lenient YAML parsing
@@ -44,7 +45,7 @@ export async function parseCursorConfiguration(
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, unknown> | undefined;
+  let mcpServers: Record<string, RulesyncMcpServer> | undefined;
 
   // Check for .cursorrules file (legacy)
   const cursorFilePath = join(baseDir, ".cursorrules");
@@ -147,7 +148,7 @@ export async function parseCursorConfiguration(
       const content = await readFileContent(cursorMcpPath);
       const mcp = JSON.parse(content);
       if (mcp.mcpServers && Object.keys(mcp.mcpServers).length > 0) {
-        mcpServers = mcp.mcpServers;
+        mcpServers = mcp.mcpServers as Record<string, RulesyncMcpServer>;
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);

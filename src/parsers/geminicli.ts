@@ -1,12 +1,13 @@
 import { basename, join } from "node:path";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
+import type { RulesyncMcpServer } from "../types/mcp.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
 export interface GeminiImportResult {
   rules: ParsedRule[];
   errors: string[];
   ignorePatterns?: string[];
-  mcpServers?: Record<string, unknown>;
+  mcpServers?: Record<string, RulesyncMcpServer>;
 }
 
 export async function parseGeminiConfiguration(
@@ -15,7 +16,7 @@ export async function parseGeminiConfiguration(
   const errors: string[] = [];
   const rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, unknown> | undefined;
+  let mcpServers: Record<string, RulesyncMcpServer> | undefined;
 
   // Check for GEMINI.md file
   const geminiFilePath = join(baseDir, "GEMINI.md");
@@ -155,13 +156,13 @@ async function parseGeminiMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
 
 interface GeminiSettingsResult {
   ignorePatterns?: string[];
-  mcpServers?: Record<string, unknown>;
+  mcpServers?: Record<string, RulesyncMcpServer>;
   errors: string[];
 }
 
 async function parseGeminiSettings(settingsPath: string): Promise<GeminiSettingsResult> {
   const errors: string[] = [];
-  let mcpServers: Record<string, unknown> | undefined;
+  let mcpServers: Record<string, RulesyncMcpServer> | undefined;
 
   try {
     const content = await readFileContent(settingsPath);
@@ -169,7 +170,7 @@ async function parseGeminiSettings(settingsPath: string): Promise<GeminiSettings
 
     // Extract MCP servers
     if (settings.mcpServers && Object.keys(settings.mcpServers).length > 0) {
-      mcpServers = settings.mcpServers;
+      mcpServers = settings.mcpServers as Record<string, RulesyncMcpServer>;
     }
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
