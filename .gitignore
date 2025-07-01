@@ -171,6 +171,7 @@ pnpm-lock.yaml
 **/.github/copilot-instructions.md
 **/.github/instructions/
 **/.cursor/rules/
+**/.cursorignore
 **/.clinerules/
 **/.roo/rules/
 **/CLAUDE.md

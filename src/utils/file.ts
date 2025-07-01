@@ -1,5 +1,6 @@
 import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
+import { filterIgnoredFiles } from "./ignore.js";
 
 export async function ensureDir(dirPath: string): Promise<void> {
   try {
@@ -18,10 +19,22 @@ export async function writeFileContent(filepath: string, content: string): Promi
   await writeFile(filepath, content, "utf-8");
 }
 
-export async function findFiles(dir: string, extension: string = ".md"): Promise<string[]> {
+export async function findFiles(
+  dir: string,
+  extension: string = ".md",
+  ignorePatterns?: string[]
+): Promise<string[]> {
   try {
     const files = await readdir(dir);
-    return files.filter((file) => file.endsWith(extension)).map((file) => join(dir, file));
+    const filtered = files
+      .filter((file) => file.endsWith(extension))
+      .map((file) => join(dir, file));
+    
+    if (ignorePatterns && ignorePatterns.length > 0) {
+      return filterIgnoredFiles(filtered, ignorePatterns);
+    }
+    
+    return filtered;
   } catch {
     return [];
   }
