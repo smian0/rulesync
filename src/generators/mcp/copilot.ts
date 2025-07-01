@@ -116,23 +116,15 @@ export function generateCopilotMcpConfiguration(
   
   // Always generate configs even if empty
   
-  // Generate .github/copilot/mcp.json
+  // Generate .vscode/mcp.json
   const editorConfig = {
     servers: copilotServers
   };
   configs.push({
-    filepath: baseDir ? `${baseDir}/.github/copilot/mcp.json` : ".github/copilot/mcp.json",
+    filepath: baseDir ? `${baseDir}/.vscode/mcp.json` : ".vscode/mcp.json",
     content: JSON.stringify(editorConfig, null, 2) + "\n"
   });
   
-  // Generate .github/copilot/copilot-codingagent-mcp.json
-  const codingAgentConfig = {
-    mcpServers: copilotServers
-  };
-  configs.push({
-    filepath: baseDir ? `${baseDir}/.github/copilot/copilot-codingagent-mcp.json` : ".github/copilot/copilot-codingagent-mcp.json",
-    content: JSON.stringify(codingAgentConfig, null, 2) + "\n"
-  });
   
   return configs;
 }
