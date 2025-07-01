@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import type { Config, GeneratedOutput, ParsedRule } from "../types/index.js";
-import { loadIgnorePatterns } from "../utils/ignore.js";
+import type { Config, GeneratedOutput, ParsedRule } from "../../types/index.js";
+import { loadIgnorePatterns } from "../../utils/ignore.js";
 
 export async function generateGeminiConfig(
   rules: ParsedRule[],

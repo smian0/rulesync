@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { generateClaudecodeConfig } from "../../src/generators/claudecode.js";
-import type { ParsedRule } from "../../src/types/index.js";
-import { getDefaultConfig } from "../../src/utils/config.js";
-import { fileExists, readFileContent, writeFileContent } from "../../src/utils/file.js";
-import { loadIgnorePatterns } from "../../src/utils/ignore.js";
+import type { ParsedRule } from "../../types/index.js";
+import { getDefaultConfig } from "../../utils/config.js";
+import { fileExists, readFileContent, writeFileContent } from "../../utils/file.js";
+import { loadIgnorePatterns } from "../../utils/ignore.js";
+import { generateClaudecodeConfig } from "./claudecode.js";
 
-vi.mock("../../src/utils/ignore.js", () => ({
+vi.mock("../../utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
 }));
 
-vi.mock("../../src/utils/file.js", () => ({
+vi.mock("../../utils/file.js", () => ({
   fileExists: vi.fn(),
   readFileContent: vi.fn(),
   writeFileContent: vi.fn(),

@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Config, ParsedRule } from "../types/index.js";
-import { loadIgnorePatterns } from "../utils/ignore.js";
+import type { Config, ParsedRule } from "../../types/index.js";
+import { loadIgnorePatterns } from "../../utils/ignore.js";
 import { generateRooConfig } from "./roo.js";
 
-vi.mock("../utils/ignore.js", () => ({
+vi.mock("../../utils/ignore.js", () => ({
   loadIgnorePatterns: vi.fn(),
 }));
 

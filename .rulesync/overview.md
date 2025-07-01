@@ -30,7 +30,7 @@ rulesync is a unified AI configuration management CLI tool that supports multipl
 - **Monorepo Support**: Base directory option (`--base-dir`) for generating configs in multiple locations
 - **Hot Reloading**: File watching with automatic regeneration
 - **Comprehensive Validation**: Frontmatter and content validation with helpful error messages
-- **Multiple Output Formats**: Support for 5 different AI tool configuration formats
+- **Multiple Output Formats**: Support for 7 different AI tool configuration formats
 - **Safety First**: Dangerous path protection and atomic file operations
 
 ### Input Data Structure
@@ -42,7 +42,7 @@ type RuleFrontmatter = {
   globs: string[];        // File patterns to apply
 }
 
-type ToolTarget = "copilot" | "cursor" | "cline" | "claude" | "roo";
+type ToolTarget = "copilot" | "cursor" | "cline" | "claudecode" | "claude" | "roo" | "geminicli";
 ```
 
 ### CLI Commands

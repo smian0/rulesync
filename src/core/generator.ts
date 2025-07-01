@@ -1,9 +1,9 @@
-import { generateClaudecodeConfig } from "../generators/claudecode.js";
-import { generateClineConfig } from "../generators/cline.js";
-import { generateCopilotConfig } from "../generators/copilot.js";
-import { generateCursorConfig } from "../generators/cursor.js";
-import { generateGeminiConfig } from "../generators/geminicli.js";
-import { generateRooConfig } from "../generators/roo.js";
+import { generateClaudecodeConfig } from "../generators/rules/claudecode.js";
+import { generateClineConfig } from "../generators/rules/cline.js";
+import { generateCopilotConfig } from "../generators/rules/copilot.js";
+import { generateCursorConfig } from "../generators/rules/cursor.js";
+import { generateGeminiConfig } from "../generators/rules/geminicli.js";
+import { generateRooConfig } from "../generators/rules/roo.js";
 import type { Config, GeneratedOutput, ParsedRule, ToolTarget } from "../types/index.js";
 import { resolveTargets } from "../utils/index.js";
 
