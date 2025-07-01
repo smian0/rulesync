@@ -382,9 +382,9 @@ rulesyncは、対応するAIツール用のMCPサーバー設定も管理でき�
 
 - **Claude Code** (プロジェクト用`.mcp.json`)
 - **GitHub Copilot** (`.vscode/mcp.json`)
-- **Cursor** (プロジェクト用`.cursor/mcp.json`、グローバル用`~/.cursor/mcp.json`)
+- **Cursor** (`.cursor/mcp.json`)
 - **Cline** (`.cline/mcp.json`)
-- **Gemini CLI** (プロジェクト用`.gemini/settings.json`、グローバル用`~/.gemini/settings.json`)
+- **Gemini CLI** (`.gemini/settings.json`)
 - **Roo Code** (`.roo/mcp.json`)
 
 ### MCP設定
