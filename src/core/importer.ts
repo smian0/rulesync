@@ -9,6 +9,7 @@ import {
   parseRooConfiguration,
 } from "../parsers/index.js";
 import type { ParsedRule, ToolTarget } from "../types/index.js";
+import type { RulesyncMcpServer } from "../types/mcp.js";
 import { fileExists, writeFileContent } from "../utils/index.js";
 
 export interface ImportOptions {
@@ -31,7 +32,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   const errors: string[] = [];
   let rules: ParsedRule[] = [];
   let ignorePatterns: string[] | undefined;
-  let mcpServers: Record<string, any> | undefined;
+  let mcpServers: Record<string, RulesyncMcpServer> | undefined;
 
   if (verbose) {
     console.log(`Importing ${tool} configuration from ${baseDir}...`);
@@ -133,7 +134,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   if (ignorePatterns && ignorePatterns.length > 0) {
     try {
       const rulesyncignorePath = join(baseDir, ".rulesyncignore");
-      const ignoreContent = ignorePatterns.join("\n") + "\n";
+      const ignoreContent = `${ignorePatterns.join("\n")}\n`;
       await writeFileContent(rulesyncignorePath, ignoreContent);
       ignoreFileCreated = true;
       if (verbose) {
@@ -150,7 +151,7 @@ export async function importConfiguration(options: ImportOptions): Promise<Impor
   if (mcpServers && Object.keys(mcpServers).length > 0) {
     try {
       const mcpPath = join(baseDir, rulesDir, ".mcp.json");
-      const mcpContent = JSON.stringify({ mcpServers }, null, 2) + "\n";
+      const mcpContent = `${JSON.stringify({ mcpServers }, null, 2)}\n`;
       await writeFileContent(mcpPath, mcpContent);
       mcpFileCreated = true;
       if (verbose) {

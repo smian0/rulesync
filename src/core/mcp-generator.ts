@@ -1,5 +1,5 @@
-import os from "os";
-import path from "path";
+import os from "node:os";
+import path from "node:path";
 import {
   generateClaudeMcp,
   generateClineMcp,
@@ -8,6 +8,7 @@ import {
   generateGeminiCliMcp,
   generateRooMcp,
 } from "../generators/mcp/index.js";
+import type { RulesyncMcpConfig, RulesyncMcpServer } from "../types/mcp.js";
 import { writeFileContent } from "../utils/file.js";
 import { parseMcpConfig } from "./mcp-parser.js";
 
@@ -135,7 +136,7 @@ export async function generateMcpConfigs(
 }
 
 export async function generateMcpConfigurations(
-  mcpConfig: any,
+  mcpConfig: RulesyncMcpConfig,
   baseDir: string,
   targetTools?: string[]
 ): Promise<Array<{ filepath: string; content: string; tool: string }>> {
@@ -143,7 +144,10 @@ export async function generateMcpConfigurations(
 
   const toolMap: Record<
     string,
-    (servers: any, dir: string) => Promise<Array<{ filepath: string; content: string }>>
+    (
+      servers: Record<string, RulesyncMcpServer>,
+      dir: string
+    ) => Promise<Array<{ filepath: string; content: string }>>
   > = {
     claudecode: async (servers, dir) =>
       (await import("../generators/mcp/claude.js")).generateClaudeMcpConfiguration(servers, dir),

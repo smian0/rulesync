@@ -99,34 +99,25 @@ export function generateCopilotMcp(
 }
 
 export function generateCopilotMcpConfiguration(
-  mcpServers: Record<string, any>,
+  mcpServers: Record<string, RulesyncMcpServer>,
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const configs: Array<{ filepath: string; content: string }> = [];
 
-  // Filter servers for copilot
-  const copilotServers: Record<string, any> = {};
-  for (const [serverName, server] of Object.entries(mcpServers)) {
-    const targets = server.rulesyncTargets;
-    if (
-      !targets ||
-      (targets as string[]).includes("*") ||
-      (targets as string[]).includes("copilot")
-    ) {
-      const { rulesyncTargets, ...serverConfig } = server;
-      copilotServers[serverName] = serverConfig;
-    }
-  }
+  const rulesyncConfig: RulesyncMcpConfig = { mcpServers };
 
-  // Always generate configs even if empty
-
-  // Generate .vscode/mcp.json
-  const editorConfig = {
-    servers: copilotServers,
-  };
+  // Generate .vscode/mcp.json (editor config)
+  const editorContent = generateCopilotMcp(rulesyncConfig, "editor");
   configs.push({
     filepath: baseDir ? `${baseDir}/.vscode/mcp.json` : ".vscode/mcp.json",
-    content: JSON.stringify(editorConfig, null, 2) + "\n",
+    content: `${editorContent}\n`,
+  });
+
+  // Generate .copilot/mcp.json (coding agent config)
+  const codingAgentContent = generateCopilotMcp(rulesyncConfig, "codingAgent");
+  configs.push({
+    filepath: baseDir ? `${baseDir}/.copilot/mcp.json` : ".copilot/mcp.json",
+    content: `${codingAgentContent}\n`,
   });
 
   return configs;

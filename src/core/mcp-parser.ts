@@ -1,5 +1,5 @@
-import fs from "fs";
-import path from "path";
+import fs from "node:fs";
+import path from "node:path";
 import type { RulesyncMcpConfig } from "../types/mcp.js";
 
 export function parseMcpConfig(projectRoot: string): RulesyncMcpConfig | null {
@@ -11,7 +11,7 @@ export function parseMcpConfig(projectRoot: string): RulesyncMcpConfig | null {
 
   try {
     const content = fs.readFileSync(mcpPath, "utf-8");
-    const rawConfig = JSON.parse(content) as any;
+    const rawConfig = JSON.parse(content) as Record<string, unknown>;
 
     // Handle legacy 'servers' field and migrate to 'mcpServers'
     if (rawConfig.servers && !rawConfig.mcpServers) {
@@ -28,7 +28,7 @@ export function parseMcpConfig(projectRoot: string): RulesyncMcpConfig | null {
       delete rawConfig.tools;
     }
 
-    return rawConfig as RulesyncMcpConfig;
+    return { mcpServers: rawConfig.mcpServers } as RulesyncMcpConfig;
   } catch (error) {
     throw new Error(
       `Failed to parse mcp.json: ${error instanceof Error ? error.message : String(error)}`

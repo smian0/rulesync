@@ -12,7 +12,10 @@ interface ClaudeServer {
   transport?: "sse" | "http";
 }
 
-export function generateClaudeMcp(config: RulesyncMcpConfig, target: "global" | "project"): string {
+export function generateClaudeMcp(
+  config: RulesyncMcpConfig,
+  _target: "global" | "project"
+): string {
   const claudeSettings: ClaudeSettings = {
     mcpServers: {},
   };
@@ -63,7 +66,7 @@ export function generateClaudeMcp(config: RulesyncMcpConfig, target: "global" | 
 }
 
 export function generateClaudeMcpConfiguration(
-  mcpServers: Record<string, any>,
+  mcpServers: Record<string, RulesyncMcpServer>,
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.claude/settings.json` : ".claude/settings.json";
@@ -75,19 +78,32 @@ export function generateClaudeMcpConfiguration(
   for (const [serverName, server] of Object.entries(mcpServers)) {
     // Check if this server should be included for claude
     const targets = server.rulesyncTargets;
-    if (targets && !targets.includes("*") && !targets.includes("claudecode")) {
-      continue;
+    if (targets && targets.length > 0) {
+      const targetsArray = targets as string[];
+      if (!targetsArray.includes("*") && !targetsArray.includes("claudecode")) {
+        continue;
+      }
     }
 
     // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets, ...serverConfig } = server;
-    settings.mcpServers![serverName] = serverConfig;
+    const { rulesyncTargets: _, transport, ...serverConfig } = server;
+    // Convert to ClaudeServer format
+    const claudeServer: ClaudeServer = {
+      ...serverConfig,
+    };
+
+    // Only add transport if it's supported by Claude
+    if (transport && transport !== "stdio") {
+      claudeServer.transport = transport as "sse" | "http";
+    }
+
+    settings.mcpServers![serverName] = claudeServer;
   }
 
   return [
     {
       filepath,
-      content: JSON.stringify(settings, null, 2) + "\n",
+      content: `${JSON.stringify(settings, null, 2)}\n`,
     },
   ];
 }

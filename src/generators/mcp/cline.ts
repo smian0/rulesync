@@ -14,7 +14,7 @@ interface ClineServer {
   networkTimeout?: number;
 }
 
-export function generateClineMcp(config: RulesyncMcpConfig, target: "global" | "project"): string {
+export function generateClineMcp(config: RulesyncMcpConfig, _target: "global" | "project"): string {
   const clineConfig: ClineConfig = {
     mcpServers: {},
   };
@@ -67,7 +67,7 @@ export function generateClineMcp(config: RulesyncMcpConfig, target: "global" | "
 }
 
 export function generateClineMcpConfiguration(
-  mcpServers: Record<string, any>,
+  mcpServers: Record<string, RulesyncMcpServer>,
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.cline/mcp.json` : ".cline/mcp.json";
@@ -88,14 +88,14 @@ export function generateClineMcpConfiguration(
     }
 
     // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets, ...serverConfig } = server;
+    const { rulesyncTargets: _, ...serverConfig } = server;
     config.mcpServers[serverName] = serverConfig;
   }
 
   return [
     {
       filepath,
-      content: JSON.stringify(config, null, 2) + "\n",
+      content: `${JSON.stringify(config, null, 2)}\n`,
     },
   ];
 }

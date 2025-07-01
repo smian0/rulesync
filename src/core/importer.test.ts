@@ -1,4 +1,4 @@
-import { readFile, writeFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as parsers from "../parsers";
@@ -220,6 +220,7 @@ describe("importConfiguration", () => {
 
   it("should handle unsupported tools", async () => {
     const result = await importConfiguration({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       tool: "unknown" as any,
       baseDir: testDir,
     });
