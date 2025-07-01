@@ -146,7 +146,7 @@ async function parseGeminiMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
         }
       }
     }
-  } catch (_error) {
+  } catch {
     // Silently handle directory reading errors
   }
 
@@ -190,7 +190,7 @@ async function parseAiexclude(aiexcludePath: string): Promise<string[]> {
       .map((line) => line.trim())
       .filter((line) => line && !line.startsWith("#"));
     return patterns;
-  } catch (_error) {
+  } catch {
     return [];
   }
 }

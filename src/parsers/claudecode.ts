@@ -135,7 +135,7 @@ async function parseClaudeMemoryFiles(memoryDir: string): Promise<ParsedRule[]> 
         }
       }
     }
-  } catch (_error) {
+  } catch {
     // Silently handle directory reading errors
   }
 

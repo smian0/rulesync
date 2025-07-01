@@ -89,7 +89,7 @@ async function updateClaudeSettings(settingsPath: string, ignorePatterns: string
     try {
       const content = await readFileContent(settingsPath);
       settings = JSON.parse(content);
-    } catch (_error) {
+    } catch {
       console.warn(`Failed to parse existing ${settingsPath}, creating new settings`);
       settings = {};
     }

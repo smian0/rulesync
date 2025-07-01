@@ -1,6 +1,6 @@
 import { basename, join } from "node:path";
 import matter from "gray-matter";
-import yaml from "js-yaml";
+import { load, DEFAULT_SCHEMA, FAILSAFE_SCHEMA } from "js-yaml";
 import type { ParsedRule, RuleFrontmatter } from "../types/index.js";
 import { fileExists, readFileContent } from "../utils/index.js";
 
@@ -23,11 +23,11 @@ const customMatterOptions = {
           // Preprocess to handle "globs: *" (Cursor's valid format) by adding quotes
           // This converts "globs: *" to "globs: \"*\"" for proper YAML parsing
           const preprocessed = str.replace(/^(\s*globs:\s*)\*\s*$/gm, '$1"*"');
-          return yaml.load(preprocessed, { schema: yaml.DEFAULT_SCHEMA }) as object;
+          return load(preprocessed, { schema: DEFAULT_SCHEMA }) as object;
         } catch (error) {
           // If that fails, try with FAILSAFE_SCHEMA as a fallback
           try {
-            return yaml.load(str, { schema: yaml.FAILSAFE_SCHEMA }) as object;
+            return load(str, { schema: FAILSAFE_SCHEMA }) as object;
           } catch {
             // If all else fails, throw the original error
             throw error;

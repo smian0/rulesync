@@ -1,4 +1,4 @@
-import chokidar from "chokidar";
+import { watch } from "chokidar";
 import { getDefaultConfig } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
 
@@ -12,7 +12,7 @@ export async function watchCommand(): Promise<void> {
   await generateCommand({ verbose: false });
 
   // Watch for changes
-  const watcher = chokidar.watch(`${config.aiRulesDir}/**/*.md`, {
+  const watcher = watch(`${config.aiRulesDir}/**/*.md`, {
     ignoreInitial: true,
     persistent: true,
   });

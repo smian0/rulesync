@@ -1,4 +1,5 @@
-import chokidar from "chokidar";
+import { watch } from "chokidar";
+import type { FSWatcher } from "chokidar";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { getDefaultConfig } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
@@ -9,11 +10,13 @@ type MockWatcher = {
   close: ReturnType<typeof vi.fn>;
 };
 
-vi.mock("chokidar");
+vi.mock("chokidar", () => ({
+  watch: vi.fn(),
+}));
 vi.mock("../../utils/index.js");
 vi.mock("./generate.js");
 
-const mockChokidar = vi.mocked(chokidar);
+const mockWatch = vi.mocked(watch);
 const mockGetDefaultConfig = vi.mocked(getDefaultConfig);
 const mockGenerateCommand = vi.mocked(generateCommand);
 
@@ -41,7 +44,7 @@ describe("watchCommand", () => {
     vi.clearAllMocks();
     mockGetDefaultConfig.mockReturnValue(mockConfig);
     mockGenerateCommand.mockResolvedValue();
-    mockChokidar.watch.mockReturnValue(mockWatcher as chokidar.FSWatcher);
+    mockWatch.mockReturnValue(mockWatcher as FSWatcher);
 
     // Mock console methods
     vi.spyOn(console, "log").mockImplementation(() => {});
@@ -61,7 +64,7 @@ describe("watchCommand", () => {
     expect(console.log).toHaveBeenCalledWith("👀 Watching for changes in .rulesync directory...");
     expect(console.log).toHaveBeenCalledWith("Press Ctrl+C to stop watching");
     expect(mockGenerateCommand).toHaveBeenCalledWith({ verbose: false });
-    expect(mockChokidar.watch).toHaveBeenCalledWith(".rulesync/**/*.md", {
+    expect(mockWatch).toHaveBeenCalledWith(".rulesync/**/*.md", {
       ignoreInitial: true,
       persistent: true,
     });

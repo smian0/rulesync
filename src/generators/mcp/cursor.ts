@@ -73,7 +73,7 @@ export function generateCursorMcpConfiguration(
     }
 
     // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets, ...serverConfig } = server;
+    const { rulesyncTargets: _rulesyncTargets, ...serverConfig } = server;
     config.mcpServers[serverName] = serverConfig;
   }
 

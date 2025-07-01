@@ -35,9 +35,11 @@
 		"bcheck": "biome check src/",
 		"bcheck:fix": "biome check --write src/",
 		"build": "tsup src/cli/index.ts --format cjs,esm --dts --clean",
-		"check": "pnpm run bcheck && pnpm run typecheck",
+		"check": "pnpm run bcheck && pnpm run lint && pnpm run typecheck",
 		"dev": "tsx src/cli/index.ts",
-		"fix": "pnpm run bcheck:fix",
+		"fix": "pnpm run bcheck:fix && pnpm run lint:fix",
+		"lint": "oxlint .",
+		"lint:fix": "oxlint . --fix",
 		"prepublishOnly": "pnpm build",
 		"secretlint": "secretlint \"**/*\"",
 		"sort": "sort-package-json",
@@ -67,6 +69,7 @@
 		"@vitest/coverage-v8": "3.2.4",
 		"lint-staged": "16.1.2",
 		"o3-search-mcp": "0.0.3",
+		"oxlint": "1.4.0",
 		"secretlint": "10.1.0",
 		"simple-git-hooks": "2.13.0",
 		"sort-package-json": "3.2.1",
@@ -87,7 +90,8 @@
 	},
 	"lint-staged": {
 		"*.{ts,js}": [
-			"biome check --write"
+			"biome check --write",
+			"oxlint --fix"
 		],
 		"*.ts": [
 			"tsgo --noEmit"
