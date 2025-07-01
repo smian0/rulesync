@@ -192,3 +192,4 @@ pnpm-lock.yaml
 **/.rulesync/geminicli__*
 
 /tmp
+/ai-tmp
