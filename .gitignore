@@ -173,11 +173,16 @@ pnpm-lock.yaml
 **/.cursor/rules/
 **/.cursorignore
 **/.clinerules/
+**/.clineignore
 **/.roo/rules/
+**/.rooignore
+**/.copilotignore
 **/CLAUDE.md
 **/.claude/memories/
+**/.claude/settings.json
 **/GEMINI.md
 **/.gemini/memories/
+**/.aiexclude
 
 **/.rulesync/copilot__*
 **/.rulesync/cursor__*

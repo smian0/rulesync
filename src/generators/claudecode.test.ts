@@ -1,10 +1,28 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach } from "vitest";
 import { generateClaudecodeConfig } from "../../src/generators/claudecode.js";
 import type { ParsedRule } from "../../src/types/index.js";
 import { getDefaultConfig } from "../../src/utils/config.js";
+import { loadIgnorePatterns } from "../../src/utils/ignore.js";
+import { fileExists, readFileContent, writeFileContent } from "../../src/utils/file.js";
+
+vi.mock("../../src/utils/ignore.js", () => ({
+  loadIgnorePatterns: vi.fn(),
+}));
+
+vi.mock("../../src/utils/file.js", () => ({
+  fileExists: vi.fn(),
+  readFileContent: vi.fn(),
+  writeFileContent: vi.fn(),
+  ensureDir: vi.fn(),
+}));
 
 describe("claudecode generator", () => {
   const config = getDefaultConfig();
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+  });
 
   const mockRules: ParsedRule[] = [
     {
@@ -141,5 +159,68 @@ describe("claudecode generator", () => {
 
     expect(namingMemory).toBeDefined();
     expect(namingMemory?.content).toContain("Use camelCase for variables.");
+  });
+
+  it("should update settings.json when .rulesyncignore exists", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
+      patterns: ["*.test.md", "temp/**/*"] 
+    });
+    vi.mocked(fileExists).mockResolvedValue(false);
+
+    await generateClaudecodeConfig(mockRules, config);
+
+    expect(writeFileContent).toHaveBeenCalledWith(
+      ".claude/settings.json",
+      expect.stringContaining('"Read(*.test.md)"')
+    );
+    expect(writeFileContent).toHaveBeenCalledWith(
+      ".claude/settings.json",
+      expect.stringContaining('"Read(temp/**/*)"')
+    );
+  });
+
+  it("should merge with existing settings.json", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
+      patterns: ["*.test.md"] 
+    });
+    vi.mocked(fileExists).mockResolvedValue(true);
+    vi.mocked(readFileContent).mockResolvedValue(JSON.stringify({
+      permissions: {
+        deny: ["Bash(sudo:*)"]
+      }
+    }));
+
+    await generateClaudecodeConfig(mockRules, config);
+
+    const callArgs = vi.mocked(writeFileContent).mock.calls[0];
+    const settingsContent = JSON.parse(callArgs[1] as string);
+    
+    expect(settingsContent.permissions.deny).toContain("Bash(sudo:*)");
+    expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
+  });
+
+  it("should not update settings.json when no ignore patterns exist", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+
+    await generateClaudecodeConfig(mockRules, config);
+
+    expect(writeFileContent).not.toHaveBeenCalledWith(
+      expect.stringContaining("settings.json"),
+      expect.any(String)
+    );
+  });
+
+  it("should respect baseDir parameter for settings.json", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({ 
+      patterns: ["*.test.md"] 
+    });
+    vi.mocked(fileExists).mockResolvedValue(false);
+
+    await generateClaudecodeConfig(mockRules, config, "/custom/base");
+
+    expect(writeFileContent).toHaveBeenCalledWith(
+      "/custom/base/.claude/settings.json",
+      expect.stringContaining('"Read(*.test.md)"')
+    );
   });
 });

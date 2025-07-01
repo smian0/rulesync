@@ -1,10 +1,2 @@
-# Ignore test files
-**/*.test.md
-
 # Ignore temporary files
-temp/**/*.md
-tmp/**/*.md
-
-# Ignore draft rules
-draft-*.md
-*-draft.md
+tmp/**/*
