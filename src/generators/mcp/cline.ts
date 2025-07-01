@@ -1,4 +1,5 @@
 import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
+import { shouldIncludeServer } from "../../utils/mcp-helpers.js";
 
 interface ClineConfig {
   mcpServers: Record<string, ClineServer>;
@@ -20,16 +21,7 @@ export function generateClineMcp(config: RulesyncMcpConfig, _target: "global" | 
   };
 
   const shouldInclude = (server: RulesyncMcpServer): boolean => {
-    const targets = server.rulesyncTargets;
-
-    // If no targets or empty array, include in all tools
-    if (!targets || targets.length === 0) return true;
-
-    // If targets is ['*'], include in all tools
-    if (targets.length === 1 && targets[0] === "*") return true;
-
-    // Otherwise check if 'cline' is in the targets array
-    return (targets as string[]).includes("cline");
+    return shouldIncludeServer(server, "cline");
   };
 
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
@@ -78,12 +70,7 @@ export function generateClineMcpConfiguration(
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
     // Check if this server should be included for cline
-    const targets = server.rulesyncTargets;
-    if (
-      targets &&
-      !(targets as string[]).includes("*") &&
-      !(targets as string[]).includes("cline")
-    ) {
+    if (!shouldIncludeServer(server, "cline")) {
       continue;
     }
 

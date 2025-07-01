@@ -57,7 +57,8 @@
 		"gray-matter": "4.0.3",
 		"js-yaml": "4.1.0",
 		"marked": "15.0.12",
-		"micromatch": "4.0.8"
+		"micromatch": "4.0.8",
+		"zod": "3.25.67"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "2.0.0",

@@ -1,4 +1,5 @@
 import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
+import { shouldIncludeServer } from "../../utils/mcp-helpers.js";
 
 interface GeminiSettings {
   mcpServers: Record<string, GeminiServer>;
@@ -22,21 +23,8 @@ export function generateGeminiCliMcp(
     mcpServers: {},
   };
 
-  const shouldInclude = (server: RulesyncMcpServer): boolean => {
-    const targets = server.rulesyncTargets;
-
-    // If no targets or empty array, include in all tools
-    if (!targets || targets.length === 0) return true;
-
-    // If targets is ['*'], include in all tools
-    if (targets.length === 1 && targets[0] === "*") return true;
-
-    // Otherwise check if 'geminicli' is in the targets array
-    return (targets as string[]).includes("geminicli");
-  };
-
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
-    if (!shouldInclude(server)) continue;
+    if (!shouldIncludeServer(server, "geminicli")) continue;
 
     const geminiServer: GeminiServer = {};
 
@@ -88,12 +76,7 @@ export function generateGeminiCliMcpConfiguration(
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
     // Check if this server should be included for geminicli
-    const targets = server.rulesyncTargets;
-    if (
-      targets &&
-      !(targets as string[]).includes("*") &&
-      !(targets as string[]).includes("geminicli")
-    ) {
+    if (!shouldIncludeServer(server, "geminicli")) {
       continue;
     }
 

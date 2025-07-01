@@ -1,4 +1,5 @@
-import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
+import type { RulesyncMcpConfig } from "../../types/mcp.js";
+import { shouldIncludeServer } from "../../utils/mcp-helpers.js";
 
 interface RooConfig {
   mcpServers: Record<string, RooServer>;
@@ -20,21 +21,8 @@ export function generateRooMcp(config: RulesyncMcpConfig, _target: "global" | "p
     mcpServers: {},
   };
 
-  const shouldInclude = (server: RulesyncMcpServer): boolean => {
-    const targets = server.rulesyncTargets;
-
-    // If no targets or empty array, include in all tools
-    if (!targets || targets.length === 0) return true;
-
-    // If targets is ['*'], include in all tools
-    if (targets.length === 1 && targets[0] === "*") return true;
-
-    // Otherwise check if 'roo' is in the targets array
-    return (targets as string[]).includes("roo");
-  };
-
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
-    if (!shouldInclude(server)) continue;
+    if (!shouldIncludeServer(server, "roo")) continue;
 
     const rooServer: RooServer = {};
 
@@ -83,7 +71,7 @@ export function generateRooMcp(config: RulesyncMcpConfig, _target: "global" | "p
 }
 
 export function generateRooMcpConfiguration(
-  mcpServers: Record<string, any>,
+  mcpServers: Record<string, any>, // eslint-disable-next-line @typescript-eslint/no-explicit-any
   baseDir: string = ""
 ): Array<{ filepath: string; content: string }> {
   const filepath = baseDir ? `${baseDir}/.roo/mcp.json` : ".roo/mcp.json";
@@ -94,8 +82,7 @@ export function generateRooMcpConfiguration(
 
   for (const [serverName, server] of Object.entries(mcpServers)) {
     // Check if this server should be included for roo
-    const targets = server.rulesyncTargets;
-    if (targets && !(targets as string[]).includes("*") && !(targets as string[]).includes("roo")) {
+    if (!shouldIncludeServer(server, "roo")) {
       continue;
     }
 
