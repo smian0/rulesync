@@ -22,6 +22,7 @@
 	},
 	"license": "MIT",
 	"author": "dyoshikawa",
+	"type": "module",
 	"main": "dist/index.js",
 	"module": "dist/index.mjs",
 	"types": "dist/index.d.ts",
@@ -38,6 +39,7 @@
 		"check": "pnpm run bcheck && pnpm run lint && pnpm run typecheck",
 		"dev": "tsx src/cli/index.ts",
 		"fix": "pnpm run bcheck:fix && pnpm run lint:fix",
+		"generate": "pnpm run dev generate",
 		"lint": "oxlint . --max-warnings 0",
 		"lint:fix": "oxlint . --fix --max-warnings 0",
 		"prepublishOnly": "pnpm build",
@@ -46,8 +48,10 @@
 		"test": "vitest run --silent",
 		"test:coverage": "vitest run --coverage --silent",
 		"test:watch": "vitest --silent",
-		"typecheck": "tsgo --noEmit",
-		"generate": "pnpm run dev generate"
+		"typecheck": "tsgo --noEmit"
+	},
+	"simple-git-hooks": {
+		"pre-commit": "pnpm exec lint-staged"
 	},
 	"dependencies": {
 		"chokidar": "4.0.3",
@@ -84,20 +88,5 @@
 	},
 	"publishConfig": {
 		"access": "public"
-	},
-	"simple-git-hooks": {
-		"pre-commit": "pnpm exec lint-staged"
-	},
-	"lint-staged": {
-		"*.{ts,js}": [
-			"biome check --write",
-			"oxlint --fix"
-		],
-		"*.ts": [
-			"tsgo --noEmit"
-		],
-		"**/*": [
-			"secretlint"
-		]
 	}
 }
