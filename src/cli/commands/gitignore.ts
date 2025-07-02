@@ -21,6 +21,7 @@ export const gitignoreCommand = async (): Promise<void> => {
     "**/.gemini/memories/",
     "**/.aiexclude",
     "**/.mcp.json",
+    "!.rulesync/.mcp.json",
     "**/.cursor/mcp.json",
     "**/.cline/mcp.json",
     "**/.vscode/mcp.json",
