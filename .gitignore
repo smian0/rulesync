@@ -185,6 +185,7 @@ pnpm-lock.yaml
 **/.aiexclude
 
 **/.mcp.json
+!.rulesync/.mcp.json
 **/.cursor/mcp.json
 **/.cline/mcp.json
 **/.vscode/mcp.json
