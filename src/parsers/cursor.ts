@@ -56,11 +56,28 @@ export async function parseCursorConfiguration(
       const content = parsed.content.trim();
 
       if (content) {
+        // Convert Cursor frontmatter format to rulesync format
+        const cursorFrontmatter = parsed.data as any;
+
+        // Map Cursor's alwaysApply to rulesync's root (only if explicitly set to true)
+        const root = cursorFrontmatter && cursorFrontmatter.alwaysApply === true;
+
+        // Use existing values or defaults
+        let globs = (cursorFrontmatter && (cursorFrontmatter.globs || cursorFrontmatter.glob)) || [
+          "**/*",
+        ];
+        // Ensure globs is always an array
+        if (typeof globs === "string") {
+          globs = [globs];
+        }
+
         const frontmatter: RuleFrontmatter = {
-          root: false,
+          root: root,
           targets: ["cursor"],
-          description: "Cursor IDE configuration rules",
-          globs: ["**/*"],
+          description:
+            (cursorFrontmatter && cursorFrontmatter.description) ||
+            "Cursor IDE configuration rules",
+          globs: globs,
         };
 
         rules.push({
@@ -93,11 +110,27 @@ export async function parseCursorConfiguration(
 
             if (content) {
               const filename = basename(file, ".mdc");
+              // Convert Cursor frontmatter format to rulesync format
+              const cursorFrontmatter = parsed.data as any;
+
+              // Map Cursor's alwaysApply to rulesync's root (only if explicitly set to true)
+              const root = cursorFrontmatter && cursorFrontmatter.alwaysApply === true;
+
+              // Use existing values or defaults
+              let globs = (cursorFrontmatter &&
+                (cursorFrontmatter.globs || cursorFrontmatter.glob)) || ["**/*"];
+              // Ensure globs is always an array
+              if (typeof globs === "string") {
+                globs = [globs];
+              }
+
               const frontmatter: RuleFrontmatter = {
-                root: false,
+                root: root,
                 targets: ["cursor"],
-                description: `Cursor rule: ${filename}`,
-                globs: ["**/*"],
+                description:
+                  (cursorFrontmatter && cursorFrontmatter.description) ||
+                  `Cursor rule: ${filename}`,
+                globs: globs,
               };
 
               rules.push({

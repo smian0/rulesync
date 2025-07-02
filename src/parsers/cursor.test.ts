@@ -45,8 +45,8 @@ This is a test cursor rule content.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.description).toBe("Cursor rule: test-rule");
-      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule.frontmatter.description).toBe("Test cursor rule");
+      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
       expect(rule.content.trim()).toBe("# Test Cursor Rule\n\nThis is a test cursor rule content.");
       expect(rule.filename).toBe("cursor-test-rule");
     });
@@ -77,7 +77,7 @@ This rule applies to all files using the asterisk wildcard without quotes.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.description).toBe("Cursor rule: docs-maintenance");
+      expect(rule.frontmatter.description).toBe("Guidelines for maintaining project documentation");
       expect(rule.content.trim()).toBe(
         "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.",
       );
@@ -153,7 +153,7 @@ This is a legacy .cursorrules file.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.description).toBe("Cursor IDE configuration rules");
+      expect(rule.frontmatter.description).toBe("Legacy cursor rules");
       expect(rule.frontmatter.globs).toEqual(["**/*"]);
       expect(rule.content.trim()).toBe(
         "# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file.",
