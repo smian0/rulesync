@@ -35,7 +35,7 @@ export const McpServerBaseSchema = z.object({
 });
 
 export const RulesyncMcpServerSchema = McpServerBaseSchema.extend({
-  rulesyncTargets: RulesyncTargetsSchema.optional(),
+  targets: RulesyncTargetsSchema.optional(),
 });
 
 export type ParsedRulesyncTargets = z.infer<typeof RulesyncTargetsSchema>;

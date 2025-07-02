@@ -24,19 +24,19 @@ describe("generateGeminiCliMcpConfiguration", () => {
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
-  it("should filter servers by rulesyncTargets", () => {
+  it("should filter servers by targets", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        rulesyncTargets: ["geminicli", "claude"],
+        targets: ["geminicli", "claude"],
       },
       server2: {
         command: "server2",
-        rulesyncTargets: ["claude"],
+        targets: ["claude"],
       },
       server3: {
         command: "server3",
-        rulesyncTargets: ["*"],
+        targets: ["*"],
       },
       server4: {
         command: "server4",
@@ -54,12 +54,12 @@ describe("generateGeminiCliMcpConfiguration", () => {
     expect(config.mcpServers).not.toHaveProperty("server2");
   });
 
-  it("should exclude rulesyncTargets from output", () => {
+  it("should exclude targets from output", () => {
     const mcpServers = {
       "language-server": {
         command: "lang-server",
         args: ["--stdio", "--log-level", "info"],
-        rulesyncTargets: ["geminicli"],
+        targets: ["geminicli"],
       },
     };
 
@@ -70,7 +70,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
       command: "lang-server",
       args: ["--stdio", "--log-level", "info"],
     });
-    expect(config.mcpServers["language-server"]).not.toHaveProperty("rulesyncTargets");
+    expect(config.mcpServers["language-server"]).not.toHaveProperty("targets");
   });
 
   it("should handle empty servers object", () => {
@@ -205,7 +205,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     });
   });
 
-  it("should preserve all server properties except rulesyncTargets", () => {
+  it("should preserve all server properties except targets", () => {
     const mcpServers = {
       "complete-server": {
         command: "complete",
@@ -214,7 +214,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
         url: "http://backup.url", // Should be preserved even if unusual
         headers: { "X-Backup": "true" },
         customField: "customValue", // Unknown fields should be preserved
-        rulesyncTargets: ["geminicli"], // This should be removed
+        targets: ["geminicli"], // This should be removed
       },
     };
 
@@ -229,6 +229,6 @@ describe("generateGeminiCliMcpConfiguration", () => {
       headers: { "X-Backup": "true" },
       customField: "customValue",
     });
-    expect(config.mcpServers["complete-server"]).not.toHaveProperty("rulesyncTargets");
+    expect(config.mcpServers["complete-server"]).not.toHaveProperty("targets");
   });
 });

@@ -20,7 +20,7 @@ export interface McpServerBase {
 }
 
 export interface RulesyncMcpServer extends McpServerBase {
-  rulesyncTargets?: ToolTarget[] | ["*"];
+  targets?: ToolTarget[] | ["*"];
 }
 
 export interface McpConfig {

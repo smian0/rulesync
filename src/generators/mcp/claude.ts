@@ -71,8 +71,8 @@ export function generateClaudeMcpConfiguration(
       continue;
     }
 
-    // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets: _, transport, ...serverConfig } = server;
+    // Clone server config and remove targets
+    const { targets: _, transport, ...serverConfig } = server;
     // Convert to ClaudeServer format
     const claudeServer: ClaudeServer = {
       ...serverConfig,

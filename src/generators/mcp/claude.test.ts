@@ -75,11 +75,11 @@ describe("generateClaudeMcp", () => {
     });
   });
 
-  it("should respect rulesyncTargets configuration", () => {
+  it("should respect targets configuration", () => {
     const config: RulesyncMcpConfig = {
       mcpServers: {
-        server1: { command: "node", args: ["s1.js"], rulesyncTargets: ["cursor"] },
-        server2: { command: "node", args: ["s2.js"], rulesyncTargets: ["claude"] },
+        server1: { command: "node", args: ["s1.js"], targets: ["cursor"] },
+        server2: { command: "node", args: ["s2.js"], targets: ["claude"] },
       },
     };
 

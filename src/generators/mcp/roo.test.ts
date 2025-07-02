@@ -24,19 +24,19 @@ describe("generateRooMcpConfiguration", () => {
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
-  it("should filter servers by rulesyncTargets", () => {
+  it("should filter servers by targets", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        rulesyncTargets: ["roo", "claude"],
+        targets: ["roo", "claude"],
       },
       server2: {
         command: "server2",
-        rulesyncTargets: ["claude", "cursor"],
+        targets: ["claude", "cursor"],
       },
       server3: {
         command: "server3",
-        rulesyncTargets: ["*"],
+        targets: ["*"],
       },
       server4: {
         command: "server4",
@@ -54,13 +54,13 @@ describe("generateRooMcpConfiguration", () => {
     expect(config.mcpServers).not.toHaveProperty("server2");
   });
 
-  it("should exclude rulesyncTargets from output", () => {
+  it("should exclude targets from output", () => {
     const mcpServers = {
       "custom-server": {
         command: "custom",
         args: ["--config", "roo.json"],
         env: { MODE: "production" },
-        rulesyncTargets: ["roo"],
+        targets: ["roo"],
       },
     };
 
@@ -72,7 +72,7 @@ describe("generateRooMcpConfiguration", () => {
       args: ["--config", "roo.json"],
       env: { MODE: "production" },
     });
-    expect(config.mcpServers["custom-server"]).not.toHaveProperty("rulesyncTargets");
+    expect(config.mcpServers["custom-server"]).not.toHaveProperty("targets");
   });
 
   it("should handle empty servers object", () => {
@@ -124,7 +124,7 @@ describe("generateRooMcpConfiguration", () => {
           LOG_LEVEL: "info",
           CUSTOM_VAR: "value",
         },
-        rulesyncTargets: ["*"],
+        targets: ["*"],
       },
       "http-server": {
         url: "https://api.example.com/mcp/v2",

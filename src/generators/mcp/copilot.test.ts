@@ -100,11 +100,11 @@ describe("generateCopilotMcp", () => {
     expect(parsed.mcpServers["test-server"].tools).toEqual(["tool1", "tool2"]);
   });
 
-  it("should respect rulesyncTargets configuration", () => {
+  it("should respect targets configuration", () => {
     const config: RulesyncMcpConfig = {
       mcpServers: {
-        server1: { command: "node", args: ["s1.js"], rulesyncTargets: ["cursor"] },
-        server2: { command: "node", args: ["s2.js"], rulesyncTargets: ["copilot"] },
+        server1: { command: "node", args: ["s1.js"], targets: ["cursor"] },
+        server2: { command: "node", args: ["s2.js"], targets: ["copilot"] },
       },
     };
 

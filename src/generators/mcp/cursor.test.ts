@@ -24,19 +24,19 @@ describe("generateCursorMcpConfiguration", () => {
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
-  it("should filter servers by rulesyncTargets", () => {
+  it("should filter servers by targets", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        rulesyncTargets: ["cursor", "claude"],
+        targets: ["cursor", "claude"],
       },
       server2: {
         command: "server2",
-        rulesyncTargets: ["claude"],
+        targets: ["claude"],
       },
       server3: {
         command: "server3",
-        rulesyncTargets: ["*"],
+        targets: ["*"],
       },
     };
 
@@ -49,7 +49,7 @@ describe("generateCursorMcpConfiguration", () => {
     expect(config.mcpServers).not.toHaveProperty("server2");
   });
 
-  it("should include servers without rulesyncTargets", () => {
+  it("should include servers without targets", () => {
     const mcpServers = {
       server1: {
         command: "server1",
@@ -62,12 +62,12 @@ describe("generateCursorMcpConfiguration", () => {
     expect(config.mcpServers).toHaveProperty("server1");
   });
 
-  it("should exclude rulesyncTargets from output", () => {
+  it("should exclude targets from output", () => {
     const mcpServers = {
       server1: {
         command: "server1",
         args: ["--stdio"],
-        rulesyncTargets: ["cursor"],
+        targets: ["cursor"],
       },
     };
 
@@ -78,7 +78,7 @@ describe("generateCursorMcpConfiguration", () => {
       command: "server1",
       args: ["--stdio"],
     });
-    expect(config.mcpServers.server1).not.toHaveProperty("rulesyncTargets");
+    expect(config.mcpServers.server1).not.toHaveProperty("targets");
   });
 
   it("should handle empty servers object", () => {

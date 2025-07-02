@@ -24,19 +24,19 @@ describe("generateClineMcpConfiguration", () => {
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
-  it("should filter servers by rulesyncTargets", () => {
+  it("should filter servers by targets", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        rulesyncTargets: ["cline", "cursor"],
+        targets: ["cline", "cursor"],
       },
       server2: {
         command: "server2",
-        rulesyncTargets: ["cursor"],
+        targets: ["cursor"],
       },
       server3: {
         command: "server3",
-        rulesyncTargets: ["*"],
+        targets: ["*"],
       },
       server4: {
         command: "server4",
@@ -54,12 +54,12 @@ describe("generateClineMcpConfiguration", () => {
     expect(config.mcpServers).not.toHaveProperty("server2");
   });
 
-  it("should exclude rulesyncTargets from output", () => {
+  it("should exclude targets from output", () => {
     const mcpServers = {
       "api-server": {
         url: "http://api.example.com",
         headers: { "X-API-Key": "secret" },
-        rulesyncTargets: ["cline"],
+        targets: ["cline"],
       },
     };
 
@@ -70,7 +70,7 @@ describe("generateClineMcpConfiguration", () => {
       url: "http://api.example.com",
       headers: { "X-API-Key": "secret" },
     });
-    expect(config.mcpServers["api-server"]).not.toHaveProperty("rulesyncTargets");
+    expect(config.mcpServers["api-server"]).not.toHaveProperty("targets");
   });
 
   it("should handle empty servers object", () => {

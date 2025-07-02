@@ -80,8 +80,8 @@ export function generateGeminiCliMcpConfiguration(
       continue;
     }
 
-    // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets: _, ...serverConfig } = server;
+    // Clone server config and remove targets
+    const { targets: _, ...serverConfig } = server;
     config.mcpServers[serverName] = serverConfig;
   }
 

@@ -3,13 +3,13 @@ import type { RulesyncMcpServer } from "../types/mcp.js";
 import type { ToolTarget } from "../types/rules.js";
 
 export function shouldIncludeServer(server: RulesyncMcpServer, targetTool: ToolTarget): boolean {
-  // If no rulesyncTargets specified, include in all tools
-  if (!server.rulesyncTargets || server.rulesyncTargets.length === 0) {
+  // If no targets specified, include in all tools
+  if (!server.targets || server.targets.length === 0) {
     return true;
   }
 
-  // Parse and validate rulesyncTargets
-  const parsedTargets = RulesyncTargetsSchema.parse(server.rulesyncTargets);
+  // Parse and validate targets
+  const parsedTargets = RulesyncTargetsSchema.parse(server.targets);
 
   // Check if it's ["*"]
   if (parsedTargets.length === 1 && parsedTargets[0] === "*") {

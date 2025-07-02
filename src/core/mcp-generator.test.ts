@@ -60,20 +60,20 @@ describe("generateMcpConfigurations", () => {
     expect(filepaths).toContain(join(testDir, ".cursor/mcp.json"));
   });
 
-  it("should filter servers by rulesyncTargets", async () => {
+  it("should filter servers by targets", async () => {
     const mcpConfig = {
       mcpServers: {
         "claude-only": {
           command: "claude-server",
-          rulesyncTargets: ["claudecode"],
+          targets: ["claudecode"],
         },
         "cursor-only": {
           command: "cursor-server",
-          rulesyncTargets: ["cursor"],
+          targets: ["cursor"],
         },
         "all-tools": {
           command: "all-server",
-          rulesyncTargets: ["*"],
+          targets: ["*"],
         },
       },
     };
@@ -144,7 +144,7 @@ describe("generateMcpConfigurations", () => {
     });
   });
 
-  it("should preserve all server properties except rulesyncTargets", async () => {
+  it("should preserve all server properties except targets", async () => {
     const mcpConfig = {
       mcpServers: {
         "complex-server": {
@@ -154,7 +154,7 @@ describe("generateMcpConfigurations", () => {
           url: "http://fallback.url",
           headers: { "X-Custom": "header" },
           customProperty: "value",
-          rulesyncTargets: ["roo"],
+          targets: ["roo"],
         },
       },
     };
@@ -170,7 +170,7 @@ describe("generateMcpConfigurations", () => {
       headers: { "X-Custom": "header" },
       customProperty: "value",
     });
-    expect(config.mcpServers["complex-server"]).not.toHaveProperty("rulesyncTargets");
+    expect(config.mcpServers["complex-server"]).not.toHaveProperty("targets");
   });
 
   it("should handle multiple base directories", async () => {

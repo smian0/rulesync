@@ -94,8 +94,8 @@ export function generateRooMcpConfiguration(
       continue;
     }
 
-    // Clone server config and remove rulesyncTargets
-    const { rulesyncTargets: _rulesyncTargets, ...serverConfig } = serverObj;
+    // Clone server config and remove targets
+    const { targets: _targets, ...serverConfig } = serverObj;
     config.mcpServers[serverName] = serverConfig;
   }
 
