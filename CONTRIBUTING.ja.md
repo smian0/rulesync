@@ -65,6 +65,9 @@ pnpm fix
 # シークレットをチェック
 pnpm secretlint
 
+# スペルチェック
+pnpm cspell
+
 # 型チェック
 pnpm typecheck
 ```
@@ -126,6 +129,7 @@ rulesync/
 - **tsx v4.20.3**: 開発用TypeScript実行
 - **Biome v2.0.0**: 統合リンターとフォーマッター（ESLint + Prettierの代替）
 - **Vitest v3.2.4**: カバレッジ付きテストフレームワーク
+- **cspell v9.1.2**: コードとドキュメント用のスペルチェッカー
 
 ### ビルドシステム
 
@@ -168,7 +172,8 @@ rulesync/
 3. 完全なテストスイートを実行: `pnpm test`
 4. コード品質チェックを実行: `pnpm check`
 5. シークレットをチェック: `pnpm secretlint`
-6. gitフックをセットアップ: `npx simple-git-hooks` (初回のみ)
+6. スペルチェック: `pnpm cspell`
+7. gitフックをセットアップ: `npx simple-git-hooks` (初回のみ)
 7. 明確なメッセージで変更をコミット
 8. フォークにプッシュしてプルリクエストを作成
 

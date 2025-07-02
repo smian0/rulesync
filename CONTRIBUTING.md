@@ -65,6 +65,9 @@ pnpm fix
 # Check for secrets
 pnpm secretlint
 
+# Spell checking
+pnpm cspell
+
 # Type checking
 pnpm typecheck
 ```
@@ -126,6 +129,7 @@ rulesync/
 - **tsx v4.20.3**: TypeScript execution for development
 - **Biome v2.0.0**: Unified linter and formatter (replaces ESLint + Prettier)
 - **Vitest v3.2.4**: Testing framework with coverage
+- **cspell v9.1.2**: Spell checker for code and documentation
 
 ### Build System
 
@@ -168,7 +172,8 @@ rulesync/
 3. Run the full test suite: `pnpm test`
 4. Run code quality checks: `pnpm check`
 5. Check for secrets: `pnpm secretlint`
-6. Set up git hooks: `npx simple-git-hooks` (first time only)
+6. Check spelling: `pnpm cspell`
+7. Set up git hooks: `npx simple-git-hooks` (first time only)
 7. Commit your changes with a clear message
 8. Push to your fork and create a pull request
 
