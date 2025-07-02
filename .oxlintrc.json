@@ -29,16 +29,5 @@
     "es2024": true
   },
 
-  "ignorePatterns": ["dist/**", "coverage/**", "*.d.ts", "node_modules/**"],
-
-  "overrides": [
-    {
-      "files": ["**/*.test.ts", "**/*.spec.ts"],
-      "categories": { "suspicious": "off" },
-      "rules": { 
-        "no-unused-expressions": "off",
-        "typescript/no-explicit-any": "off"
-      }
-    }
-  ]
+  "ignorePatterns": ["dist/**", "coverage/**", "*.d.ts", "node_modules/**"]
 }
