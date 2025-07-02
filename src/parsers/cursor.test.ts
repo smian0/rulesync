@@ -44,9 +44,9 @@ This is a test cursor rule content.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
       expect(rule.frontmatter.description).toBe("Test cursor rule");
-      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
+      expect(rule.frontmatter.globs).toEqual([]);
       expect(rule.content.trim()).toBe("# Test Cursor Rule\n\nThis is a test cursor rule content.");
       expect(rule.filename).toBe("cursor-test-rule");
     });
@@ -76,7 +76,7 @@ This rule applies to all files using the asterisk wildcard without quotes.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
       expect(rule.frontmatter.description).toBe("Guidelines for maintaining project documentation");
       expect(rule.content.trim()).toBe(
         "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.",
@@ -242,6 +242,247 @@ ruletype: always
       expect(result.errors).toHaveLength(2); // Parse error + no config files found
       expect(result.errors[0]).toContain("Failed to parse");
       expect(result.errors[1]).toContain("No Cursor configuration files found");
+    });
+  });
+
+  describe("four kinds of .mdc pattern specification compliance", () => {
+    it("should handle 'always' pattern (alwaysApply: true)", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: "Any description"
+globs: ["**/*.ts", "**/*.js"]
+alwaysApply: true
+---
+
+# Always Applied Rule
+
+This rule is always applied.
+`;
+
+      writeFileSync(join(cursorRulesDir, "always-rule.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("");
+      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule.filename).toBe("cursor-always-rule");
+    });
+
+    it("should handle 'manual' pattern (empty description and empty globs)", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description:
+globs:
+alwaysApply: false
+---
+
+# Manual Rule
+
+This is a manual rule with no file patterns.
+`;
+
+      writeFileSync(join(cursorRulesDir, "manual-rule.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("");
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.filename).toBe("cursor-manual-rule");
+    });
+
+    it("should handle 'auto attached' pattern (empty description and non-empty globs)", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description:
+globs: **/*.py,**/*.pyc
+alwaysApply: false
+---
+
+# Auto Attached Rule
+
+This rule is automatically attached to Python files.
+`;
+
+      writeFileSync(join(cursorRulesDir, "auto-attached.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("Cursor rule: auto-attached");
+      expect(rule.frontmatter.globs).toEqual(["**/*.py", "**/*.pyc"]);
+      expect(rule.filename).toBe("cursor-auto-attached");
+    });
+
+    it("should handle 'auto attached' pattern with single glob", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description:
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Single Glob Rule
+
+This rule applies to TypeScript files only.
+`;
+
+      writeFileSync(join(cursorRulesDir, "single-glob.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("Cursor rule: single-glob");
+      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
+      expect(rule.filename).toBe("cursor-single-glob");
+    });
+
+    it("should handle 'agent_request' pattern (non-empty description)", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: "Pythonのコードを書く場合"
+globs:
+alwaysApply: false
+---
+
+# Agent Request Rule
+
+This rule is triggered by agent requests.
+`;
+
+      writeFileSync(join(cursorRulesDir, "agent-request.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("Pythonのコードを書く場合");
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.filename).toBe("cursor-agent-request");
+    });
+
+    it("should handle edge case: non-empty description and non-empty globs (should be agent_request)", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: "TypeScript development rules"
+globs: **/*.ts
+alwaysApply: false
+---
+
+# Edge Case Rule
+
+This has both description and globs, but should be treated as agent_request.
+`;
+
+      writeFileSync(join(cursorRulesDir, "edge-case.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("TypeScript development rules");
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.filename).toBe("cursor-edge-case");
+    });
+
+    it("should handle undefined alwaysApply (should default to false)", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description:
+globs:
+---
+
+# Default AlwaysApply Rule
+
+This rule has no alwaysApply field.
+`;
+
+      writeFileSync(join(cursorRulesDir, "default-always.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("");
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.filename).toBe("cursor-default-always");
+    });
+
+    it("should handle empty array globs", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description:
+globs: []
+alwaysApply: false
+---
+
+# Empty Array Globs Rule
+
+This rule has empty array globs.
+`;
+
+      writeFileSync(join(cursorRulesDir, "empty-array.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("");
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.filename).toBe("cursor-empty-array");
     });
   });
 });
