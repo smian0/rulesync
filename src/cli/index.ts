@@ -15,7 +15,7 @@ import {
 
 const program = new Command();
 
-program.name("rulesync").description("Unified AI rules management CLI tool").version("0.38.0");
+program.name("rulesync").description("Unified AI rules management CLI tool").version("0.39.1");
 
 program.command("init").description("Initialize rulesync in current directory").action(initCommand);
 
