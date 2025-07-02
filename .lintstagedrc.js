@@ -7,6 +7,7 @@ export default {
     () => "tsgo --noEmit"
   ],
   "**/*": [
-    "secretlint"
+    "secretlint",
+    "cspell"
   ]
 };

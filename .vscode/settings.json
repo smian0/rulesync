@@ -16,23 +16,5 @@
 	},
 	"[jsonc]": {
 		"editor.defaultFormatter": "biomejs.biome"
-	},
-	"cSpell.words": [
-		"aiexclude",
-		"bcheck",
-		"claudecode",
-		"clineignore",
-		"clinerules",
-		"copilotignore",
-		"cursorignore",
-		"cursorrules",
-		"dyoshikawa",
-		"geminicli",
-		"Nonoctal",
-		"oxlint",
-		"rooignore",
-		"roorules",
-		"rulesync",
-		"tsgo"
-	]
+	}
 }
