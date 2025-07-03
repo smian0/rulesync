@@ -4,7 +4,8 @@ export default {
     "oxlint --fix"
   ],
   "*.ts": [
-    () => "tsgo --noEmit"
+    () => "tsgo --noEmit",
+    () => "pnpm test"
   ],
   "**/*": [
     "secretlint",

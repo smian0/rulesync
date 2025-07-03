@@ -96,6 +96,13 @@ export function generateRooMcpConfiguration(
 
     // Clone server config and remove targets
     const { targets: _targets, ...serverConfig } = serverObj;
+
+    // Handle httpUrl precedence over url
+    if (serverConfig.httpUrl && serverConfig.url) {
+      serverConfig.url = serverConfig.httpUrl;
+      delete serverConfig.httpUrl;
+    }
+
     config.mcpServers[serverName] = serverConfig;
   }
 
