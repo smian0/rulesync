@@ -402,7 +402,7 @@ Create a `.rulesync/.mcp.json` file in your project:
         "ghcr.io/github/github-mcp-server"
       ],
       "env": {},
-      "rulesyncTargets": ["*"]
+      "targets": ["*"]
     }
   }
 }
@@ -415,7 +415,7 @@ Create a `.rulesync/.mcp.json` file in your project:
   - **`args`**: Command arguments
   - **`url`**: URL for HTTP/SSE-based servers
   - **`env`**: Environment variables to pass to the server
-  - **`rulesyncTargets`**: Array of tool names to deploy this server to
+  - **`targets`**: Array of tool names to deploy this server to
     - Use specific tool names: `["claude", "cursor", "copilot"]`
     - Use `["*"]` to deploy to all supported tools
     - If omitted, server is deployed to all tools by default

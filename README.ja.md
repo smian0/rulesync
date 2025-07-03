@@ -402,7 +402,7 @@ rulesyncは、対応するAIツール用のMCPサーバー設定も管理でき�
         "ghcr.io/github/github-mcp-server"
       ],
       "env": {},
-      "rulesyncTargets": ["*"]
+      "targets": ["*"]
     }
   }
 }
@@ -415,7 +415,7 @@ rulesyncは、対応するAIツール用のMCPサーバー設定も管理でき�
   - **`args`**: コマンド引数
   - **`url`**: HTTP/SSEベースのサーバー用URL
   - **`env`**: サーバーに渡す環境変数
-  - **`rulesyncTargets`**: このサーバーをデプロイするツール名の配列
+  - **`targets`**: このサーバーをデプロイするツール名の配列
     - 特定のツール名を使用: `["claude", "cursor", "copilot"]`
     - すべてのサポートツールにデプロイするには`["*"]`を使用
     - 省略した場合、デフォルトですべてのツールにデプロイ
