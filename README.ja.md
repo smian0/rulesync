@@ -167,7 +167,7 @@ rulesyncは2レベルのルールシステムを使用します：
 | ツール             | ルートルール       | 非ルートルール           | 特別な動作                                                           |
 | ------------------ | ------------------ | ------------------------ | -------------------------------------------------------------------- |
 | **Claude Code**    | `./CLAUDE.md`      | `.claude/memories/*.md`  | CLAUDE.mdが詳細ファイルへの`@filename`参照を含む                     |
-| **Cursor**         | `ruletype: always` | `ruletype: autoattached` | globsのない詳細ルールは`ruletype: agentrequested`を使用              |
+| **Cursor**         | `cursorRuleType: always` | `cursorRuleType: specificFiles` (globs指定時)<br>`cursorRuleType: intelligently` (description指定時)<br>`cursorRuleType: manual` (デフォルト) | コンテンツ解析に基づく高度なルールタイプシステム |
 | **GitHub Copilot** | 標準フォーマット   | 標準フォーマット         | すべてのルールがフロントマター付きの同じフォーマットを使用           |
 | **Cline**          | 標準フォーマット   | 標準フォーマット         | すべてのルールがプレーンMarkdownフォーマットを使用                   |
 | **Roo Code**       | 標準フォーマット   | 標準フォーマット         | すべてのルールが説明ヘッダー付きのプレーンMarkdownフォーマットを使用 |

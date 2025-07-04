@@ -261,6 +261,8 @@ pnpm test src/parsers/                     # Test all parsers
 ### Recent Improvements
 
 - **Cursor Parser**: Updated to support specification changes with 4 rule types (always, manual, specificFiles, intelligently)
+- **Cursor Generator**: Updated with cursorRuleType field priority
+- **Type Safety**: Improved type safety by replacing `any` types with `unknown` and proper type guards
 - **Test Suite**: Added 23 comprehensive tests covering error handling and edge cases
 - **Coverage**: Achieved 86.62% overall, significantly exceeding 80% target
 
