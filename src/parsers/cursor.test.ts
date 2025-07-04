@@ -156,7 +156,8 @@ This is a legacy .cursorrules file.
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
       expect(rule.frontmatter.description).toBe("Legacy cursor rules");
-      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.frontmatter.cursorRuleType).toBe("intelligently");
       expect(rule.content.trim()).toBe(
         "# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file.",
       );
@@ -691,6 +692,58 @@ This has no frontmatter values set.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.cursorRuleType).toBe("manual");
+    });
+  });
+
+  describe(".cursorrules file processing with cursorRuleType", () => {
+    it("should set cursorRuleType: always for .cursorrules with alwaysApply: true", async () => {
+      const cursorRulesFile = join(testDir, ".cursorrules");
+
+      const cursorRulesContent = `---
+alwaysApply: true
+description: Global cursor rules
+---
+
+# Global Cursor Rules
+
+These rules apply to all files in the project.`;
+
+      writeFileSync(cursorRulesFile, cursorRulesContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.cursorRuleType).toBe("always");
+      expect(rule.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+    });
+
+    it("should set appropriate cursorRuleType for .cursorrules without alwaysApply", async () => {
+      const cursorRulesFile = join(testDir, ".cursorrules");
+
+      const cursorRulesContent = `---
+description: TypeScript rules
+globs: ["**/*.ts", "**/*.tsx"]
+---
+
+# TypeScript Cursor Rules
+
+These rules apply to TypeScript files.`;
+
+      writeFileSync(cursorRulesFile, cursorRulesContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule.frontmatter.globs).toEqual(["**/*.ts", "**/*.tsx"]);
     });
   });
 });

@@ -51,11 +51,17 @@ const customMatterOptions = {
 /**
  * convert from .mdc file to rulesync format according to four kinds of .mdc file format
  */
-function convertCursorMdcFrontmatter(cursorFrontmatter: any, _filename: string): RuleFrontmatter {
+function convertCursorMdcFrontmatter(
+  cursorFrontmatter: unknown,
+  _filename: string,
+): RuleFrontmatter {
+  // Type guard to ensure we have an object
+  const frontmatter = cursorFrontmatter as Record<string, unknown>;
+
   // 用語の定義に従って値を正規化
-  const description = normalizeValue(cursorFrontmatter?.description);
-  const globs = normalizeGlobsValue(cursorFrontmatter?.globs);
-  const alwaysApply = cursorFrontmatter?.alwaysApply === true;
+  const description = normalizeValue(frontmatter?.description);
+  const globs = normalizeGlobsValue(frontmatter?.globs);
+  const alwaysApply = frontmatter?.alwaysApply === true;
 
   // 1. always: alwaysApply: true がある場合
   if (alwaysApply) {
@@ -115,7 +121,7 @@ function convertCursorMdcFrontmatter(cursorFrontmatter: any, _filename: string):
 /**
  * 値を正規化する（空文字列、未記載、未定義を統一的に扱う）
  */
-function normalizeValue(value: any): string | undefined {
+function normalizeValue(value: unknown): string | undefined {
   if (value === undefined || value === null || value === "") {
     return undefined;
   }
@@ -125,7 +131,7 @@ function normalizeValue(value: any): string | undefined {
 /**
  * globs値を正規化する
  */
-function normalizeGlobsValue(value: any): string | string[] | undefined {
+function normalizeGlobsValue(value: unknown): string | string[] | undefined {
   if (value === undefined || value === null || value === "") {
     return undefined;
   }
@@ -138,7 +144,7 @@ function normalizeGlobsValue(value: any): string | string[] | undefined {
 /**
  * 値が空かどうかを判定する
  */
-function isEmpty(value: any): boolean {
+function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || value === "";
 }
 
@@ -182,29 +188,11 @@ export async function parseCursorConfiguration(
       const content = parsed.content.trim();
 
       if (content) {
-        // Convert Cursor frontmatter format to rulesync format
-        const cursorFrontmatter = parsed.data as any;
+        // Convert Cursor frontmatter format to rulesync format using unified function
+        const frontmatter = convertCursorMdcFrontmatter(parsed.data, "cursorrules");
 
-        // Map Cursor's alwaysApply to rulesync's root (only if explicitly set to true)
-        const root = cursorFrontmatter && cursorFrontmatter.alwaysApply === true;
-
-        // Use existing values or defaults
-        let globs = (cursorFrontmatter && (cursorFrontmatter.globs || cursorFrontmatter.glob)) || [
-          "**/*",
-        ];
-        // Ensure globs is always an array
-        if (typeof globs === "string") {
-          globs = [globs];
-        }
-
-        const frontmatter: RuleFrontmatter = {
-          root: root,
-          targets: ["cursor"],
-          description:
-            (cursorFrontmatter && cursorFrontmatter.description) ||
-            "Cursor IDE configuration rules",
-          globs: globs,
-        };
+        // Override targets to be cursor-specific for .cursorrules files
+        frontmatter.targets = ["cursor"];
 
         rules.push({
           frontmatter,
