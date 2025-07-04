@@ -65,15 +65,15 @@ function generateCursorMarkdown(rule: ParsedRule): string {
       lines.push("alwaysApply: false");
       break;
 
-    case "autoattached":
-      // 3. auto attached: empty description, globs from original (comma-separated), alwaysApply: false
+    case "specificFiles":
+      // 3. specificFiles: empty description, globs from original (comma-separated), alwaysApply: false
       lines.push("description:");
       lines.push(`globs: ${rule.frontmatter.globs.join(",")}`);
       lines.push("alwaysApply: false");
       break;
 
-    case "agentrequested":
-      // 4. agent_request: description from original, empty globs, alwaysApply: false
+    case "intelligently":
+      // 4. intelligently: description from original, empty globs, alwaysApply: false
       lines.push(`description: ${rule.frontmatter.description}`);
       lines.push("globs:");
       lines.push("alwaysApply: false");
@@ -88,12 +88,19 @@ function generateCursorMarkdown(rule: ParsedRule): string {
 }
 
 /**
- * Determine Cursor rule type based on four kinds of .mdc specification
- * Order of checking: 1. always → 2. manual → 3. auto attached → 4. agent_request
+ * Determine Cursor rule type
+ * Order of checking: 1. always → 2. manual → 3. specificFiles → 4. intelligently
+ * If cursorRuleType is explicitly specified, use that; otherwise use fallback logic
  */
 function determineCursorRuleType(
   frontmatter: import("../../types/index.js").RuleFrontmatter,
 ): string {
+  // If cursorRuleType is explicitly specified, use it
+  if (frontmatter.cursorRuleType) {
+    return frontmatter.cursorRuleType;
+  }
+
+  // Fallback logic when cursorRuleType is not specified (section 5 of specification)
   const isDescriptionEmpty = !frontmatter.description || frontmatter.description.trim() === "";
   const isGlobsEmpty = frontmatter.globs.length === 0;
   const isGlobsExactlyAllFiles = frontmatter.globs.length === 1 && frontmatter.globs[0] === "**/*";
@@ -108,20 +115,20 @@ function determineCursorRuleType(
     return "manual";
   }
 
-  // 3. auto attached: description is empty/undefined AND globs is non-empty (but not ["**/*"])
+  // 3. specificFiles: description is empty/undefined AND globs is non-empty (but not ["**/*"])
   if (isDescriptionEmpty && !isGlobsEmpty) {
-    return "autoattached";
+    return "specificFiles";
   }
 
-  // 4. agent request: description is non-empty AND globs is empty/undefined
+  // 4. intelligently: description is non-empty AND globs is empty/undefined
   if (!isDescriptionEmpty && isGlobsEmpty) {
-    return "agentrequested";
+    return "intelligently";
   }
 
   // Edge case: description is non-empty AND globs is non-empty (but not ["**/*"])
-  // According to specification order, this should be treated as "agentrequested"
+  // According to specification order, this should be treated as "intelligently"
   // because it doesn't match 1, 2, or 3, so it falls to 4
-  return "agentrequested";
+  return "intelligently";
 }
 
 function generateCursorIgnore(patterns: string[]): string {

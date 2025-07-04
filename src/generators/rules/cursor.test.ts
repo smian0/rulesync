@@ -76,55 +76,55 @@ describe("generateCursorConfig", () => {
       expect(outputs[0].content).toContain("# Manual Rule");
     });
 
-    it("should generate 'autoattached' type for empty description and non-empty globs", async () => {
+    it("should generate 'specificFiles' type for empty description and non-empty globs", async () => {
       vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
 
-      const autoAttachedRule: ParsedRule = {
+      const specificFilesRule: ParsedRule = {
         frontmatter: {
           root: false,
           targets: ["*"],
           description: "",
           globs: ["**/*.json", "**/*.ts", "**/*.js"],
         },
-        content: "# Auto Attached Rule\n\nThis rule auto-attaches to specific files.",
-        filename: "auto-attached-rule",
-        filepath: ".rulesync/auto-attached-rule.md",
+        content: "# Specific Files Rule\n\nThis rule applies to specific files.",
+        filename: "specific-files-rule",
+        filepath: ".rulesync/specific-files-rule.md",
       };
 
-      const outputs = await generateCursorConfig([autoAttachedRule], mockConfig);
+      const outputs = await generateCursorConfig([specificFilesRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
       expect(outputs[0].content).toContain("description:");
       expect(outputs[0].content).toContain("globs: **/*.json,**/*.ts,**/*.js");
       expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Auto Attached Rule");
+      expect(outputs[0].content).toContain("# Specific Files Rule");
     });
 
-    it("should generate 'agentrequested' type for non-empty description and empty globs", async () => {
+    it("should generate 'intelligently' type for non-empty description and empty globs", async () => {
       vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
 
-      const agentRequestedRule: ParsedRule = {
+      const intelligentlyRule: ParsedRule = {
         frontmatter: {
           root: false,
           targets: ["*"],
           description: "API development rule",
           globs: [],
         },
-        content: "# Agent Requested Rule\n\nThis rule is applied when requested by agent.",
-        filename: "agent-requested-rule",
-        filepath: ".rulesync/agent-requested-rule.md",
+        content: "# Intelligently Applied Rule\n\nThis rule is applied intelligently by AI.",
+        filename: "intelligently-rule",
+        filepath: ".rulesync/intelligently-rule.md",
       };
 
-      const outputs = await generateCursorConfig([agentRequestedRule], mockConfig);
+      const outputs = await generateCursorConfig([intelligentlyRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
       expect(outputs[0].content).toContain("description: API development rule");
       expect(outputs[0].content).toContain("globs:");
       expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Agent Requested Rule");
+      expect(outputs[0].content).toContain("# Intelligently Applied Rule");
     });
 
-    it("should handle edge case: non-empty description and non-empty globs (should be agentrequested)", async () => {
+    it("should handle edge case: non-empty description and non-empty globs (should be intelligently)", async () => {
       vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
 
       const edgeCaseRule: ParsedRule = {
@@ -142,12 +142,114 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([edgeCaseRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      // According to the specification order, this should be 'agentrequested'
+      // According to the specification order, this should be 'intelligently'
       // because it doesn't match 'always' (globs != ["**/*"]) or 'manual' (description not empty)
-      // or 'autoattached' (description not empty), so falls to 'agentrequested'
+      // or 'specificFiles' (description not empty), so falls to 'intelligently'
       expect(outputs[0].content).toContain("description: API development rule");
       expect(outputs[0].content).toContain("globs:");
       expect(outputs[0].content).toContain("alwaysApply: false");
+    });
+  });
+
+  describe("explicit cursorRuleType specification", () => {
+    it("should use explicit cursorRuleType: always when specified", async () => {
+      vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+
+      const explicitAlwaysRule: ParsedRule = {
+        frontmatter: {
+          root: false,
+          targets: ["*"],
+          description: "API development rule",
+          globs: ["**/*"],
+          cursorRuleType: "always",
+        },
+        content: "# Explicit Always Rule\n\nThis rule is explicitly set as always.",
+        filename: "explicit-always-rule",
+        filepath: ".rulesync/explicit-always-rule.md",
+      };
+
+      const outputs = await generateCursorConfig([explicitAlwaysRule], mockConfig);
+
+      expect(outputs).toHaveLength(1);
+      expect(outputs[0].content).toContain("description:");
+      expect(outputs[0].content).toContain("globs:");
+      expect(outputs[0].content).toContain("alwaysApply: true");
+      expect(outputs[0].content).toContain("# Explicit Always Rule");
+    });
+
+    it("should use explicit cursorRuleType: specificFiles when specified", async () => {
+      vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+
+      const explicitSpecificFilesRule: ParsedRule = {
+        frontmatter: {
+          root: false,
+          targets: ["*"],
+          description: "",
+          globs: ["**/*.json", "**/*.ts", "**/*.js"],
+          cursorRuleType: "specificFiles",
+        },
+        content: "# Explicit Specific Files Rule\n\nThis rule is explicitly set as specificFiles.",
+        filename: "explicit-specific-files-rule",
+        filepath: ".rulesync/explicit-specific-files-rule.md",
+      };
+
+      const outputs = await generateCursorConfig([explicitSpecificFilesRule], mockConfig);
+
+      expect(outputs).toHaveLength(1);
+      expect(outputs[0].content).toContain("description:");
+      expect(outputs[0].content).toContain("globs: **/*.json,**/*.ts,**/*.js");
+      expect(outputs[0].content).toContain("alwaysApply: false");
+      expect(outputs[0].content).toContain("# Explicit Specific Files Rule");
+    });
+
+    it("should use explicit cursorRuleType: intelligently when specified", async () => {
+      vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+
+      const explicitIntelligentlyRule: ParsedRule = {
+        frontmatter: {
+          root: false,
+          targets: ["*"],
+          description: "API development rule",
+          globs: [],
+          cursorRuleType: "intelligently",
+        },
+        content: "# Explicit Intelligently Rule\n\nThis rule is explicitly set as intelligently.",
+        filename: "explicit-intelligently-rule",
+        filepath: ".rulesync/explicit-intelligently-rule.md",
+      };
+
+      const outputs = await generateCursorConfig([explicitIntelligentlyRule], mockConfig);
+
+      expect(outputs).toHaveLength(1);
+      expect(outputs[0].content).toContain("description: API development rule");
+      expect(outputs[0].content).toContain("globs:");
+      expect(outputs[0].content).toContain("alwaysApply: false");
+      expect(outputs[0].content).toContain("# Explicit Intelligently Rule");
+    });
+
+    it("should use explicit cursorRuleType: manual when specified", async () => {
+      vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+
+      const explicitManualRule: ParsedRule = {
+        frontmatter: {
+          root: false,
+          targets: ["*"],
+          description: "",
+          globs: [],
+          cursorRuleType: "manual",
+        },
+        content: "# Explicit Manual Rule\n\nThis rule is explicitly set as manual.",
+        filename: "explicit-manual-rule",
+        filepath: ".rulesync/explicit-manual-rule.md",
+      };
+
+      const outputs = await generateCursorConfig([explicitManualRule], mockConfig);
+
+      expect(outputs).toHaveLength(1);
+      expect(outputs[0].content).toContain("description:");
+      expect(outputs[0].content).toContain("globs:");
+      expect(outputs[0].content).toContain("alwaysApply: false");
+      expect(outputs[0].content).toContain("# Explicit Manual Rule");
     });
   });
 
