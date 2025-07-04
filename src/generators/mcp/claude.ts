@@ -13,10 +13,7 @@ interface ClaudeServer {
   transport?: "sse" | "http";
 }
 
-export function generateClaudeMcp(
-  config: RulesyncMcpConfig,
-  _target: "global" | "project",
-): string {
+export function generateClaudeMcp(config: RulesyncMcpConfig): string {
   const claudeSettings: ClaudeSettings = {
     mcpServers: {},
   };

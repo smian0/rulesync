@@ -15,10 +15,7 @@ interface GeminiServer {
   trust?: boolean;
 }
 
-export function generateGeminiCliMcp(
-  config: RulesyncMcpConfig,
-  _target: "global" | "project",
-): string {
+export function generateGeminiCliMcp(config: RulesyncMcpConfig): string {
   const geminiSettings: GeminiSettings = {
     mcpServers: {},
   };

@@ -1,4 +1,3 @@
-import os from "node:os";
 import path from "node:path";
 import {
   generateClaudeMcp,
@@ -35,7 +34,7 @@ export async function generateMcpConfigs(
     {
       tool: "claude-project",
       path: path.join(targetRoot, ".mcp.json"),
-      generate: () => generateClaudeMcp(config, "project"),
+      generate: () => generateClaudeMcp(config),
     },
     {
       tool: "copilot-editor",
@@ -45,44 +44,24 @@ export async function generateMcpConfigs(
     {
       tool: "cursor-project",
       path: path.join(targetRoot, ".cursor", "mcp.json"),
-      generate: () => generateCursorMcp(config, "project"),
+      generate: () => generateCursorMcp(config),
     },
     {
       tool: "cline-project",
       path: path.join(targetRoot, ".cline", "mcp.json"),
-      generate: () => generateClineMcp(config, "project"),
+      generate: () => generateClineMcp(config),
     },
     {
       tool: "gemini-project",
       path: path.join(targetRoot, ".gemini", "settings.json"),
-      generate: () => generateGeminiCliMcp(config, "project"),
+      generate: () => generateGeminiCliMcp(config),
     },
     {
       tool: "roo-project",
       path: path.join(targetRoot, ".roo", "mcp.json"),
-      generate: () => generateRooMcp(config, "project"),
+      generate: () => generateRooMcp(config),
     },
   ];
-
-  if (!baseDir) {
-    generators.push(
-      {
-        tool: "claude-global",
-        path: path.join(os.homedir(), ".claude", "settings.json"),
-        generate: () => generateClaudeMcp(config, "global"),
-      },
-      {
-        tool: "cursor-global",
-        path: path.join(os.homedir(), ".cursor", "mcp.json"),
-        generate: () => generateCursorMcp(config, "global"),
-      },
-      {
-        tool: "gemini-global",
-        path: path.join(os.homedir(), ".gemini", "settings.json"),
-        generate: () => generateGeminiCliMcp(config, "global"),
-      },
-    );
-  }
 
   for (const generator of generators) {
     try {

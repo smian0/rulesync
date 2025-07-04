@@ -14,7 +14,7 @@ describe("generateClaudeMcp", () => {
       },
     };
 
-    const result = generateClaudeMcp(config, "project");
+    const result = generateClaudeMcp(config);
     const parsed = JSON.parse(result);
 
     expect(parsed).toEqual({
@@ -38,7 +38,7 @@ describe("generateClaudeMcp", () => {
       },
     };
 
-    const result = generateClaudeMcp(config, "project");
+    const result = generateClaudeMcp(config);
     const parsed = JSON.parse(result);
 
     expect(parsed).toEqual({
@@ -61,7 +61,7 @@ describe("generateClaudeMcp", () => {
       },
     };
 
-    const result = generateClaudeMcp(config, "project");
+    const result = generateClaudeMcp(config);
     const parsed = JSON.parse(result);
 
     expect(parsed).toEqual({
@@ -83,7 +83,7 @@ describe("generateClaudeMcp", () => {
       },
     };
 
-    const result = generateClaudeMcp(config, "global");
+    const result = generateClaudeMcp(config);
     const parsed = JSON.parse(result);
 
     expect(Object.keys(parsed.mcpServers)).toHaveLength(1);
@@ -98,7 +98,7 @@ describe("generateClaudeMcp", () => {
       },
     };
 
-    const result = generateClaudeMcp(config, "project");
+    const result = generateClaudeMcp(config);
     const parsed = JSON.parse(result);
 
     expect(Object.keys(parsed.mcpServers)).toHaveLength(2);

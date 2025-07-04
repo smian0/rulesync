@@ -15,7 +15,7 @@ interface ClineServer {
   networkTimeout?: number;
 }
 
-export function generateClineMcp(config: RulesyncMcpConfig, _target: "global" | "project"): string {
+export function generateClineMcp(config: RulesyncMcpConfig): string {
   const clineConfig: ClineConfig = {
     mcpServers: {},
   };

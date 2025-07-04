@@ -14,10 +14,7 @@ interface CursorServer {
   type?: "sse" | "streamable-http";
 }
 
-export function generateCursorMcp(
-  config: RulesyncMcpConfig,
-  _target: "global" | "project",
-): string {
+export function generateCursorMcp(config: RulesyncMcpConfig): string {
   const cursorConfig: CursorConfig = {
     mcpServers: {},
   };

@@ -16,7 +16,7 @@ interface RooServer {
   type?: "sse" | "streamable-http";
 }
 
-export function generateRooMcp(config: RulesyncMcpConfig, _target: "global" | "project"): string {
+export function generateRooMcp(config: RulesyncMcpConfig): string {
   const rooConfig: RooConfig = {
     mcpServers: {},
   };
