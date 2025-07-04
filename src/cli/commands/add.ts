@@ -3,14 +3,14 @@ import path from "node:path";
 import { getDefaultConfig } from "../../utils/config.js";
 
 /**
- * ファイル名から.md拡張子を除去
+ * Remove .md extension from filename
  */
 function sanitizeFilename(filename: string): string {
   return filename.endsWith(".md") ? filename.slice(0, -3) : filename;
 }
 
 /**
- * デフォルトのルールファイルテンプレートを生成
+ * Generate default rule file template
  */
 function generateRuleTemplate(filename: string): string {
   return `---
@@ -27,7 +27,7 @@ Add your rules here.
 }
 
 /**
- * addコマンドの実装
+ * Implementation of add command
  */
 export async function addCommand(filename: string): Promise<void> {
   try {
@@ -36,7 +36,7 @@ export async function addCommand(filename: string): Promise<void> {
     const rulesDir = config.aiRulesDir;
     const filePath = path.join(rulesDir, `${sanitizedFilename}.md`);
 
-    // .rulesyncディレクトリが存在しない場合は作成
+    // Create .rulesync directory if it doesn't exist
     await mkdir(rulesDir, { recursive: true });
 
     // テンプレート内容を生成
@@ -51,6 +51,6 @@ export async function addCommand(filename: string): Promise<void> {
     console.error(
       `❌ Failed to create rule file: ${error instanceof Error ? error.message : String(error)}`,
     );
-    process.exit(3); // ファイルI/Oエラー
+    process.exit(3); // File I/O error
   }
 }

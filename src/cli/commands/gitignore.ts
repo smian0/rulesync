@@ -44,7 +44,7 @@ export const gitignoreCommand = async (): Promise<void> => {
   }
 
   if (linesToAdd.length === 0) {
-    console.log("✅ .gitignoreは既に最新です");
+    console.log("✅ .gitignore is already up to date");
     return;
   }
 
@@ -54,7 +54,7 @@ export const gitignoreCommand = async (): Promise<void> => {
 
   writeFileSync(gitignorePath, newContent);
 
-  console.log(`✅ .gitignoreに${linesToAdd.length}個のルールを追加しました:`);
+  console.log(`✅ Added ${linesToAdd.length} rules to .gitignore:`);
   for (const line of linesToAdd) {
     if (!line.startsWith("#")) {
       console.log(`  ${line}`);

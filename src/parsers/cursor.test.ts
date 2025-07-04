@@ -57,7 +57,7 @@ This is a test cursor rule content.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description空でない + globs空でない -> description=""
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: non-empty description + non-empty globs -> description=""
       expect(rule.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved in specificFiles pattern
       expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.content.trim()).toBe("# Test Cursor Rule\n\nThis is a test cursor rule content.");
@@ -90,7 +90,7 @@ This rule applies to all files using the asterisk wildcard without quotes.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description空でない + globs空でない -> description=""
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: non-empty description + non-empty globs -> description=""
       expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.content.trim()).toBe(
         "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.",
@@ -508,7 +508,7 @@ This rule applies to TypeScript files only.
       mkdirSync(cursorRulesDir, { recursive: true });
 
       const mdcContent = `---
-description: "Pythonのコードを書く場合"
+description: "When writing Python code"
 globs:
 alwaysApply: false
 ---
@@ -528,7 +528,7 @@ This rule is triggered by agent requests.
       const rule = result.rules[0];
       expect(rule.frontmatter.root).toBe(false);
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("Pythonのコードを書く場合");
+      expect(rule.frontmatter.description).toBe("When writing Python code");
       expect(rule.frontmatter.globs).toEqual([]);
       expect(rule.frontmatter.cursorRuleType).toBe("intelligently");
       expect(rule.filename).toBe("cursor-agent-request");

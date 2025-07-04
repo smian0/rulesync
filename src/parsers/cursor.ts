@@ -58,12 +58,12 @@ function convertCursorMdcFrontmatter(
   // Type guard to ensure we have an object
   const frontmatter = cursorFrontmatter as Record<string, unknown>;
 
-  // 用語の定義に従って値を正規化
+  // Normalize values according to term definitions
   const description = normalizeValue(frontmatter?.description);
   const globs = normalizeGlobsValue(frontmatter?.globs);
   const alwaysApply = frontmatter?.alwaysApply === true || frontmatter?.alwaysApply === "true";
 
-  // 1. always: alwaysApply: true がある場合
+  // 1. always: when alwaysApply: true is present
   if (alwaysApply) {
     return {
       root: false,
@@ -74,7 +74,7 @@ function convertCursorMdcFrontmatter(
     };
   }
 
-  // 2. manual: description空 + globs空 + alwaysApply: false
+  // 2. manual: empty description + empty globs + alwaysApply: false
   if (isEmpty(description) && isEmpty(globs)) {
     return {
       root: false,
@@ -86,7 +86,7 @@ function convertCursorMdcFrontmatter(
   }
 
   // 3. specificFiles: description is empty string and globs is not empty and alwaysApply: false
-  // edge case: not description and globs is not empty ->  specificFiles
+  // edge case: no description and globs is not empty -> specificFiles
   if (!isEmpty(globs)) {
     return {
       root: false,
@@ -97,7 +97,7 @@ function convertCursorMdcFrontmatter(
     };
   }
 
-  // 4. intelligently: description非空 + globs空 + alwaysApply: false
+  // 4. intelligently: non-empty description + empty globs + alwaysApply: false
   if (!isEmpty(description)) {
     return {
       root: false,
@@ -108,7 +108,7 @@ function convertCursorMdcFrontmatter(
     };
   }
 
-  // デフォルト: manual として扱う
+  // Default: treat as manual
   return {
     root: false,
     targets: ["*"],
@@ -119,7 +119,7 @@ function convertCursorMdcFrontmatter(
 }
 
 /**
- * 値を正規化する（空文字列、未記載、未定義を統一的に扱う）
+ * Normalize values (handle empty strings, unspecified, and undefined uniformly)
  */
 function normalizeValue(value: unknown): string | undefined {
   if (value === undefined || value === null || value === "") {
@@ -129,7 +129,7 @@ function normalizeValue(value: unknown): string | undefined {
 }
 
 /**
- * globs値を正規化する
+ * Normalize globs value
  */
 function normalizeGlobsValue(value: unknown): string | string[] | undefined {
   if (value === undefined || value === null || value === "") {
@@ -142,14 +142,14 @@ function normalizeGlobsValue(value: unknown): string | string[] | undefined {
 }
 
 /**
- * 値が空かどうかを判定する
+ * Check if value is empty
  */
 function isEmpty(value: unknown): boolean {
   return value === undefined || value === null || value === "";
 }
 
 /**
- * globs値を配列に変換する
+ * Convert globs value to array
  */
 function convertGlobsToArray(globs: string | string[] | undefined): string[] {
   if (!globs) {
@@ -160,7 +160,7 @@ function convertGlobsToArray(globs: string | string[] | undefined): string[] {
     return globs;
   }
 
-  // カンマ区切りの文字列を配列に変換
+  // Convert comma-separated string to array
   if (typeof globs === "string") {
     return globs
       .split(",")
