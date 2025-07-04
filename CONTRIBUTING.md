@@ -16,8 +16,8 @@ We welcome contributions to rulesync! This document outlines the process for con
 
 ### Prerequisites
 
-- Node.js 20.0.0 or higher (recommended: 24.0.0+)
-- pnpm 10.12.2+ (recommended) or npm/yarn
+- Node.js 20+ (recommended: 24+)
+- pnpm (recommended) or npm/yarn
 
 ### MCP Connection Setup
 
@@ -122,19 +122,19 @@ rulesync/
 
 ### Key Dependencies
 
-- **Commander.js v14.0.0**: CLI framework for command-line interface
-- **gray-matter v4.0.3**: Frontmatter parsing for Markdown files (supports YAML, TOML, JSON)
-- **marked v15.0.12**: Markdown parsing and rendering
-- **chokidar v4.0.3**: File watching for `watch` command with high performance
-- **tsup v8.5.0**: Build system (outputs both CJS and ESM)
-- **tsx v4.20.3**: TypeScript execution for development
-- **Biome v2.0.0**: Unified linter and formatter (replaces ESLint + Prettier)
-- **Vitest v3.2.4**: Testing framework with coverage
-- **cspell v9.1.2**: Spell checker for code and documentation
+- **Commander.js**: CLI framework for command-line interface
+- **gray-matter**: Frontmatter parsing for Markdown files (supports YAML, TOML, JSON)
+- **marked**: Markdown parsing and rendering
+- **chokidar**: File watching for `watch` command with high performance
+- **tsup**: Build system (outputs both CJS and ESM)
+- **tsx**: TypeScript execution for development
+- **Biome**: Unified linter and formatter (replaces ESLint + Prettier)
+- **Vitest**: Testing framework with coverage
+- **cspell**: Spell checker for code and documentation
 
 ### Build System
 
-- **Target**: Node.js 20.0.0+ (recommended: 24.0.0+)
+- **Target**: Node.js 20+ (recommended: 24+)
 - **TypeScript**: Strict mode with `@tsconfig/node24`
 - **Output**: Both CommonJS (`dist/index.js`) and ESM (`dist/index.mjs`)
 - **Binary**: `dist/index.js` (executable entry point)
@@ -217,7 +217,7 @@ The style is automatically enforced by our CI pipeline and pre-commit hooks.
 
 ## Testing
 
-The project uses Vitest for testing with comprehensive coverage (current: 314 tests across 37 test files, 86.62% coverage achieved):
+The project uses Vitest for testing with comprehensive coverage:
 
 ### Test Structure
 
@@ -237,7 +237,7 @@ The project uses Vitest for testing with comprehensive coverage (current: 314 te
 ### Running Tests
 
 ```bash
-# All tests (314 tests across 37 test files)
+# All tests
 pnpm test
 
 # Watch mode for development
@@ -256,11 +256,11 @@ pnpm test src/parsers/                     # Test all parsers
 
 ### Test Coverage by Module
 
-- **cli/commands**: 96.21% (excellent coverage)
-- **core**: 90.76% (high coverage achieved)
-- **generators**: High coverage across all modules (98.35%)
-- **parsers**: 74.66% (good coverage, cursor parser achieved 89.49%)
-- **utils**: High coverage across all modules (100%)
+- **cli/commands**: Excellent coverage
+- **core**: High coverage achieved
+- **generators**: High coverage across all modules
+- **parsers**: Good coverage across all parsers
+- **utils**: High coverage across all modules
 - **types**: Type definition files (not measured)
 
 ### Recent Improvements
@@ -268,8 +268,7 @@ pnpm test src/parsers/                     # Test all parsers
 - **Cursor Parser**: Updated to support specification changes with 4 rule types (always, manual, specificFiles, intelligently)
 - **Cursor Generator**: Updated with cursorRuleType field priority
 - **Type Safety**: Improved type safety by replacing `any` types with `unknown` and proper type guards
-- **Test Suite**: Added 23 comprehensive tests covering error handling and edge cases
-- **Coverage**: Achieved 86.62% overall, significantly exceeding 80% target
+- **Test Suite**: Added comprehensive tests covering error handling and edge cases
 
 ## Adding New AI Tools
 
