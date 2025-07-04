@@ -164,14 +164,14 @@ rulesyncは2レベルのルールシステムを使用します：
 
 各AIツールはルールレベルを異なって処理します：
 
-| ツール | ルートルール | 非ルートルール | 特別な動作 |
-|------|------------|----------------|------------------|
-| **Claude Code** | `./CLAUDE.md` | `.claude/memories/*.md` | CLAUDE.mdが詳細ファイルへの`@filename`参照を含む |
-| **Cursor** | `ruletype: always` | `ruletype: autoattached` | globsのない詳細ルールは`ruletype: agentrequested`を使用 |
-| **GitHub Copilot** | 標準フォーマット | 標準フォーマット | すべてのルールがフロントマター付きの同じフォーマットを使用 |
-| **Cline** | 標準フォーマット | 標準フォーマット | すべてのルールがプレーンMarkdownフォーマットを使用 |
-| **Roo Code** | 標準フォーマット | 標準フォーマット | すべてのルールが説明ヘッダー付きのプレーンMarkdownフォーマットを使用 |
-| **Gemini CLI** | `GEMINI.md` | `.gemini/memories/*.md` | GEMINI.mdがメモリファイルへの`@filename`参照を含む |
+| ツール             | ルートルール       | 非ルートルール           | 特別な動作                                                           |
+| ------------------ | ------------------ | ------------------------ | -------------------------------------------------------------------- |
+| **Claude Code**    | `./CLAUDE.md`      | `.claude/memories/*.md`  | CLAUDE.mdが詳細ファイルへの`@filename`参照を含む                     |
+| **Cursor**         | `cursorRuleType: always` | `cursorRuleType: specificFiles` (globs指定時)<br>`cursorRuleType: intelligently` (description指定時)<br>`cursorRuleType: manual` (デフォルト) | コンテンツ解析に基づく高度なルールタイプシステム |
+| **GitHub Copilot** | 標準フォーマット   | 標準フォーマット         | すべてのルールがフロントマター付きの同じフォーマットを使用           |
+| **Cline**          | 標準フォーマット   | 標準フォーマット         | すべてのルールがプレーンMarkdownフォーマットを使用                   |
+| **Roo Code**       | 標準フォーマット   | 標準フォーマット         | すべてのルールが説明ヘッダー付きのプレーンMarkdownフォーマットを使用 |
+| **Gemini CLI**     | `GEMINI.md`        | `.gemini/memories/*.md`  | GEMINI.mdがメモリファイルへの`@filename`参照を含む                   |
 
 ### 3. 設定ファイルの生成
 
@@ -240,6 +240,34 @@ importコマンドの動作：
 - 競合が発生した場合はユニークなファイル名を生成
 - YAMLフロントマター付きのCursorのMDCファイルなど複雑なフォーマットをサポート
 - 複数ファイルのインポート（例：`.claude/memories/`ディレクトリのすべてのファイル）に対応
+
+### Cursorインポートの詳細
+
+Cursorからのインポートでは、以下の4つのルールタイプが自動的に識別されます：
+
+1. **always** (`cursorRuleType: always`)
+   - 条件: `alwaysApply: true` が設定されている場合
+   - 変換: ルートルール（`root: false`）としてインポート、`globs: ["**/*"]`を設定
+
+2. **manual** (`cursorRuleType: manual`)
+   - 条件: description空 + globs空 + `alwaysApply: false`
+   - 変換: 空のglobsパターンでインポート（手動適用ルール）
+
+3. **specificFiles** (`cursorRuleType: specificFiles`)
+   - 条件: globs指定あり（description有無問わず）
+   - 変換: 指定されたglobsパターンを配列として保持、descriptionは空文字に設定
+
+4. **intelligently** (`cursorRuleType: intelligently`)
+   - 条件: description指定あり + globs空
+   - 変換: descriptionを保持、空のglobsパターンを設定
+
+#### エッジケース処理
+- **description非空 + globs非空の場合**: `specificFiles`として処理（globsパターンを優先）
+- **判定条件に該当しない場合**: `manual`として処理（デフォルト）
+
+#### Cursorのサポートファイル
+- `.cursor/rules/*.mdc` (モダンな推奨形式)
+- `.cursorrules` (レガシーな形式)
 
 ### 5. その他のコマンド
 
@@ -314,8 +342,18 @@ root: true | false               # 必須: ルールレベル (概要の場合tr
 targets: ["*"]                   # 必須: ターゲットツール (* = すべて、または特定のツール)
 description: "簡潔な説明"        # 必須: ルールの説明
 globs: "**/*.ts,**/*.js"          # 必須: ファイルパターン (カンマ区切りまたは空文字列)
+cursorRuleType: "always"         # オプション: Cursor固有のルールタイプ (always, manual, specificFiles, intelligently)
 ---
 ```
+
+#### cursorRuleTypeフィールド (オプション)
+
+Cursorツール用の追加メタデータフィールド：
+
+- **`always`**: プロジェクト全体に常に適用されるルール
+- **`manual`**: 手動で適用するルール（デフォルト）
+- **`specificFiles`**: 特定のファイルパターンに自動適用されるルール
+- **`intelligently`**: AIが判断して適用するルール
 
 ### ファイル例
 
@@ -351,14 +389,14 @@ globs: "**/*.ts,**/*.tsx"
 
 ## 生成される設定ファイル
 
-| ツール | 出力パス | フォーマット | ルールレベル処理 |
-|------|------------|--------|-------------------|
-| **GitHub Copilot** | `.github/instructions/*.instructions.md` | フロントマター + Markdown | 両レベルとも同じフォーマットを使用 |
-| **Cursor** | `.cursor/rules/*.mdc` | MDC (YAMLヘッダー + Markdown) | ルート: `ruletype: always`<br>非ルート: `ruletype: autoattached`<br>globsなしの非ルート: `ruletype: agentrequested` |
-| **Cline** | `.clinerules/*.md` | プレーンMarkdown | 両レベルとも同じフォーマットを使用 |
-| **Claude Code** | `./CLAUDE.md` (ルート)<br>`.claude/memories/*.md` (非ルート) | プレーンMarkdown | ルートはCLAUDE.mdに移動<br>非ルートは別メモリファイルに移動<br>CLAUDE.mdは`@filename`参照を含む |
-| **Roo Code** | `.roo/rules/*.md` | プレーンMarkdown | 両レベルとも説明ヘッダー付きの同じフォーマットを使用 |
-| **Gemini CLI** | `GEMINI.md` (ルート)<br>`.gemini/memories/*.md` (非ルート) | プレーンMarkdown | ルートはGEMINI.mdに移動<br>非ルートは別メモリファイルに移動<br>GEMINI.mdは`@filename`参照を含む |
+| ツール             | 出力パス                                                     | フォーマット                  | ルールレベル処理                                                                                                                                                                                                |
+| ------------------ | ------------------------------------------------------------ | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GitHub Copilot** | `.github/instructions/*.instructions.md`                     | フロントマター + Markdown     | 両レベルとも同じフォーマットを使用                                                                                                                                                                              |
+| **Cursor**         | `.cursor/rules/*.mdc`                                        | MDC (YAMLヘッダー + Markdown) | ルート: `cursorRuleType: always`<br>非ルート: `cursorRuleType: specificFiles` (globs指定時)<br>非ルート: `cursorRuleType: intelligently` (description指定時)<br>非ルート: `cursorRuleType: manual` (デフォルト) |
+| **Cline**          | `.clinerules/*.md`                                           | プレーンMarkdown              | 両レベルとも同じフォーマットを使用                                                                                                                                                                              |
+| **Claude Code**    | `./CLAUDE.md` (ルート)<br>`.claude/memories/*.md` (非ルート) | プレーンMarkdown              | ルートはCLAUDE.mdに移動<br>非ルートは別メモリファイルに移動<br>CLAUDE.mdは`@filename`参照を含む                                                                                                                 |
+| **Roo Code**       | `.roo/rules/*.md`                                            | プレーンMarkdown              | 両レベルとも説明ヘッダー付きの同じフォーマットを使用                                                                                                                                                            |
+| **Gemini CLI**     | `GEMINI.md` (ルート)<br>`.gemini/memories/*.md` (非ルート)   | プレーンMarkdown              | ルートはGEMINI.mdに移動<br>非ルートは別メモリファイルに移動<br>GEMINI.mdは`@filename`参照を含む                                                                                                                 |
 
 ## バリデーション
 

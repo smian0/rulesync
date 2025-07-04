@@ -167,7 +167,7 @@ Each AI tool handles rule levels differently:
 | Tool | Root Rules | Non-Root Rules | Special Behavior |
 |------|------------|----------------|------------------|
 | **Claude Code** | `./CLAUDE.md` | `.claude/memories/*.md` | CLAUDE.md includes `@filename` references to detail files |
-| **Cursor** | `ruletype: always` | `ruletype: autoattached` | Detail rules without globs use `ruletype: agentrequested` |
+| **Cursor** | `cursorRuleType: always` | `cursorRuleType: specificFiles` (with globs)<br>`cursorRuleType: intelligently` (with description)<br>`cursorRuleType: manual` (default) | Advanced rule type system based on content analysis |
 | **GitHub Copilot** | Standard format | Standard format | All rules use same format with frontmatter |
 | **Cline** | Standard format | Standard format | All rules use plain Markdown format |
 | **Roo Code** | Standard format | Standard format | All rules use plain Markdown format with description header |
@@ -240,6 +240,36 @@ The import command will:
 - Generate unique filenames if conflicts occur
 - Support complex formats like Cursor's MDC files with YAML frontmatter
 - Handle multiple file imports (e.g., all files from `.claude/memories/` directory)
+
+### Cursor Import Details
+
+When importing from Cursor, the following four rule types are automatically identified:
+
+1. **always** (`cursorRuleType: always`)
+   - Condition: `alwaysApply: true` is set
+   - Conversion: Imported as root rule (`root: false`), with `globs: ["**/*"]` set
+
+2. **manual** (`cursorRuleType: manual`)
+   - Condition: empty description + empty globs + `alwaysApply: false`
+   - Conversion: Imported with empty globs patterns (manual application rule)
+
+3. **specificFiles** (`cursorRuleType: specificFiles`)
+   - Condition: globs specified (regardless of description)
+   - Conversion: Specified globs patterns preserved as array, description set to empty string
+
+4. **intelligently** (`cursorRuleType: intelligently`)
+   - Condition: description specified + empty globs
+   - Conversion: Description preserved, empty globs patterns set
+
+#### Edge Case Handling
+- **Non-empty description + non-empty globs**: Processed as `specificFiles` (globs patterns take priority)
+- **No matching conditions**: Processed as `manual` (default)
+
+#### Supported Files
+- `.cursorrules` (legacy format)
+- `.cursor/rules/*.mdc` (modern MDC format)
+- `.cursorignore` (ignore patterns)
+- `.cursor/mcp.json` (MCP server configuration)
 
 ### 5. Other Commands
 
@@ -314,8 +344,18 @@ root: true | false               # Required: Rule level (true for overview, fals
 targets: ["*"]                   # Required: Target tools (* = all, or specific tools)
 description: "Brief description" # Required: Rule description
 globs: "**/*.ts,**/*.js"          # Required: File patterns (comma-separated or empty string)
+cursorRuleType: "always"         # Optional: Cursor-specific rule type (always, manual, specificFiles, intelligently)
 ---
 ```
+
+#### cursorRuleType Field (Optional)
+
+Additional metadata field for Cursor tool:
+
+- **`always`**: Rules applied to the entire project constantly
+- **`manual`**: Rules applied manually (default)
+- **`specificFiles`**: Rules automatically applied to specific file patterns
+- **`intelligently`**: Rules applied by AI judgment
 
 ### Example Files
 
@@ -354,7 +394,7 @@ globs: "**/*.ts,**/*.tsx"
 | Tool | Output Path | Format | Rule Level Handling |
 |------|------------|--------|-------------------|
 | **GitHub Copilot** | `.github/instructions/*.instructions.md` | Front Matter + Markdown | Both levels use same format |
-| **Cursor** | `.cursor/rules/*.mdc` | MDC (YAML header + Markdown) | Root: `ruletype: always`<br>Non-root: `ruletype: autoattached`<br>Non-root without globs: `ruletype: agentrequested` |
+| **Cursor** | `.cursor/rules/*.mdc` | MDC (YAML header + Markdown) | Root: `cursorRuleType: always`<br>Non-root: `cursorRuleType: specificFiles` (with globs)<br>Non-root: `cursorRuleType: intelligently` (with description)<br>Non-root: `cursorRuleType: manual` (default) |
 | **Cline** | `.clinerules/*.md` | Plain Markdown | Both levels use same format |
 | **Claude Code** | `./CLAUDE.md` (root)<br>`.claude/memories/*.md` (non-root) | Plain Markdown | Root goes to CLAUDE.md<br>Non-root go to separate memory files<br>CLAUDE.md includes `@filename` references |
 | **Roo Code** | `.roo/rules/*.md` | Plain Markdown | Both levels use same format with description header |

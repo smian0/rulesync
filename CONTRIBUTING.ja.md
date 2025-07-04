@@ -105,6 +105,7 @@ rulesync/
 │   ├── parsers/           # インポート機能用ツール固有パーサー
 │   │   ├── copilot.ts     # GitHub Copilot設定のパース (.github/copilot-instructions.md)
 │   │   ├── cursor.ts      # Cursor設定のパース (.cursorrules, .cursor/rules/*.mdc)
+│   │   │                  # 4つのルールタイプをサポート: always, manual, specificFiles, intelligently
 │   │   ├── cline.ts       # Cline設定のパース (.cline/instructions.md)
 │   │   ├── claudecode.ts  # Claude Code設定のパース (CLAUDE.md, .claude/memories/*.md)
 │   │   ├── geminicli.ts   # Gemini CLI設定のパース (GEMINI.md, .gemini/memories/*.md)
@@ -216,7 +217,7 @@ type(scope): description
 
 ## テスト
 
-プロジェクトは包括的なカバレッジ（現在: 21テストファイルで157テスト、目標: 80%+カバレッジ）でVitestを使用してテストしています:
+プロジェクトは包括的なカバレッジ（現在: 37テストファイルで314テスト、86.62%カバレッジ達成）でVitestを使用してテストしています:
 
 ### テスト構造
 
@@ -236,7 +237,7 @@ type(scope): description
 ### テストの実行
 
 ```bash
-# すべてのテスト（21テストファイルで157テスト）
+# すべてのテスト（37テストファイルで314テスト）
 pnpm test
 
 # 開発用ウォッチモード
@@ -255,13 +256,20 @@ pnpm test src/parsers/                     # すべてのパーサーのテス�
 
 ### モジュール別テストカバレッジ
 
-- **cli/commands**: 85.41%（良好なカバレッジ、新しいimportコマンドのテストが必要）
-- **core**: 62.97%（改善が必要、新しいimporterモジュールのテストが必要）
-- **generators**: すべてのモジュールで高カバレッジ
-- **utils**: すべてのモジュールで高カバレッジ
-- **types**: すべてのモジュールで高カバレッジ
+- **cli/commands**: 96.21%（優秀なカバレッジ）
+- **core**: 90.76%（高カバレッジを達成）
+- **generators**: すべてのモジュールで高カバレッジ（98.35%）
+- **parsers**: 74.66%（良好なカバレッジ、cursorパーサーは89.49%）
+- **utils**: すべてのモジュールで高カバレッジ（100%）
+- **types**: 型定義ファイルのため測定対象外
 
-注意: 新しいインポート機能のテスト実装が必要なため、カバレッジが一時的に低下しています。
+### 最近の改善
+
+- **Cursorパーサー**: 仕様変更に対応し、4つのルールタイプ（always, manual, specificFiles, intelligently）をサポート
+- **Cursorジェネレーター**: cursorRuleTypeフィールドの優先処理に対応
+- **型安全性**: `any`型を`unknown`型に置き換え、適切な型ガードで型安全性を向上
+- **テストスイート**: 23個の包括的なテストを追加し、エラーハンドリングやエッジケースを網羅
+- **カバレッジ**: 全体で86.62%達成、80%目標を大幅に上回る
 
 ## 新しいAIツールの追加
 

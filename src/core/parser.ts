@@ -114,9 +114,9 @@ function validateFrontmatter(data: unknown, filepath: string): void {
       `Missing required field "description" in ${filepath}: must be a descriptive string`,
     );
   }
-  if (!obj.description || typeof obj.description !== "string") {
+  if (typeof obj.description !== "string") {
     throw new Error(
-      `Invalid "description" field in ${filepath}: must be a non-empty string, got ${typeof obj.description}`,
+      `Invalid "description" field in ${filepath}: must be a string, got ${typeof obj.description}`,
     );
   }
 

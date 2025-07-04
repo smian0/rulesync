@@ -12,6 +12,7 @@ export type RuleFrontmatter = {
   targets: ToolTarget[] | ["*"];
   description: string;
   globs: string[];
+  cursorRuleType?: "always" | "manual" | "specificFiles" | "intelligently";
 };
 
 export type ParsedRule = {

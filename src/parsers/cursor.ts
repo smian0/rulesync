@@ -21,9 +21,18 @@ const customMatterOptions = {
     yaml: {
       parse: (str: string): object => {
         try {
-          // Preprocess to handle "globs: *" (Cursor's valid format) by adding quotes
-          // This converts "globs: *" to "globs: \"*\"" for proper YAML parsing
-          const preprocessed = str.replace(/^(\s*globs:\s*)\*\s*$/gm, '$1"*"');
+          // Preprocess to handle Cursor's valid formats:
+          // 1. "globs: *" (bare asterisk) -> "globs: \"*\""
+          // 2. "globs: **/*.ts" (glob patterns without quotes) -> "globs: \"**/*.ts\""
+          // 3. "globs: **/*.py,**/*.pyc" (comma-separated patterns) -> "globs: \"**/*.py,**/*.pyc\""
+          // Note: Don't process array literals like [] or ["item"]
+          let preprocessed = str
+            // Handle bare asterisk
+            .replace(/^(\s*globs:\s*)\*\s*$/gm, '$1"*"')
+            // Handle glob patterns without quotes (single or comma-separated)
+            // But exclude array literals (starting with [ or already quoted strings)
+            .replace(/^(\s*globs:\s*)([^\s"'[\n][^"'[\n]*?)(\s*)$/gm, '$1"$2"$3');
+
           return load(preprocessed, { schema: DEFAULT_SCHEMA }) as object;
         } catch (error) {
           // If that fails, try with FAILSAFE_SCHEMA as a fallback
@@ -38,6 +47,129 @@ const customMatterOptions = {
     },
   },
 };
+
+/**
+ * convert from .mdc file to rulesync format according to four kinds of .mdc file format
+ */
+function convertCursorMdcFrontmatter(
+  cursorFrontmatter: unknown,
+  _filename: string,
+): RuleFrontmatter {
+  // Type guard to ensure we have an object
+  const frontmatter = cursorFrontmatter as Record<string, unknown>;
+
+  // 用語の定義に従って値を正規化
+  const description = normalizeValue(frontmatter?.description);
+  const globs = normalizeGlobsValue(frontmatter?.globs);
+  const alwaysApply = frontmatter?.alwaysApply === true || frontmatter?.alwaysApply === "true";
+
+  // 1. always: alwaysApply: true がある場合
+  if (alwaysApply) {
+    return {
+      root: false,
+      targets: ["*"],
+      description: description || "",
+      globs: ["**/*"],
+      cursorRuleType: "always",
+    };
+  }
+
+  // 2. manual: description空 + globs空 + alwaysApply: false
+  if (isEmpty(description) && isEmpty(globs)) {
+    return {
+      root: false,
+      targets: ["*"],
+      description: "",
+      globs: [],
+      cursorRuleType: "manual",
+    };
+  }
+
+  // 3. specificFiles: description is empty string and globs is not empty and alwaysApply: false
+  // edge case: not description and globs is not empty ->  specificFiles
+  if (!isEmpty(globs)) {
+    return {
+      root: false,
+      targets: ["*"],
+      description: "",
+      globs: convertGlobsToArray(globs),
+      cursorRuleType: "specificFiles",
+    };
+  }
+
+  // 4. intelligently: description非空 + globs空 + alwaysApply: false
+  if (!isEmpty(description)) {
+    return {
+      root: false,
+      targets: ["*"],
+      description: description!,
+      globs: [],
+      cursorRuleType: "intelligently",
+    };
+  }
+
+  // デフォルト: manual として扱う
+  return {
+    root: false,
+    targets: ["*"],
+    description: "",
+    globs: [],
+    cursorRuleType: "manual",
+  };
+}
+
+/**
+ * 値を正規化する（空文字列、未記載、未定義を統一的に扱う）
+ */
+function normalizeValue(value: unknown): string | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  return String(value);
+}
+
+/**
+ * globs値を正規化する
+ */
+function normalizeGlobsValue(value: unknown): string | string[] | undefined {
+  if (value === undefined || value === null || value === "") {
+    return undefined;
+  }
+  if (Array.isArray(value)) {
+    return value.length === 0 ? undefined : value;
+  }
+  return String(value);
+}
+
+/**
+ * 値が空かどうかを判定する
+ */
+function isEmpty(value: unknown): boolean {
+  return value === undefined || value === null || value === "";
+}
+
+/**
+ * globs値を配列に変換する
+ */
+function convertGlobsToArray(globs: string | string[] | undefined): string[] {
+  if (!globs) {
+    return [];
+  }
+
+  if (Array.isArray(globs)) {
+    return globs;
+  }
+
+  // カンマ区切りの文字列を配列に変換
+  if (typeof globs === "string") {
+    return globs
+      .split(",")
+      .map((g) => g.trim())
+      .filter((g) => g.length > 0);
+  }
+
+  return [];
+}
 
 export async function parseCursorConfiguration(
   baseDir: string = process.cwd(),
@@ -56,12 +188,11 @@ export async function parseCursorConfiguration(
       const content = parsed.content.trim();
 
       if (content) {
-        const frontmatter: RuleFrontmatter = {
-          root: false,
-          targets: ["cursor"],
-          description: "Cursor IDE configuration rules",
-          globs: ["**/*"],
-        };
+        // Convert Cursor frontmatter format to rulesync format using unified function
+        const frontmatter = convertCursorMdcFrontmatter(parsed.data, "cursorrules");
+
+        // Override targets to be cursor-specific for .cursorrules files
+        frontmatter.targets = ["cursor"];
 
         rules.push({
           frontmatter,
@@ -93,12 +224,8 @@ export async function parseCursorConfiguration(
 
             if (content) {
               const filename = basename(file, ".mdc");
-              const frontmatter: RuleFrontmatter = {
-                root: false,
-                targets: ["cursor"],
-                description: `Cursor rule: ${filename}`,
-                globs: ["**/*"],
-              };
+              // Convert according to four kinds of mdc file format
+              const frontmatter = convertCursorMdcFrontmatter(parsed.data, filename);
 
               rules.push({
                 frontmatter,
