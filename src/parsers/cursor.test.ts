@@ -45,8 +45,9 @@ This is a test cursor rule content.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("Test cursor rule");
-      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description空でない + globs空でない -> description=""
+      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved in specificFiles pattern
+      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.content.trim()).toBe("# Test Cursor Rule\n\nThis is a test cursor rule content.");
       expect(rule.filename).toBe("cursor-test-rule");
     });
@@ -77,7 +78,8 @@ This rule applies to all files using the asterisk wildcard without quotes.
 
       const rule = result.rules[0];
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("Guidelines for maintaining project documentation");
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description空でない + globs空でない -> description=""
+      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.content.trim()).toBe(
         "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.",
       );
@@ -271,8 +273,9 @@ This rule is always applied.
       const rule = result.rules[0];
       expect(rule.frontmatter.root).toBe(false);
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("");
+      expect(rule.frontmatter.description).toBe("Any description"); // always pattern preserves original description
       expect(rule.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule.frontmatter.cursorRuleType).toBe("always");
       expect(rule.filename).toBe("cursor-always-rule");
     });
 
@@ -303,6 +306,7 @@ This is a manual rule with no file patterns.
       expect(rule.frontmatter.targets).toEqual(["*"]);
       expect(rule.frontmatter.description).toBe("");
       expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.frontmatter.cursorRuleType).toBe("manual");
       expect(rule.filename).toBe("cursor-manual-rule");
     });
 
@@ -331,8 +335,9 @@ This rule is automatically attached to Python files.
       const rule = result.rules[0];
       expect(rule.frontmatter.root).toBe(false);
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("Cursor rule: auto-attached");
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
       expect(rule.frontmatter.globs).toEqual(["**/*.py", "**/*.pyc"]);
+      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.filename).toBe("cursor-auto-attached");
     });
 
@@ -361,8 +366,9 @@ This rule applies to TypeScript files only.
       const rule = result.rules[0];
       expect(rule.frontmatter.root).toBe(false);
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("Cursor rule: single-glob");
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
       expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
+      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.filename).toBe("cursor-single-glob");
     });
 
@@ -393,10 +399,11 @@ This rule is triggered by agent requests.
       expect(rule.frontmatter.targets).toEqual(["*"]);
       expect(rule.frontmatter.description).toBe("Pythonのコードを書く場合");
       expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.frontmatter.cursorRuleType).toBe("intelligently");
       expect(rule.filename).toBe("cursor-agent-request");
     });
 
-    it("should handle edge case: non-empty description and non-empty globs (should be agent_request)", async () => {
+    it("should handle edge case: non-empty description and non-empty globs (should be specificFiles)", async () => {
       const cursorRulesDir = join(testDir, ".cursor", "rules");
       mkdirSync(cursorRulesDir, { recursive: true });
 
@@ -408,7 +415,7 @@ alwaysApply: false
 
 # Edge Case Rule
 
-This has both description and globs, but should be treated as agent_request.
+This has both description and globs, but should be treated as specificFiles according to new specification.
 `;
 
       writeFileSync(join(cursorRulesDir, "edge-case.mdc"), mdcContent);
@@ -421,8 +428,9 @@ This has both description and globs, but should be treated as agent_request.
       const rule = result.rules[0];
       expect(rule.frontmatter.root).toBe(false);
       expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("TypeScript development rules");
-      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
+      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved
+      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
       expect(rule.filename).toBe("cursor-edge-case");
     });
 
@@ -483,6 +491,206 @@ This rule has empty array globs.
       expect(rule.frontmatter.description).toBe("");
       expect(rule.frontmatter.globs).toEqual([]);
       expect(rule.filename).toBe("cursor-empty-array");
+    });
+  });
+
+  describe("additional coverage tests", () => {
+    it("should handle .cursorignore file with comments and empty lines", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: Test rule
+globs:
+alwaysApply: false
+---
+
+# Test Rule
+`;
+
+      writeFileSync(join(cursorRulesDir, "test.mdc"), mdcContent);
+
+      const cursorIgnoreContent = `# This is a comment
+node_modules/
+*.log
+
+# Another comment
+.env
+`;
+
+      writeFileSync(join(testDir, ".cursorignore"), cursorIgnoreContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+      expect(result.ignorePatterns).toEqual(["node_modules/", "*.log", ".env"]);
+    });
+
+    it("should handle .cursorignore read error", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: Test rule
+globs:
+alwaysApply: false
+---
+
+# Test Rule
+`;
+
+      writeFileSync(join(cursorRulesDir, "test.mdc"), mdcContent);
+
+      // Create a directory instead of a file to cause read error
+      mkdirSync(join(testDir, ".cursorignore"));
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.rules).toHaveLength(1);
+      expect(result.errors.some((error) => error.includes("Failed to parse .cursorignore"))).toBe(
+        true,
+      );
+    });
+
+    it("should handle .cursor/mcp.json file", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: Test rule
+globs:
+alwaysApply: false
+---
+
+# Test Rule
+`;
+
+      writeFileSync(join(cursorRulesDir, "test.mdc"), mdcContent);
+
+      const mcpContent = {
+        mcpServers: {
+          "test-server": {
+            command: "node",
+            args: ["test.js"],
+          },
+        },
+      };
+
+      writeFileSync(join(testDir, ".cursor", "mcp.json"), JSON.stringify(mcpContent));
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+      expect(result.mcpServers).toEqual(mcpContent.mcpServers);
+    });
+
+    it("should handle .cursor/mcp.json parse error", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: Test rule
+globs:
+alwaysApply: false
+---
+
+# Test Rule
+`;
+
+      writeFileSync(join(cursorRulesDir, "test.mdc"), mdcContent);
+
+      // Write invalid JSON
+      writeFileSync(join(testDir, ".cursor", "mcp.json"), "{ invalid json }");
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.rules).toHaveLength(1);
+      expect(
+        result.errors.some((error) => error.includes("Failed to parse .cursor/mcp.json")),
+      ).toBe(true);
+    });
+
+    it("should handle .cursor/mcp.json read error", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: Test rule
+globs:
+alwaysApply: false
+---
+
+# Test Rule
+`;
+
+      writeFileSync(join(cursorRulesDir, "test.mdc"), mdcContent);
+
+      // Create a directory instead of a file to cause read error
+      mkdirSync(join(testDir, ".cursor", "mcp.json"));
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.rules).toHaveLength(1);
+      expect(
+        result.errors.some((error) => error.includes("Failed to parse .cursor/mcp.json")),
+      ).toBe(true);
+    });
+
+    it("should handle fallback to default when no conditions match", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+alwaysApply: false
+---
+
+# Fallback Rule
+
+This rule should fall back to manual.
+`;
+
+      writeFileSync(join(cursorRulesDir, "fallback.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.root).toBe(false);
+      expect(rule.frontmatter.targets).toEqual(["*"]);
+      expect(rule.frontmatter.description).toBe("");
+      expect(rule.frontmatter.globs).toEqual([]);
+      expect(rule.frontmatter.cursorRuleType).toBe("manual");
+      expect(rule.filename).toBe("cursor-fallback");
+    });
+
+    it("should handle normalizeValue edge cases", async () => {
+      const cursorRulesDir = join(testDir, ".cursor", "rules");
+      mkdirSync(cursorRulesDir, { recursive: true });
+
+      const mdcContent = `---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# Edge Case Rule
+
+This has no frontmatter values set.
+`;
+
+      writeFileSync(join(cursorRulesDir, "edge-case.mdc"), mdcContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.cursorRuleType).toBe("manual");
     });
   });
 });

@@ -51,7 +51,7 @@ const customMatterOptions = {
 /**
  * convert from .mdc file to rulesync format according to four kinds of .mdc file format
  */
-function convertCursorMdcFrontmatter(cursorFrontmatter: any, filename: string): RuleFrontmatter {
+function convertCursorMdcFrontmatter(cursorFrontmatter: any, _filename: string): RuleFrontmatter {
   // 用語の定義に従って値を正規化
   const description = normalizeValue(cursorFrontmatter?.description);
   const globs = normalizeGlobsValue(cursorFrontmatter?.globs);
@@ -62,8 +62,9 @@ function convertCursorMdcFrontmatter(cursorFrontmatter: any, filename: string): 
     return {
       root: false,
       targets: ["*"],
-      description: "",
+      description: description || "",
       globs: ["**/*"],
+      cursorRuleType: "always",
     };
   }
 
@@ -74,26 +75,30 @@ function convertCursorMdcFrontmatter(cursorFrontmatter: any, filename: string): 
       targets: ["*"],
       description: "",
       globs: [],
+      cursorRuleType: "manual",
     };
   }
 
-  // 3. auto attached: description空 + globs非空 + alwaysApply: false
-  if (isEmpty(description) && !isEmpty(globs)) {
+  // 3. specificFiles: description is empty string and globs is not empty and alwaysApply: false
+  // edge case: not description and globs is not empty ->  specificFiles
+  if (!isEmpty(globs)) {
     return {
       root: false,
       targets: ["*"],
-      description: `Cursor rule: ${filename}`,
+      description: "",
       globs: convertGlobsToArray(globs),
+      cursorRuleType: "specificFiles",
     };
   }
 
-  // 4. agent_request: description非空 + alwaysApply: false
+  // 4. intelligently: description非空 + globs空 + alwaysApply: false
   if (!isEmpty(description)) {
     return {
       root: false,
       targets: ["*"],
       description: description!,
       globs: [],
+      cursorRuleType: "intelligently",
     };
   }
 
@@ -103,6 +108,7 @@ function convertCursorMdcFrontmatter(cursorFrontmatter: any, filename: string): 
     targets: ["*"],
     description: "",
     globs: [],
+    cursorRuleType: "manual",
   };
 }
 
