@@ -102,6 +102,7 @@ rulesync/
 │   ├── parsers/           # Tool-specific parsers for import functionality
 │   │   ├── copilot.ts     # Parse GitHub Copilot configurations (.github/copilot-instructions.md)
 │   │   ├── cursor.ts      # Parse Cursor configurations (.cursorrules, .cursor/rules/*.mdc)
+│   │   │                  # Supports 4 rule types: always, manual, specificFiles, intelligently
 │   │   ├── cline.ts       # Parse Cline configurations (.cline/instructions.md)
 │   │   ├── claudecode.ts  # Parse Claude Code configurations (CLAUDE.md, .claude/memories/*.md)
 │   │   ├── geminicli.ts   # Parse Gemini CLI configurations (GEMINI.md, .gemini/memories/*.md)
@@ -211,7 +212,7 @@ The style is automatically enforced by our CI pipeline and pre-commit hooks.
 
 ## Testing
 
-The project uses Vitest for testing with comprehensive coverage (current: 157 tests across 21 test files, target: 80%+ coverage):
+The project uses Vitest for testing with comprehensive coverage (current: 314 tests across 37 test files, 86.62% coverage achieved):
 
 ### Test Structure
 
@@ -231,7 +232,7 @@ The project uses Vitest for testing with comprehensive coverage (current: 157 te
 ### Running Tests
 
 ```bash
-# All tests (157 tests across 21 test files)
+# All tests (314 tests across 37 test files)
 pnpm test
 
 # Watch mode for development
@@ -250,13 +251,18 @@ pnpm test src/parsers/                     # Test all parsers
 
 ### Test Coverage by Module
 
-- **cli/commands**: 85.41% (good coverage, new import command needs testing)
-- **core**: 62.97% (needs improvement, new importer module requires tests)
-- **generators**: High coverage across all modules  
-- **utils**: High coverage across all modules
-- **types**: High coverage across all modules
+- **cli/commands**: 96.21% (excellent coverage)
+- **core**: 90.76% (high coverage achieved)
+- **generators**: High coverage across all modules (98.35%)
+- **parsers**: 74.66% (good coverage, cursor parser achieved 89.49%)
+- **utils**: High coverage across all modules (100%)
+- **types**: Type definition files (not measured)
 
-Note: Coverage temporarily reduced due to new import functionality requiring test implementation.
+### Recent Improvements
+
+- **Cursor Parser**: Updated to support specification changes with 4 rule types (always, manual, specificFiles, intelligently)
+- **Test Suite**: Added 23 comprehensive tests covering error handling and edge cases
+- **Coverage**: Achieved 86.62% overall, significantly exceeding 80% target
 
 ## Adding New AI Tools
 
