@@ -745,5 +745,30 @@ These rules apply to TypeScript files.`;
       expect(rule.frontmatter.targets).toEqual(["cursor"]);
       expect(rule.frontmatter.globs).toEqual(["**/*.ts", "**/*.tsx"]);
     });
+
+    it("should handle alwaysApply as string 'true' in .cursorrules", async () => {
+      const cursorRulesFile = join(testDir, ".cursorrules");
+
+      const cursorRulesContent = `---
+alwaysApply: 'true'
+description: String true value test
+---
+
+# String True Test
+
+Testing alwaysApply as string 'true'.`;
+
+      writeFileSync(cursorRulesFile, cursorRulesContent);
+
+      const result = await parseCursorConfiguration(testDir);
+
+      expect(result.errors).toEqual([]);
+      expect(result.rules).toHaveLength(1);
+
+      const rule = result.rules[0];
+      expect(rule.frontmatter.cursorRuleType).toBe("always");
+      expect(rule.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+    });
   });
 });

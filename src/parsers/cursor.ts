@@ -61,7 +61,7 @@ function convertCursorMdcFrontmatter(
   // 用語の定義に従って値を正規化
   const description = normalizeValue(frontmatter?.description);
   const globs = normalizeGlobsValue(frontmatter?.globs);
-  const alwaysApply = frontmatter?.alwaysApply === true;
+  const alwaysApply = frontmatter?.alwaysApply === true || frontmatter?.alwaysApply === "true";
 
   // 1. always: alwaysApply: true がある場合
   if (alwaysApply) {
