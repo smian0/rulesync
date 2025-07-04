@@ -1,11 +1,4 @@
-export type ToolTarget =
-  | "copilot"
-  | "cursor"
-  | "cline"
-  | "claudecode"
-  | "claude"
-  | "roo"
-  | "geminicli";
+export type ToolTarget = "copilot" | "cursor" | "cline" | "claudecode" | "roo" | "geminicli";
 
 export type RuleFrontmatter = {
   root: boolean;

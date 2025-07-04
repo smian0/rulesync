@@ -13,8 +13,7 @@ describe("generateRooConfig", () => {
   });
 
   const mockConfig: Config = {
-    projectName: "test-project",
-    rulesDir: ".rulesync",
+    aiRulesDir: ".rulesync",
     outputPaths: {
       copilot: ".github/instructions",
       cursor: ".cursor/rules",
@@ -23,6 +22,8 @@ describe("generateRooConfig", () => {
       roo: ".roo/rules",
       geminicli: "",
     },
+    watchEnabled: false,
+    defaultTargets: [],
   };
 
   const mockRule: ParsedRule = {

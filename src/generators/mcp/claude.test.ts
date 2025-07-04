@@ -79,7 +79,7 @@ describe("generateClaudeMcp", () => {
     const config: RulesyncMcpConfig = {
       mcpServers: {
         server1: { command: "node", args: ["s1.js"], targets: ["cursor"] },
-        server2: { command: "node", args: ["s2.js"], targets: ["claude"] },
+        server2: { command: "node", args: ["s2.js"], targets: ["claudecode"] },
       },
     };
 

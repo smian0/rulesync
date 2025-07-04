@@ -19,7 +19,7 @@ export function generateClaudeMcp(config: RulesyncMcpConfig): string {
   };
 
   const shouldInclude = (server: RulesyncMcpServer): boolean => {
-    return shouldIncludeServer(server, "claude");
+    return shouldIncludeServer(server, "claudecode");
   };
 
   for (const [serverName, server] of Object.entries(config.mcpServers)) {
