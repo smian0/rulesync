@@ -28,11 +28,11 @@ describe("generateCursorMcpConfiguration", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        targets: ["cursor", "claude"],
+        targets: ["cursor", "claudecode"],
       },
       server2: {
         command: "server2",
-        targets: ["claude"],
+        targets: ["claudecode"],
       },
       server3: {
         command: "server3",
