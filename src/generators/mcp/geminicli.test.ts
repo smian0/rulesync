@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ToolTarget } from "../../types/rules.js";
 import { generateGeminiCliMcpConfiguration } from "./geminicli.js";
 
 describe("generateGeminiCliMcpConfiguration", () => {
@@ -18,9 +19,9 @@ describe("generateGeminiCliMcpConfiguration", () => {
     const result = generateGeminiCliMcpConfiguration(mcpServers);
 
     expect(result).toHaveLength(1);
-    expect(result[0].filepath).toBe(".gemini/settings.json");
+    expect(result[0]!.filepath).toBe(".gemini/settings.json");
 
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
@@ -28,15 +29,15 @@ describe("generateGeminiCliMcpConfiguration", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        targets: ["geminicli", "claude"],
+        targets: ["geminicli", "claudecode"] as ToolTarget[],
       },
       server2: {
         command: "server2",
-        targets: ["claude"],
+        targets: ["claudecode"] as ToolTarget[],
       },
       server3: {
         command: "server3",
-        targets: ["*"],
+        targets: ["*"] as ["*"],
       },
       server4: {
         command: "server4",
@@ -45,7 +46,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(Object.keys(config.mcpServers)).toHaveLength(3);
     expect(config.mcpServers).toHaveProperty("server1");
@@ -59,12 +60,12 @@ describe("generateGeminiCliMcpConfiguration", () => {
       "language-server": {
         command: "lang-server",
         args: ["--stdio", "--log-level", "info"],
-        targets: ["geminicli"],
+        targets: ["geminicli"] as ToolTarget[],
       },
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["language-server"]).toEqual({
       command: "lang-server",
@@ -75,7 +76,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
 
   it("should handle empty servers object", () => {
     const result = generateGeminiCliMcpConfiguration({});
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toEqual({});
   });
@@ -88,7 +89,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers, "/home/user/project");
-    expect(result[0].filepath).toBe("/home/user/project/.gemini/settings.json");
+    expect(result[0]!.filepath).toBe("/home/user/project/.gemini/settings.json");
   });
 
   it("should handle servers with various configurations", () => {
@@ -120,7 +121,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(Object.keys(config.mcpServers)).toHaveLength(4);
 
@@ -168,15 +169,15 @@ describe("generateGeminiCliMcpConfiguration", () => {
     const result = generateGeminiCliMcpConfiguration(mcpServers);
 
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain('  "mcpServers": {');
-    expect(result[0].content).toContain('    "formatted-server": {');
-    expect(result[0].content).toContain('      "command": "server"');
-    expect(result[0].content).toContain('      "args": [');
-    expect(result[0].content).toContain('        "--arg1",');
-    expect(result[0].content).toContain('        "--arg2"');
-    expect(result[0].content).toContain('      "env": {');
-    expect(result[0].content).toContain('        "VAR1": "value1",');
-    expect(result[0].content).toContain('        "VAR2": "value2"');
+    expect(result[0]!.content).toContain('  "mcpServers": {');
+    expect(result[0]!.content).toContain('    "formatted-server": {');
+    expect(result[0]!.content).toContain('      "command": "server"');
+    expect(result[0]!.content).toContain('      "args": [');
+    expect(result[0]!.content).toContain('        "--arg1",');
+    expect(result[0]!.content).toContain('        "--arg2"');
+    expect(result[0]!.content).toContain('      "env": {');
+    expect(result[0]!.content).toContain('        "VAR1": "value1",');
+    expect(result[0]!.content).toContain('        "VAR2": "value2"');
   });
 
   it("should handle environment variables with special values", () => {
@@ -194,7 +195,7 @@ describe("generateGeminiCliMcpConfiguration", () => {
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["env-test-server"].env).toEqual({
       EMPTY_VAR: "",
@@ -214,12 +215,12 @@ describe("generateGeminiCliMcpConfiguration", () => {
         url: "http://backup.url", // Should be preserved even if unusual
         headers: { "X-Backup": "true" },
         customField: "customValue", // Unknown fields should be preserved
-        targets: ["geminicli"], // This should be removed
+        targets: ["geminicli"] as ToolTarget[], // This should be removed
       },
     };
 
     const result = generateGeminiCliMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["complete-server"]).toEqual({
       command: "complete",

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ToolTarget } from "../../types/rules.js";
 import { generateRooMcpConfiguration } from "./roo.js";
 
 describe("generateRooMcpConfiguration", () => {
@@ -18,9 +19,9 @@ describe("generateRooMcpConfiguration", () => {
     const result = generateRooMcpConfiguration(mcpServers);
 
     expect(result).toHaveLength(1);
-    expect(result[0].filepath).toBe(".roo/mcp.json");
+    expect(result[0]!.filepath).toBe(".roo/mcp.json");
 
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
@@ -28,15 +29,15 @@ describe("generateRooMcpConfiguration", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        targets: ["roo", "claude"],
+        targets: ["roo", "claudecode"] as ToolTarget[],
       },
       server2: {
         command: "server2",
-        targets: ["claude", "cursor"],
+        targets: ["claudecode", "cursor"] as ToolTarget[],
       },
       server3: {
         command: "server3",
-        targets: ["*"],
+        targets: ["*"] as ["*"],
       },
       server4: {
         command: "server4",
@@ -45,7 +46,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(Object.keys(config.mcpServers)).toHaveLength(3);
     expect(config.mcpServers).toHaveProperty("server1");
@@ -60,12 +61,12 @@ describe("generateRooMcpConfiguration", () => {
         command: "custom",
         args: ["--config", "roo.json"],
         env: { MODE: "production" },
-        targets: ["roo"],
+        targets: ["roo"] as ToolTarget[],
       },
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["custom-server"]).toEqual({
       command: "custom",
@@ -77,7 +78,7 @@ describe("generateRooMcpConfiguration", () => {
 
   it("should handle empty servers object", () => {
     const result = generateRooMcpConfiguration({});
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toEqual({});
   });
@@ -90,7 +91,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers, "/projects/my-app");
-    expect(result[0].filepath).toBe("/projects/my-app/.roo/mcp.json");
+    expect(result[0]!.filepath).toBe("/projects/my-app/.roo/mcp.json");
   });
 
   it("should handle servers with minimal configuration", () => {
@@ -104,7 +105,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["minimal-stdio"]).toEqual({
       command: "minimal",
@@ -124,7 +125,7 @@ describe("generateRooMcpConfiguration", () => {
           LOG_LEVEL: "info",
           CUSTOM_VAR: "value",
         },
-        targets: ["*"],
+        targets: ["*"] as ["*"],
       },
       "http-server": {
         url: "https://api.example.com/mcp/v2",
@@ -137,7 +138,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["complex-server"]).toEqual({
       command: "complex-server",
@@ -172,11 +173,11 @@ describe("generateRooMcpConfiguration", () => {
     const result = generateRooMcpConfiguration(mcpServers);
 
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain('  "mcpServers": {');
-    expect(result[0].content).toContain('    "server": {');
-    expect(result[0].content).toContain('      "url": "http://example.com"');
-    expect(result[0].content).toContain('      "headers": {');
-    expect(result[0].content).toContain('        "X-Header-1": "value1"');
+    expect(result[0]!.content).toContain('  "mcpServers": {');
+    expect(result[0]!.content).toContain('    "server": {');
+    expect(result[0]!.content).toContain('      "url": "http://example.com"');
+    expect(result[0]!.content).toContain('      "headers": {');
+    expect(result[0]!.content).toContain('        "X-Header-1": "value1"');
   });
 
   it("should handle server names with special characters", () => {
@@ -193,7 +194,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toHaveProperty("server-with-dash");
     expect(config.mcpServers).toHaveProperty("server_with_underscore");
@@ -221,7 +222,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     // Actual code behavior check
     expect(config.mcpServers["http-server-1"]).toHaveProperty("httpUrl", "http://api.example.com");
@@ -250,7 +251,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     // Check actual behavior - roo generator doesn't format env vars, just copies them
     expect(config.mcpServers["env-server"].env).toEqual({
@@ -282,7 +283,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["full-server"]).toEqual({
       command: "full-server",
@@ -317,7 +318,7 @@ describe("generateRooMcpConfiguration", () => {
     };
 
     const result = generateRooMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     // Check actual behavior - roo generator may copy all properties
     expect(config.mcpServers["command-priority-server"]).toHaveProperty("command", "my-command");
