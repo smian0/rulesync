@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseRulesFromDirectory } from "../../core/index.js";
+import type { ToolTarget } from "../../types/rules.js";
 import { fileExists, getDefaultConfig } from "../../utils/index.js";
 import { statusCommand } from "./status.js";
 
@@ -20,16 +21,16 @@ const mockConfig = {
     roo: ".roo/rules",
     geminicli: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as any,
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as ToolTarget[],
   watchEnabled: false,
-} as const;
+};
 
 const mockRules = [
   {
     filename: "rule1",
     filepath: ".rulesync/rule1.md",
     frontmatter: {
-      targets: ["*"] as any,
+      targets: ["*"] as ["*"],
       root: true,
       description: "Rule 1",
       globs: ["**/*.ts"],
@@ -41,7 +42,7 @@ const mockRules = [
     filename: "rule2",
     filepath: ".rulesync/rule2.md",
     frontmatter: {
-      targets: ["copilot", "cursor"] as any,
+      targets: ["copilot", "cursor"] as ToolTarget[],
       root: false,
       description: "Rule 2",
       globs: ["**/*.js"],
@@ -150,7 +151,7 @@ describe("statusCommand", () => {
         filename: "rule1",
         filepath: ".rulesync/rule1.md",
         frontmatter: {
-          targets: ["*"] as any,
+          targets: ["*"] as ["*"],
           root: true,
           description: "Rule 1",
           globs: ["**/*.ts"],

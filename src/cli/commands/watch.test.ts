@@ -1,6 +1,7 @@
 import type { FSWatcher } from "chokidar";
 import { watch } from "chokidar";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ToolTarget } from "../../types/rules.js";
 import { getDefaultConfig } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
 import { watchCommand } from "./watch.js";
@@ -30,9 +31,9 @@ const mockConfig = {
     roo: ".roo/rules",
     geminicli: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as any,
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as ToolTarget[],
   watchEnabled: false,
-} as const;
+};
 
 // Mock watcher instance
 const mockWatcher: MockWatcher = {
