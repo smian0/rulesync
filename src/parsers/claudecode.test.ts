@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { parseClaudeConfiguration } from "./claudecode";
+import { parseClaudeConfiguration } from "./claudecode.js";
 
 describe("parseClaudeConfiguration", () => {
   const testDir = join(__dirname, "test-temp-claude");
@@ -40,13 +40,13 @@ This is the main Claude configuration.
     const result = await parseClaudeConfiguration(testDir);
     expect(result.errors).toEqual([]);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]?.frontmatter).toEqual({
       root: false,
       targets: ["claudecode"],
       description: "Main Claude Code configuration",
       globs: ["**/*"],
     });
-    expect(result.rules[0].content).toContain("This is the main Claude configuration");
+    expect(result.rules[0]?.content).toContain("This is the main Claude configuration");
   });
 
   it("should skip reference table in CLAUDE.md", async () => {
@@ -64,8 +64,8 @@ This is the real content after the table.`;
 
     const result = await parseClaudeConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].content).not.toContain("| Document |");
-    expect(result.rules[0].content).toContain("## Actual Content");
+    expect(result.rules[0]?.content).not.toContain("| Document |");
+    expect(result.rules[0]?.content).toContain("## Actual Content");
   });
 
   it("should parse memory files", async () => {
@@ -99,7 +99,7 @@ This is the real content after the table.`;
     const result = await parseClaudeConfiguration(testDir);
     const memoryRules = result.rules.filter((r) => r.filename.includes("memory"));
     expect(memoryRules).toHaveLength(1);
-    expect(memoryRules[0].filename).toContain("valid");
+    expect(memoryRules[0]?.filename).toContain("valid");
   });
 
   it("should parse settings.json and extract ignore patterns", async () => {

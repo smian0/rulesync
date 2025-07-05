@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { parseClineConfiguration } from "./cline";
+import { parseClineConfiguration } from "./cline.js";
 
 describe("parseClineConfiguration", () => {
   const testDir = join(__dirname, "test-temp-cline");
@@ -42,13 +42,13 @@ This is a Node.js application.
     const result = await parseClineConfiguration(testDir);
     expect(result.errors).toEqual([]);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]?.frontmatter).toEqual({
       root: false,
       targets: ["cline"],
       description: "Cline instructions",
       globs: ["**/*"],
     });
-    expect(result.rules[0].content).toContain("This is a Node.js application");
+    expect(result.rules[0]?.content).toContain("This is a Node.js application");
   });
 
   it("should parse .clinerules directory files", async () => {
@@ -85,7 +85,7 @@ This is a Node.js application.
 
     const result = await parseClineConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].content).toContain("Valid content");
+    expect(result.rules[0]?.content).toContain("Valid content");
   });
 
   it("should handle file read errors gracefully", async () => {
@@ -128,12 +128,12 @@ This is a Node.js application.
     await writeFile(join(clinerulesDirPath, "architecture.md"), "# Architecture Guidelines");
 
     const result = await parseClineConfiguration(testDir);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]?.frontmatter).toEqual({
       root: false,
       targets: ["cline"],
       description: "Cline rule: architecture",
       globs: ["**/*"],
     });
-    expect(result.rules[0].filename).toBe("cline-architecture");
+    expect(result.rules[0]?.filename).toBe("cline-architecture");
   });
 });
