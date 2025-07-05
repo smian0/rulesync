@@ -1,6 +1,6 @@
-import { RulesyncTargetsSchema, ToolTargetSchema } from "../schemas/mcp.js";
 import type { RulesyncMcpServer } from "../types/mcp.js";
 import type { ToolTarget } from "../types/rules.js";
+import { RulesyncTargetsSchema, ToolTargetSchema } from "../types/tool-targets.js";
 
 export function shouldIncludeServer(server: RulesyncMcpServer, targetTool: ToolTarget): boolean {
   // If no targets specified, include in all tools
