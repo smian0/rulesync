@@ -91,7 +91,9 @@ describe("generateCopilotConfig", () => {
     const outputs = await generateCopilotConfig([mockRule], mockConfig, "/custom/base");
 
     expect(outputs).toHaveLength(2);
-    expect(outputs[0]?.filepath).toBe("/custom/base/.github/instructions/test-rule.instructions.md");
+    expect(outputs[0]?.filepath).toBe(
+      "/custom/base/.github/instructions/test-rule.instructions.md",
+    );
     expect(outputs[1]?.filepath).toBe("/custom/base/.copilotignore");
   });
 });
