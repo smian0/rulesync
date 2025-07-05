@@ -1,4 +1,4 @@
-import type { ToolTarget } from "./rules.js";
+import type { ToolTarget } from "./tool-targets.js";
 
 export type Config = {
   aiRulesDir: string;

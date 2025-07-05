@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseRulesFromDirectory, validateRules } from "../../core/index.js";
-import type { ToolTarget } from "../../types/rules.js";
+import type { ToolTarget } from "../../types/tool-targets.js";
 import { fileExists, getDefaultConfig } from "../../utils/index.js";
 import { validateCommand } from "./validate.js";
 

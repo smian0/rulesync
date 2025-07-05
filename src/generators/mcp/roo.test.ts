@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { ToolTarget } from "../../types/rules.js";
+import type { ToolTarget } from "../../types/tool-targets.js";
 import { generateRooMcpConfiguration } from "./roo.js";
 
 describe("generateRooMcpConfiguration", () => {

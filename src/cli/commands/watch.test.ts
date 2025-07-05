@@ -1,7 +1,7 @@
 import type { FSWatcher } from "chokidar";
 import { watch } from "chokidar";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { ToolTarget } from "../../types/rules.js";
+import type { ToolTarget } from "../../types/tool-targets.js";
 import { getDefaultConfig } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
 import { watchCommand } from "./watch.js";
