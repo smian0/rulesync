@@ -1,10 +1,12 @@
+Execute the following commands in order. If an error occurs, stop executing subsequent commands and focus on resolving the encountered error.
+
 ```bash
 pnpm fix | tail -n 100
 pnpm typecheck | tail -n 100
 pnpm test | tail -n 100
 ```
 
-Execute these commands and modify the source code to reduce the errors that appear from these commands.
+Modify the source code to reduce errors that appear from the relevant commands. You may repeatedly execute the relevant commands for confirmation.
 
 The `tail` command is a preventive measure because you might get confused if you see a large number of errors at once. Therefore, removing `tail -n 100` is prohibited.
 
