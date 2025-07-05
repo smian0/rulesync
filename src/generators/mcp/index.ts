@@ -1,4 +1,4 @@
-export { generateClaudeMcp } from "./claude.js";
+export { generateClaudeMcp } from "./claudecode.js";
 export { generateClineMcp } from "./cline.js";
 export { generateCopilotMcp } from "./copilot.js";
 export { generateCursorMcp } from "./cursor.js";
