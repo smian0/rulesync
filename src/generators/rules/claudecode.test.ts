@@ -195,7 +195,7 @@ describe("claudecode generator", () => {
     await generateClaudecodeConfig(mockRules, config);
 
     const callArgs = vi.mocked(writeFileContent).mock.calls[0];
-    const settingsContent = JSON.parse(callArgs?.[1] as string);
+    const settingsContent = JSON.parse(callArgs?.[1] ?? "");
 
     expect(settingsContent.permissions.deny).toContain("Bash(sudo:*)");
     expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
