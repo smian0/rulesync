@@ -45,10 +45,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([alwaysRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description:");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: true");
-      expect(outputs[0].content).toContain("# Always Applied Rule");
+      expect(outputs[0]!.content).toContain("description:");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: true");
+      expect(outputs[0]!.content).toContain("# Always Applied Rule");
     });
 
     it("should generate 'manual' type for empty description and empty globs", async () => {
@@ -69,10 +69,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([manualRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description:");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Manual Rule");
+      expect(outputs[0]!.content).toContain("description:");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("# Manual Rule");
     });
 
     it("should generate 'specificFiles' type for empty description and non-empty globs", async () => {
@@ -93,10 +93,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([specificFilesRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description:");
-      expect(outputs[0].content).toContain("globs: **/*.json,**/*.ts,**/*.js");
-      expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Specific Files Rule");
+      expect(outputs[0]!.content).toContain("description:");
+      expect(outputs[0]!.content).toContain("globs: **/*.json,**/*.ts,**/*.js");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("# Specific Files Rule");
     });
 
     it("should generate 'intelligently' type for non-empty description and empty globs", async () => {
@@ -117,10 +117,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([intelligentlyRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description: API development rule");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Intelligently Applied Rule");
+      expect(outputs[0]!.content).toContain("description: API development rule");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("# Intelligently Applied Rule");
     });
 
     it("should handle edge case: non-empty description and non-empty globs (should be intelligently)", async () => {
@@ -144,9 +144,9 @@ describe("generateCursorConfig", () => {
       // According to the specification order, this should be 'intelligently'
       // because it doesn't match 'always' (globs != ["**/*"]) or 'manual' (description not empty)
       // or 'specificFiles' (description not empty), so falls to 'intelligently'
-      expect(outputs[0].content).toContain("description: API development rule");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("description: API development rule");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
     });
   });
 
@@ -170,10 +170,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([explicitAlwaysRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description:");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: true");
-      expect(outputs[0].content).toContain("# Explicit Always Rule");
+      expect(outputs[0]!.content).toContain("description:");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: true");
+      expect(outputs[0]!.content).toContain("# Explicit Always Rule");
     });
 
     it("should use explicit cursorRuleType: specificFiles when specified", async () => {
@@ -195,10 +195,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([explicitSpecificFilesRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description:");
-      expect(outputs[0].content).toContain("globs: **/*.json,**/*.ts,**/*.js");
-      expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Explicit Specific Files Rule");
+      expect(outputs[0]!.content).toContain("description:");
+      expect(outputs[0]!.content).toContain("globs: **/*.json,**/*.ts,**/*.js");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("# Explicit Specific Files Rule");
     });
 
     it("should use explicit cursorRuleType: intelligently when specified", async () => {
@@ -220,10 +220,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([explicitIntelligentlyRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description: API development rule");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Explicit Intelligently Rule");
+      expect(outputs[0]!.content).toContain("description: API development rule");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("# Explicit Intelligently Rule");
     });
 
     it("should use explicit cursorRuleType: manual when specified", async () => {
@@ -245,10 +245,10 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([explicitManualRule], mockConfig);
 
       expect(outputs).toHaveLength(1);
-      expect(outputs[0].content).toContain("description:");
-      expect(outputs[0].content).toContain("globs:");
-      expect(outputs[0].content).toContain("alwaysApply: false");
-      expect(outputs[0].content).toContain("# Explicit Manual Rule");
+      expect(outputs[0]!.content).toContain("description:");
+      expect(outputs[0]!.content).toContain("globs:");
+      expect(outputs[0]!.content).toContain("alwaysApply: false");
+      expect(outputs[0]!.content).toContain("# Explicit Manual Rule");
     });
   });
 
@@ -275,7 +275,7 @@ describe("generateCursorConfig", () => {
       expect(outputs).toHaveLength(2);
 
       // Check rule file
-      expect(outputs[0].filepath).toBe(".cursor/rules/test-rule.mdc");
+      expect(outputs[0]!.filepath).toBe(".cursor/rules/test-rule.mdc");
 
       // Check .cursorignore file
       expect(outputs[1]).toEqual({
@@ -283,8 +283,8 @@ describe("generateCursorConfig", () => {
         filepath: ".cursorignore",
         content: expect.stringContaining("# Generated by rulesync from .rulesyncignore"),
       });
-      expect(outputs[1].content).toContain("*.test.md");
-      expect(outputs[1].content).toContain("temp/**/*");
+      expect(outputs[1]!.content).toContain("*.test.md");
+      expect(outputs[1]!.content).toContain("temp/**/*");
     });
 
     it("should not generate .cursorignore when no ignore patterns exist", async () => {
@@ -304,8 +304,8 @@ describe("generateCursorConfig", () => {
       const outputs = await generateCursorConfig([testRule], mockConfig, "/custom/base");
 
       expect(outputs).toHaveLength(2);
-      expect(outputs[0].filepath).toBe("/custom/base/.cursor/rules/test-rule.mdc");
-      expect(outputs[1].filepath).toBe("/custom/base/.cursorignore");
+      expect(outputs[0]!.filepath).toBe("/custom/base/.cursor/rules/test-rule.mdc");
+      expect(outputs[1]!.filepath).toBe("/custom/base/.cursorignore");
     });
   });
 });

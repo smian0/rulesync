@@ -58,19 +58,19 @@ describe("generateGeminiConfig", () => {
 
     // Check memory file
     expect(results[0].tool).toBe("geminicli");
-    expect(results[0].filepath).toBe(".gemini/memories/detail-rule.md");
-    expect(results[0].content).not.toContain("# Detail rule");
-    expect(results[0].content).toContain("This is a detail rule content");
+    expect(results[0]!.filepath).toBe(".gemini/memories/detail-rule.md");
+    expect(results[0]!.content).not.toContain("# Detail rule");
+    expect(results[0]!.content).toContain("This is a detail rule content");
 
     // Check root file
     expect(results[1].tool).toBe("geminicli");
-    expect(results[1].filepath).toBe("GEMINI.md");
-    expect(results[1].content).toContain(
+    expect(results[1]!.filepath).toBe("GEMINI.md");
+    expect(results[1]!.content).toContain(
       "Please also reference the following documents as needed:",
     );
-    expect(results[1].content).toContain("| Document | Description | File Patterns |");
-    expect(results[1].content).toContain("@.gemini/memories/detail-rule.md");
-    expect(results[1].content).toContain("This is an overview rule content");
+    expect(results[1]!.content).toContain("| Document | Description | File Patterns |");
+    expect(results[1]!.content).toContain("@.gemini/memories/detail-rule.md");
+    expect(results[1]!.content).toContain("This is an overview rule content");
   });
 
   it("should generate table of memory files in root file", async () => {
@@ -101,9 +101,9 @@ describe("generateGeminiConfig", () => {
     const results = await generateGeminiConfig(rootOnlyRules, mockConfig);
 
     expect(results).toHaveLength(1);
-    expect(results[0].filepath).toBe("GEMINI.md");
-    expect(results[0].content).toContain("This is root only content");
-    expect(results[0].content).not.toContain(
+    expect(results[0]!.filepath).toBe("GEMINI.md");
+    expect(results[0]!.content).toContain("This is root only content");
+    expect(results[0]!.content).not.toContain(
       "Please also reference the following documents as needed:",
     );
   });
@@ -128,24 +128,24 @@ describe("generateGeminiConfig", () => {
     expect(results).toHaveLength(2);
 
     // Memory file
-    expect(results[0].filepath).toBe(".gemini/memories/memory-rule.md");
-    expect(results[0].content).not.toContain("# Memory rule");
+    expect(results[0]!.filepath).toBe(".gemini/memories/memory-rule.md");
+    expect(results[0]!.content).not.toContain("# Memory rule");
 
     // Root file
-    expect(results[1].filepath).toBe("GEMINI.md");
-    expect(results[1].content).toContain(
+    expect(results[1]!.filepath).toBe("GEMINI.md");
+    expect(results[1]!.content).toContain(
       "Please also reference the following documents as needed:",
     );
-    expect(results[1].content).toContain("| Document | Description | File Patterns |");
-    expect(results[1].content).not.toContain("This is memory rule content");
+    expect(results[1]!.content).toContain("| Document | Description | File Patterns |");
+    expect(results[1]!.content).not.toContain("This is memory rule content");
   });
 
   it("should handle empty rules array", async () => {
     const results = await generateGeminiConfig([], mockConfig);
 
     expect(results).toHaveLength(1);
-    expect(results[0].filepath).toBe("GEMINI.md");
-    expect(results[0].content).toContain("No configuration rules have been defined yet");
+    expect(results[0]!.filepath).toBe("GEMINI.md");
+    expect(results[0]!.content).toContain("No configuration rules have been defined yet");
   });
 
   it("should generate .aiexclude when .rulesyncignore exists", async () => {
@@ -187,7 +187,7 @@ describe("generateGeminiConfig", () => {
     const results = await generateGeminiConfig(mockRules, mockConfig, "/custom/base");
 
     expect(results).toHaveLength(2);
-    expect(results[0].filepath).toBe("/custom/base/.gemini/memories/detail-rule.md");
-    expect(results[1].filepath).toBe("/custom/base/GEMINI.md");
+    expect(results[0]!.filepath).toBe("/custom/base/.gemini/memories/detail-rule.md");
+    expect(results[1]!.filepath).toBe("/custom/base/GEMINI.md");
   });
 });

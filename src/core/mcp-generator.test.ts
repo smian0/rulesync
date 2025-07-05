@@ -132,7 +132,7 @@ describe("generateMcpConfigurations", () => {
     };
     await writeFile(mcpPath, JSON.stringify(mcpContent, null, 2));
 
-    const parsedConfig = parseMcpConfig(testDir)!
+    const parsedConfig = parseMcpConfig(testDir)!;
     const outputs = await generateMcpConfigurations(parsedConfig, testDir, ["cline"]);
 
     expect(outputs).toHaveLength(1);
