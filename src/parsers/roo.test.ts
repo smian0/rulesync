@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { parseRooConfiguration } from "./roo";
+import { parseRooConfiguration } from "./roo.js";
 
 describe("parseRooConfiguration", () => {
   const testDir = join(__dirname, "test-temp-roo");
@@ -42,13 +42,13 @@ This is a React TypeScript project.
     const result = await parseRooConfiguration(testDir);
     expect(result.errors).toEqual([]);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]?.frontmatter).toEqual({
       root: false,
       targets: ["roo"],
       description: "Roo Code instructions",
       globs: ["**/*"],
     });
-    expect(result.rules[0].content).toContain("This is a React TypeScript project");
+    expect(result.rules[0]?.content).toContain("This is a React TypeScript project");
   });
 
   it("should parse .roo/rules directory files", async () => {
@@ -85,7 +85,7 @@ This is a React TypeScript project.
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].content).toContain("Some rules here");
+    expect(result.rules[0]?.content).toContain("Some rules here");
   });
 
   it("should handle file read errors gracefully", async () => {
@@ -128,13 +128,13 @@ This is a React TypeScript project.
     await writeFile(join(rooRulesDir, "state-management.md"), "# State Management Guidelines");
 
     const result = await parseRooConfiguration(testDir);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]?.frontmatter).toEqual({
       root: false,
       targets: ["roo"],
       description: "Roo rule: state-management",
       globs: ["**/*"],
     });
-    expect(result.rules[0].filename).toBe("roo-state-management");
+    expect(result.rules[0]?.filename).toBe("roo-state-management");
   });
 
   it("should handle special characters in filenames", async () => {
@@ -143,7 +143,7 @@ This is a React TypeScript project.
 
     const result = await parseRooConfiguration(testDir);
     expect(result.rules).toHaveLength(2);
-    expect(result.rules[0].filename).toBe("roo-api-integration");
-    expect(result.rules[1].filename).toBe("roo-ui_components");
+    expect(result.rules[0]?.filename).toBe("roo-api-integration");
+    expect(result.rules[1]?.filename).toBe("roo-ui_components");
   });
 });
