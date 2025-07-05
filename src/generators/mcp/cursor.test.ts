@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateCursorMcpConfiguration } from "./cursor";
+import { generateCursorMcpConfiguration } from "./cursor.js";
 
 describe("generateCursorMcpConfiguration", () => {
   it("should generate Cursor MCP configuration with all servers", () => {
@@ -18,9 +18,9 @@ describe("generateCursorMcpConfiguration", () => {
     const result = generateCursorMcpConfiguration(mcpServers);
 
     expect(result).toHaveLength(1);
-    expect(result[0].filepath).toBe(".cursor/mcp.json");
+    expect(result[0]!.filepath).toBe(".cursor/mcp.json");
 
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
@@ -41,7 +41,7 @@ describe("generateCursorMcpConfiguration", () => {
     };
 
     const result = generateCursorMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(Object.keys(config.mcpServers)).toHaveLength(2);
     expect(config.mcpServers).toHaveProperty("server1");
@@ -57,7 +57,7 @@ describe("generateCursorMcpConfiguration", () => {
     };
 
     const result = generateCursorMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toHaveProperty("server1");
   });
@@ -72,7 +72,7 @@ describe("generateCursorMcpConfiguration", () => {
     };
 
     const result = generateCursorMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers.server1).toEqual({
       command: "server1",
@@ -83,7 +83,7 @@ describe("generateCursorMcpConfiguration", () => {
 
   it("should handle empty servers object", () => {
     const result = generateCursorMcpConfiguration({});
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toEqual({});
   });
@@ -96,7 +96,7 @@ describe("generateCursorMcpConfiguration", () => {
     };
 
     const result = generateCursorMcpConfiguration(mcpServers, "/custom/path");
-    expect(result[0].filepath).toBe("/custom/path/.cursor/mcp.json");
+    expect(result[0]!.filepath).toBe("/custom/path/.cursor/mcp.json");
   });
 
   it("should format JSON with proper indentation", () => {
@@ -110,8 +110,8 @@ describe("generateCursorMcpConfiguration", () => {
     const result = generateCursorMcpConfiguration(mcpServers);
 
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain('  "mcpServers": {');
-    expect(result[0].content).toContain('    "server": {');
-    expect(result[0].content).toContain('      "command": "test"');
+    expect(result[0]!.content).toContain('  "mcpServers": {');
+    expect(result[0]!.content).toContain('    "server": {');
+    expect(result[0]!.content).toContain('      "command": "test"');
   });
 });

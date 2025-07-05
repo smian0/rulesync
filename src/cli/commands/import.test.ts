@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from "vitest";
-import * as importer from "../../core/importer";
-import { importCommand } from "./import";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import * as importer from "../../core/importer.js";
+import { importCommand } from "./import.js";
 
 vi.mock("../../core/importer");
 

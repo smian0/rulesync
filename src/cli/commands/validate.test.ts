@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseRulesFromDirectory, validateRules } from "../../core/index.js";
+import type { ToolTarget } from "../../types/rules.js";
 import { fileExists, getDefaultConfig } from "../../utils/index.js";
 import { validateCommand } from "./validate.js";
 
@@ -19,17 +20,18 @@ const mockConfig = {
     cline: ".clinerules",
     claudecode: ".",
     roo: ".roo/rules",
+    geminicli: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as ToolTarget[],
   watchEnabled: false,
-} as const;
+};
 
 const mockRules = [
   {
     filename: "rule1",
     filepath: ".rulesync/rule1.md",
     frontmatter: {
-      targets: ["*"],
+      targets: ["*"] as ["*"],
       root: true,
       description: "Rule 1",
       globs: ["**/*.ts"],

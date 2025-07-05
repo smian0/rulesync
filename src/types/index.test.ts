@@ -56,8 +56,9 @@ describe("types/index", () => {
         cline: ".clinerules",
         claudecode: ".",
         roo: ".roo/rules",
+        geminicli: ".geminicli/rules",
       },
-      defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
+      defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"],
       watchEnabled: false,
     };
 
@@ -68,10 +69,17 @@ describe("types/index", () => {
   });
 
   it("should validate ToolTarget type constraints", () => {
-    const validTargets: ToolTarget[] = ["copilot", "cursor", "cline", "claudecode", "roo"];
+    const validTargets: ToolTarget[] = [
+      "copilot",
+      "cursor",
+      "cline",
+      "claudecode",
+      "roo",
+      "geminicli",
+    ];
 
     for (const target of validTargets) {
-      expect(["copilot", "cursor", "cline", "claudecode", "roo"]).toContain(target);
+      expect(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"]).toContain(target);
     }
   });
 

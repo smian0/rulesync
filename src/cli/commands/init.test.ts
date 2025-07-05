@@ -85,9 +85,9 @@ describe("initCommand", () => {
       call[0].includes("overview.md"),
     );
     expect(overviewCall).toBeDefined();
-    expect(overviewCall?.[1]).toContain("root: true");
-    expect(overviewCall?.[1]).toContain('targets: ["*"]');
-    expect(overviewCall?.[1]).toContain("Project overview");
+    expect(overviewCall![1]).toContain("root: true");
+    expect(overviewCall![1]).toContain('targets: ["*"]');
+    expect(overviewCall![1]).toContain("Project overview");
   });
 
   it("should create proper content for non-root files", async () => {
@@ -97,14 +97,14 @@ describe("initCommand", () => {
       call[0].includes("frontend.md"),
     );
     expect(frontendCall).toBeDefined();
-    expect(frontendCall?.[1]).toContain("root: false");
-    expect(frontendCall?.[1]).toContain("Frontend development rules");
+    expect(frontendCall![1]).toContain("root: false");
+    expect(frontendCall![1]).toContain("Frontend development rules");
 
     const backendCall = mockWriteFileContent.mock.calls.find((call) =>
       call[0].includes("backend.md"),
     );
     expect(backendCall).toBeDefined();
-    expect(backendCall?.[1]).toContain("root: false");
-    expect(backendCall?.[1]).toContain("Backend development rules");
+    expect(backendCall![1]).toContain("root: false");
+    expect(backendCall![1]).toContain("Backend development rules");
   });
 });

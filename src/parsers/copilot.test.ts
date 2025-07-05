@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { parseCopilotConfiguration } from "./copilot";
+import { parseCopilotConfiguration } from "./copilot.js";
 
 describe("parseCopilotConfiguration", () => {
   const testDir = join(__dirname, "test-temp-copilot");
@@ -42,13 +42,13 @@ This is a TypeScript project.
     const result = await parseCopilotConfiguration(testDir);
     expect(result.errors).toEqual([]);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]!.frontmatter).toEqual({
       root: false,
       targets: ["copilot"],
       description: "GitHub Copilot instructions",
       globs: ["**/*"],
     });
-    expect(result.rules[0].content).toContain("This is a TypeScript project");
+    expect(result.rules[0]!.content).toContain("This is a TypeScript project");
   });
 
   it("should parse instructions directory files", async () => {
@@ -86,7 +86,7 @@ This is a TypeScript project.
 
     const result = await parseCopilotConfiguration(testDir);
     expect(result.rules).toHaveLength(1);
-    expect(result.rules[0].content).toContain("Valid content");
+    expect(result.rules[0]!.content).toContain("Valid content");
   });
 
   it("should handle file read errors gracefully", async () => {
@@ -114,12 +114,12 @@ This is a TypeScript project.
     await writeFile(join(instructionsDir, "api-design.instructions.md"), "# API Design Guidelines");
 
     const result = await parseCopilotConfiguration(testDir);
-    expect(result.rules[0].frontmatter).toEqual({
+    expect(result.rules[0]!.frontmatter).toEqual({
       root: false,
       targets: ["copilot"],
       description: "Copilot instruction: api-design",
       globs: ["**/*"],
     });
-    expect(result.rules[0].filename).toBe("copilot-api-design");
+    expect(result.rules[0]!.filename).toBe("copilot-api-design");
   });
 });

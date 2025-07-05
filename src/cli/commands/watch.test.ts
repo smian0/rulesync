@@ -1,6 +1,7 @@
 import type { FSWatcher } from "chokidar";
 import { watch } from "chokidar";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { ToolTarget } from "../../types/rules.js";
 import { getDefaultConfig } from "../../utils/index.js";
 import { generateCommand } from "./generate.js";
 import { watchCommand } from "./watch.js";
@@ -28,10 +29,11 @@ const mockConfig = {
     cline: ".clinerules",
     claudecode: ".",
     roo: ".roo/rules",
+    geminicli: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as ToolTarget[],
   watchEnabled: false,
-} as const;
+};
 
 // Mock watcher instance
 const mockWatcher: MockWatcher = {
@@ -44,7 +46,7 @@ describe("watchCommand", () => {
     vi.clearAllMocks();
     mockGetDefaultConfig.mockReturnValue(mockConfig);
     mockGenerateCommand.mockResolvedValue();
-    mockWatch.mockReturnValue(mockWatcher as FSWatcher);
+    mockWatch.mockReturnValue(mockWatcher as unknown as FSWatcher);
 
     // Mock console methods
     vi.spyOn(console, "log").mockImplementation(() => {});
@@ -95,7 +97,7 @@ describe("watchCommand", () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     // Simulate file change
-    await changeHandler?.("test.md");
+    await changeHandler!("test.md");
 
     expect(console.log).toHaveBeenCalledWith("\n📝 Detected change in test.md");
     expect(mockGenerateCommand).toHaveBeenCalledTimes(2); // Initial + change
@@ -115,7 +117,7 @@ describe("watchCommand", () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     // Simulate file addition
-    await addHandler?.("new-rule.md");
+    await addHandler!("new-rule.md");
 
     expect(console.log).toHaveBeenCalledWith("\n📝 Detected change in new-rule.md");
     expect(mockGenerateCommand).toHaveBeenCalledTimes(2); // Initial + add
@@ -134,7 +136,7 @@ describe("watchCommand", () => {
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     // Simulate file deletion
-    await unlinkHandler?.("deleted-rule.md");
+    await unlinkHandler!("deleted-rule.md");
 
     expect(console.log).toHaveBeenCalledWith("\n🗑️  Removed deleted-rule.md");
     expect(mockGenerateCommand).toHaveBeenCalledTimes(2); // Initial + unlink
@@ -160,7 +162,7 @@ describe("watchCommand", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Simulate file change with error
-    await changeHandler?.("test.md");
+    await changeHandler!("test.md");
 
     expect(console.error).toHaveBeenCalledWith("❌ Failed to regenerate:", error);
   });
@@ -182,7 +184,7 @@ describe("watchCommand", () => {
     await new Promise((resolve) => setTimeout(resolve, 50));
 
     // Simulate watcher error
-    errorHandler?.(error);
+    errorHandler!(error);
 
     expect(console.error).toHaveBeenCalledWith("❌ Watcher error:", error);
   });

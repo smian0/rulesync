@@ -1,8 +1,9 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as parsers from "../parsers";
-import { importConfiguration } from "./importer";
+import * as parsers from "../parsers/index.js";
+import type { ToolTarget } from "../types/index.js";
+import { importConfiguration } from "./importer.js";
 
 vi.mock("../parsers");
 
@@ -36,7 +37,7 @@ describe("importConfiguration", () => {
       {
         frontmatter: {
           root: false,
-          targets: ["claudecode"] as const,
+          targets: ["claudecode"] as ToolTarget[],
           description: "Main config",
           globs: ["**/*"],
         },
@@ -49,8 +50,8 @@ describe("importConfiguration", () => {
     vi.spyOn(parsers, "parseClaudeConfiguration").mockResolvedValueOnce({
       rules: mockRules,
       errors: [],
-      ignorePatterns: undefined,
-      mcpServers: undefined,
+      ignorePatterns: [],
+      mcpServers: {},
     });
 
     const result = await importConfiguration({
@@ -72,7 +73,7 @@ describe("importConfiguration", () => {
       {
         frontmatter: {
           root: false,
-          targets: ["cursor"] as const,
+          targets: ["cursor"] as ToolTarget[],
           description: "Rule 1",
           globs: ["**/*"],
         },
@@ -83,7 +84,7 @@ describe("importConfiguration", () => {
       {
         frontmatter: {
           root: false,
-          targets: ["cursor"] as const,
+          targets: ["cursor"] as ToolTarget[],
           description: "Rule 2",
           globs: ["**/*"],
         },
@@ -238,7 +239,7 @@ describe("importConfiguration", () => {
         {
           frontmatter: {
             root: false,
-            targets: ["claudecode"] as const,
+            targets: ["claudecode"] as ToolTarget[],
             description: "Test",
             globs: ["**/*"],
           },
