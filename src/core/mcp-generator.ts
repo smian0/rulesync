@@ -129,7 +129,10 @@ export async function generateMcpConfigurations(
     ) => Promise<Array<{ filepath: string; content: string }>>
   > = {
     claudecode: async (servers, dir) =>
-      (await import("../generators/mcp/claude.js")).generateClaudeMcpConfiguration(servers, dir),
+      (await import("../generators/mcp/claudecode.js")).generateClaudeMcpConfiguration(
+        servers,
+        dir,
+      ),
     copilot: async (servers, dir) =>
       (await import("../generators/mcp/copilot.js")).generateCopilotMcpConfiguration(servers, dir),
     cursor: async (servers, dir) =>

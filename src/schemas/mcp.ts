@@ -5,7 +5,6 @@ export const ToolTargetSchema = z.enum([
   "cursor",
   "cline",
   "claudecode",
-  "claude",
   "roo",
   "geminicli",
 ]);

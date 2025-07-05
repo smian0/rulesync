@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import type { RulesyncMcpConfig } from "../../types/mcp.js";
-import { generateClaudeMcp } from "./claude.js";
+import { generateClaudeMcp } from "./claudecode.js";
 
 describe("generateClaudeMcp", () => {
   it("should generate Claude MCP config for stdio transport", () => {
