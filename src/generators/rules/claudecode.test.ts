@@ -225,4 +225,109 @@ describe("claudecode generator", () => {
       expect.stringContaining('"Read(*.test.md)"'),
     );
   });
+
+  it("should preserve existing settings outside of permissions.deny", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
+    });
+    vi.mocked(fileExists).mockResolvedValue(true);
+    vi.mocked(readFileContent).mockResolvedValue(
+      JSON.stringify({
+        permissions: {
+          deny: ["Bash(sudo:*)"],
+          allow: ["Read(*.ts)", "Write(*.js)"],
+          defaultMode: "acceptEdits",
+        },
+        customSetting: "value",
+        anotherSetting: {
+          nested: "property",
+        },
+      }),
+    );
+
+    await generateClaudecodeConfig(mockRules, config);
+
+    const callArgs = vi
+      .mocked(writeFileContent)
+      .mock.calls.find((call) => call?.[0]?.includes("settings.json"));
+    const settingsContent = JSON.parse(callArgs?.[1] ?? "");
+
+    // Check that deny array is updated with our new patterns
+    expect(settingsContent.permissions.deny).toContain("Bash(sudo:*)");
+    expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
+
+    // Check that other permissions properties are preserved
+    expect(settingsContent.permissions.allow).toEqual(["Read(*.ts)", "Write(*.js)"]);
+    expect(settingsContent.permissions.defaultMode).toBe("acceptEdits");
+
+    // Check that root-level custom settings are preserved
+    expect(settingsContent.customSetting).toBe("value");
+    expect(settingsContent.anotherSetting).toEqual({
+      nested: "property",
+    });
+  });
+
+  it("should handle settings.json without permissions.deny", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
+    });
+    vi.mocked(fileExists).mockResolvedValue(true);
+    vi.mocked(readFileContent).mockResolvedValue(
+      JSON.stringify({
+        permissions: {
+          allow: ["Read(*.ts)", "Write(*.js)"],
+          defaultMode: "acceptEdits",
+        },
+        customSetting: "value",
+      }),
+    );
+
+    await generateClaudecodeConfig(mockRules, config);
+
+    const callArgs = vi
+      .mocked(writeFileContent)
+      .mock.calls.find((call) => call?.[0]?.includes("settings.json"));
+    const settingsContent = JSON.parse(callArgs?.[1] ?? "");
+
+    // Check that deny array is created with our patterns
+    expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
+
+    // Check that other permissions properties are preserved
+    expect(settingsContent.permissions.allow).toEqual(["Read(*.ts)", "Write(*.js)"]);
+    expect(settingsContent.permissions.defaultMode).toBe("acceptEdits");
+
+    // Check that root-level custom settings are preserved
+    expect(settingsContent.customSetting).toBe("value");
+  });
+
+  it("should handle settings.json without permissions object", async () => {
+    vi.mocked(loadIgnorePatterns).mockResolvedValue({
+      patterns: ["*.test.md"],
+    });
+    vi.mocked(fileExists).mockResolvedValue(true);
+    vi.mocked(readFileContent).mockResolvedValue(
+      JSON.stringify({
+        customSetting: "value",
+        anotherSetting: {
+          nested: "property",
+        },
+      }),
+    );
+
+    await generateClaudecodeConfig(mockRules, config);
+
+    const callArgs = vi
+      .mocked(writeFileContent)
+      .mock.calls.find((call) => call?.[0]?.includes("settings.json"));
+    const settingsContent = JSON.parse(callArgs?.[1] ?? "");
+
+    // Check that permissions object is created with deny array
+    expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
+
+    // Check that root-level custom settings are preserved
+    expect(settingsContent.customSetting).toBe("value");
+    expect(settingsContent.anotherSetting).toEqual({
+      nested: "property",
+    });
+  });
 });
