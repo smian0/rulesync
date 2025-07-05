@@ -1,8 +1,8 @@
-export type ToolTarget = "copilot" | "cursor" | "cline" | "claudecode" | "roo" | "geminicli";
+import { ToolTarget, ToolTargets } from "./tool-targets.js";
 
 export type RuleFrontmatter = {
   root: boolean;
-  targets: ToolTarget[] | ["*"];
+  targets: ToolTargets | ["*"];
   description: string;
   globs: string[];
   cursorRuleType?: "always" | "manual" | "specificFiles" | "intelligently";
@@ -22,7 +22,7 @@ export type GeneratedOutput = {
 };
 
 export type GenerateOptions = {
-  targetTools?: ToolTarget[];
+  targetTools?: ToolTargets;
   outputDir?: string;
   watch?: boolean;
 };
