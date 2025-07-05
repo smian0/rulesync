@@ -6,12 +6,14 @@ interface CursorConfig {
 }
 
 interface CursorServer {
-  command?: string;
-  args?: string[];
-  url?: string;
-  env?: Record<string, string>;
-  cwd?: string;
-  type?: "sse" | "streamable-http";
+  command?: string | undefined;
+  args?: string[] | undefined;
+  url?: string | undefined;
+  env?: Record<string, string> | undefined;
+  cwd?: string | undefined;
+  type?: "sse" | "streamable-http" | undefined;
+  // Allow additional properties that might be present in the server config
+  [key: string]: unknown;
 }
 
 export function generateCursorMcp(config: RulesyncMcpConfig): string {
@@ -79,7 +81,16 @@ export function generateCursorMcpConfiguration(
 
     // Clone server config and remove targets
     const { targets: _targets, ...serverConfig } = serverObj;
-    config.mcpServers[serverName] = serverConfig;
+    // Convert to CursorServer format
+    const cursorServer: CursorServer = serverConfig as CursorServer;
+
+    // Handle httpUrl by converting to url
+    if (serverConfig.httpUrl !== undefined) {
+      cursorServer.url = serverConfig.httpUrl;
+      delete cursorServer.httpUrl;
+    }
+
+    config.mcpServers[serverName] = cursorServer;
   }
 
   return [

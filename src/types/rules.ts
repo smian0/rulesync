@@ -1,28 +1,34 @@
-import { ToolTarget, ToolTargets } from "./tool-targets.js";
+import { z } from "zod/v4";
+import { RulesyncTargetsSchema, ToolTargetSchema, ToolTargetsSchema } from "./tool-targets.js";
 
-export type RuleFrontmatter = {
-  root: boolean;
-  targets: ToolTargets | ["*"];
-  description: string;
-  globs: string[];
-  cursorRuleType?: "always" | "manual" | "specificFiles" | "intelligently";
-};
+export const RuleFrontmatterSchema = z.object({
+  root: z.boolean(),
+  targets: RulesyncTargetsSchema,
+  description: z.string(),
+  globs: z.array(z.string()),
+  cursorRuleType: z.enum(["always", "manual", "specificFiles", "intelligently"]).optional(),
+});
 
-export type ParsedRule = {
-  frontmatter: RuleFrontmatter;
-  content: string;
-  filename: string;
-  filepath: string;
-};
+export const ParsedRuleSchema = z.object({
+  frontmatter: RuleFrontmatterSchema,
+  content: z.string(),
+  filename: z.string(),
+  filepath: z.string(),
+});
 
-export type GeneratedOutput = {
-  tool: ToolTarget;
-  filepath: string;
-  content: string;
-};
+export const GeneratedOutputSchema = z.object({
+  tool: ToolTargetSchema,
+  filepath: z.string(),
+  content: z.string(),
+});
 
-export type GenerateOptions = {
-  targetTools?: ToolTargets;
-  outputDir?: string;
-  watch?: boolean;
-};
+export const GenerateOptionsSchema = z.object({
+  targetTools: ToolTargetsSchema.optional(),
+  outputDir: z.string().optional(),
+  watch: z.boolean().optional(),
+});
+
+export type RuleFrontmatter = z.infer<typeof RuleFrontmatterSchema>;
+export type ParsedRule = z.infer<typeof ParsedRuleSchema>;
+export type GeneratedOutput = z.infer<typeof GeneratedOutputSchema>;
+export type GenerateOptions = z.infer<typeof GenerateOptionsSchema>;

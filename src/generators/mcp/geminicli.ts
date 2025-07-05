@@ -6,13 +6,15 @@ interface GeminiSettings {
 }
 
 interface GeminiServer {
-  command?: string;
-  args?: string[];
-  url?: string;
-  httpUrl?: string;
-  env?: Record<string, string>;
-  timeout?: number;
-  trust?: boolean;
+  command?: string | undefined;
+  args?: string[] | undefined;
+  url?: string | undefined;
+  httpUrl?: string | undefined;
+  env?: Record<string, string> | undefined;
+  timeout?: number | undefined;
+  trust?: boolean | undefined;
+  // Allow additional properties that might be present in the server config
+  [key: string]: unknown;
 }
 
 export function generateGeminiCliMcp(config: RulesyncMcpConfig): string {
@@ -79,7 +81,8 @@ export function generateGeminiCliMcpConfiguration(
 
     // Clone server config and remove targets
     const { targets: _, ...serverConfig } = server;
-    config.mcpServers[serverName] = serverConfig;
+    // Cast to GeminiServer type - the index signature allows all properties
+    config.mcpServers[serverName] = serverConfig as GeminiServer;
   }
 
   return [

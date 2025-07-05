@@ -6,13 +6,15 @@ interface ClineConfig {
 }
 
 interface ClineServer {
-  command?: string;
-  args?: string[];
-  url?: string;
-  env?: Record<string, string>;
-  disabled?: boolean;
-  alwaysAllow?: string[];
-  networkTimeout?: number;
+  command?: string | undefined;
+  args?: string[] | undefined;
+  url?: string | undefined;
+  env?: Record<string, string> | undefined;
+  disabled?: boolean | undefined;
+  alwaysAllow?: string[] | undefined;
+  networkTimeout?: number | undefined;
+  // Allow additional properties that might be present in the server config
+  [key: string]: unknown;
 }
 
 export function generateClineMcp(config: RulesyncMcpConfig): string {
@@ -76,7 +78,8 @@ export function generateClineMcpConfiguration(
 
     // Clone server config and remove targets
     const { targets: _, ...serverConfig } = server;
-    config.mcpServers[serverName] = serverConfig;
+    // Cast to ClineServer type - the index signature allows all properties
+    config.mcpServers[serverName] = serverConfig as ClineServer;
   }
 
   return [

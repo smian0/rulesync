@@ -1,5 +1,5 @@
 import { z } from "zod/v4";
-import { RulesyncTargetsSchema, ToolTargets } from "./tool-targets.js";
+import { RulesyncTargetsSchema } from "./tool-targets.js";
 
 export const McpTransportTypeSchema = z.enum(["stdio", "sse", "http"]);
 
@@ -24,36 +24,18 @@ export const RulesyncMcpServerSchema = McpServerBaseSchema.extend({
   targets: RulesyncTargetsSchema.optional(),
 });
 
+export const McpConfigSchema = z.object({
+  mcpServers: z.record(z.string(), McpServerBaseSchema),
+});
+
+export const RulesyncMcpConfigSchema = z.object({
+  mcpServers: z.record(z.string(), RulesyncMcpServerSchema),
+});
+
+export type McpTransportType = z.infer<typeof McpTransportTypeSchema>;
+export type McpServerBase = z.infer<typeof McpServerBaseSchema>;
+export type RulesyncMcpServer = z.infer<typeof RulesyncMcpServerSchema>;
+export type McpConfig = z.infer<typeof McpConfigSchema>;
+export type RulesyncMcpConfig = z.infer<typeof RulesyncMcpConfigSchema>;
 export type ParsedRulesyncTargets = z.infer<typeof RulesyncTargetsSchema>;
 export type ParsedRulesyncMcpServer = z.infer<typeof RulesyncMcpServerSchema>;
-
-export type McpTransportType = "stdio" | "sse" | "http";
-
-export interface McpServerBase {
-  command?: string;
-  args?: string[];
-  url?: string;
-  httpUrl?: string;
-  env?: Record<string, string>;
-  disabled?: boolean;
-  networkTimeout?: number;
-  timeout?: number;
-  trust?: boolean;
-  cwd?: string;
-  transport?: McpTransportType;
-  type?: "sse" | "streamable-http";
-  alwaysAllow?: string[];
-  tools?: string[];
-}
-
-export interface RulesyncMcpServer extends McpServerBase {
-  targets?: ToolTargets | ["*"];
-}
-
-export interface McpConfig {
-  mcpServers: Record<string, McpServerBase>;
-}
-
-export interface RulesyncMcpConfig {
-  mcpServers: Record<string, RulesyncMcpServer>;
-}

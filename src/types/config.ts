@@ -1,8 +1,11 @@
-import type { ToolTarget } from "./tool-targets.js";
+import { z } from "zod/v4";
+import { ToolTargetSchema, ToolTargetsSchema } from "./tool-targets.js";
 
-export type Config = {
-  aiRulesDir: string;
-  outputPaths: Record<ToolTarget, string>;
-  watchEnabled: boolean;
-  defaultTargets: ToolTarget[];
-};
+export const ConfigSchema = z.object({
+  aiRulesDir: z.string(),
+  outputPaths: z.record(ToolTargetSchema, z.string()),
+  watchEnabled: z.boolean(),
+  defaultTargets: ToolTargetsSchema,
+});
+
+export type Config = z.infer<typeof ConfigSchema>;

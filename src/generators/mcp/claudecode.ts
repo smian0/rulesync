@@ -6,11 +6,13 @@ interface ClaudeSettings {
 }
 
 interface ClaudeServer {
-  command?: string;
-  args?: string[];
-  url?: string;
-  env?: Record<string, string>;
-  transport?: "sse" | "http";
+  command?: string | undefined;
+  args?: string[] | undefined;
+  url?: string | undefined;
+  env?: Record<string, string> | undefined;
+  transport?: "sse" | "http" | undefined;
+  // Allow additional properties that might be present in the server config
+  [key: string]: unknown;
 }
 
 export function generateClaudeMcp(config: RulesyncMcpConfig): string {
@@ -71,9 +73,13 @@ export function generateClaudeMcpConfiguration(
     // Clone server config and remove targets
     const { targets: _, transport, ...serverConfig } = server;
     // Convert to ClaudeServer format
-    const claudeServer: ClaudeServer = {
-      ...serverConfig,
-    };
+    const claudeServer: ClaudeServer = serverConfig as ClaudeServer;
+
+    // Handle httpUrl by converting to url
+    if (serverConfig.httpUrl !== undefined) {
+      claudeServer.url = serverConfig.httpUrl;
+      delete claudeServer.httpUrl;
+    }
 
     // Only add transport if it's supported by Claude
     if (transport && transport !== "stdio") {

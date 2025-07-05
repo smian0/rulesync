@@ -6,14 +6,16 @@ interface RooConfig {
 }
 
 interface RooServer {
-  command?: string;
-  args?: string[];
-  url?: string;
-  env?: Record<string, string>;
-  disabled?: boolean;
-  alwaysAllow?: string[];
-  networkTimeout?: number;
-  type?: "sse" | "streamable-http";
+  command?: string | undefined;
+  args?: string[] | undefined;
+  url?: string | undefined;
+  env?: Record<string, string> | undefined;
+  disabled?: boolean | undefined;
+  alwaysAllow?: string[] | undefined;
+  networkTimeout?: number | undefined;
+  type?: "sse" | "streamable-http" | undefined;
+  // Allow additional properties that might be present in the server config
+  [key: string]: unknown;
 }
 
 export function generateRooMcp(config: RulesyncMcpConfig): string {
@@ -97,13 +99,15 @@ export function generateRooMcpConfiguration(
     // Clone server config and remove targets
     const { targets: _targets, ...serverConfig } = serverObj;
 
+    // Convert to RooServer format
+    const rooServer: RooServer = serverConfig as RooServer;
+
     // Handle httpUrl precedence over url
-    if (serverConfig.httpUrl && serverConfig.url) {
-      serverConfig.url = serverConfig.httpUrl;
-      delete serverConfig.httpUrl;
+    if (serverConfig.httpUrl !== undefined && serverConfig.url !== undefined) {
+      rooServer.url = serverConfig.httpUrl;
     }
 
-    config.mcpServers[serverName] = serverConfig;
+    config.mcpServers[serverName] = rooServer;
   }
 
   return [
