@@ -84,7 +84,9 @@ This is the actual content after the table.`;
     const result = await parseGeminiConfiguration(testDir);
     expect(result.rules).toHaveLength(3); // main + 2 memory files
 
-    const memoryRules = result.rules.filter((rule: ParsedRule) => rule.filename.startsWith("gemini-memory-"));
+    const memoryRules = result.rules.filter((rule: ParsedRule) =>
+      rule.filename.startsWith("gemini-memory-"),
+    );
     expect(memoryRules).toHaveLength(2);
     expect(memoryRules[0]?.frontmatter.description).toContain("Memory file:");
     expect(memoryRules[0]?.content).toContain("Memory content");
@@ -152,9 +154,9 @@ dist/
 
     const result = await parseGeminiConfiguration(testDir);
     expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors.some((error: string) => error.includes("Failed to parse settings.json"))).toBe(
-      true,
-    );
+    expect(
+      result.errors.some((error: string) => error.includes("Failed to parse settings.json")),
+    ).toBe(true);
   });
 
   it("should handle empty content gracefully", async () => {
@@ -177,7 +179,9 @@ dist/
     const result = await parseGeminiConfiguration(testDir);
     expect(result.rules).toHaveLength(2); // main + 1 valid memory file
 
-    const memoryRules = result.rules.filter((rule: ParsedRule) => rule.filename.startsWith("gemini-memory-"));
+    const memoryRules = result.rules.filter((rule: ParsedRule) =>
+      rule.filename.startsWith("gemini-memory-"),
+    );
     expect(memoryRules).toHaveLength(1);
     expect(memoryRules[0]?.filename).toBe("gemini-memory-valid");
   });

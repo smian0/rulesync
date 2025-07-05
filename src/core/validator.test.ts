@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ParsedRule } from "../types/index.js";
 import { fileExists } from "../utils/index.js";
 import { validateRules } from "./validator.js";

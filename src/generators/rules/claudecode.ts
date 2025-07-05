@@ -141,7 +141,7 @@ async function updateClaudeSettings(settingsPath: string, ignorePatterns: string
   filteredDeny.push(...readDenyRules);
 
   // Remove duplicates
-  permissions.deny = [...new Set(filteredDeny)];
+  permissions.deny = Array.from(new Set(filteredDeny));
 
   // Write updated settings
   const jsonContent = JSON.stringify(settingsObj, null, 2);

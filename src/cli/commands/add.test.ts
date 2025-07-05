@@ -1,6 +1,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import * as path from "node:path";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import type { Config } from "../../types/config.js";
 import { getDefaultConfig } from "../../utils/config.js";
 import { addCommand } from "./add.js";
 
@@ -11,7 +12,7 @@ const mockMkdir = vi.mocked(mkdir);
 const mockWriteFile = vi.mocked(writeFile);
 const mockGetDefaultConfig = vi.mocked(getDefaultConfig);
 
-const mockConfig = {
+const mockConfig: Config = {
   aiRulesDir: ".rulesync",
   outputPaths: {
     copilot: ".github/instructions",
@@ -23,7 +24,7 @@ const mockConfig = {
   },
   defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
   watchEnabled: false,
-} as const;
+};
 
 describe("addCommand", () => {
   beforeEach(() => {

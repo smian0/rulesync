@@ -19,7 +19,6 @@ describe("generateCursorConfig", () => {
       cursor: ".cursor/rules",
       cline: ".clinerules",
       claudecode: "",
-      claude: "",
       roo: ".roo/rules",
       geminicli: "",
     },

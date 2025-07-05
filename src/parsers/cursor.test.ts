@@ -56,12 +56,14 @@ This is a test cursor rule content.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: non-empty description + non-empty globs -> description=""
-      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved in specificFiles pattern
-      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
-      expect(rule.content.trim()).toBe("# Test Cursor Rule\n\nThis is a test cursor rule content.");
-      expect(rule.filename).toBe("cursor-test-rule");
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe(""); // specificFiles pattern: non-empty description + non-empty globs -> description=""
+      expect(rule!.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved in specificFiles pattern
+      expect(rule!.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule!.content.trim()).toBe(
+        "# Test Cursor Rule\n\nThis is a test cursor rule content.",
+      );
+      expect(rule!.filename).toBe("cursor-test-rule");
     });
 
     it("should handle globs: * without quotes (Cursor's valid format)", async () => {
@@ -89,13 +91,13 @@ This rule applies to all files using the asterisk wildcard without quotes.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: non-empty description + non-empty globs -> description=""
-      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
-      expect(rule.content.trim()).toBe(
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe(""); // specificFiles pattern: non-empty description + non-empty globs -> description=""
+      expect(rule!.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule!.content.trim()).toBe(
         "# Documentation Maintenance\n\nThis rule applies to all files using the asterisk wildcard without quotes.",
       );
-      expect(rule.filename).toBe("cursor-docs-maintenance");
+      expect(rule!.filename).toBe("cursor-docs-maintenance");
     });
 
     it("should handle multiple .mdc files including ones with globs: *", async () => {
@@ -166,14 +168,14 @@ This is a legacy .cursorrules file.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.description).toBe("Legacy cursor rules");
-      expect(rule.frontmatter.globs).toEqual([]);
-      expect(rule.frontmatter.cursorRuleType).toBe("intelligently");
-      expect(rule.content.trim()).toBe(
+      expect(rule!.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule!.frontmatter.description).toBe("Legacy cursor rules");
+      expect(rule!.frontmatter.globs).toEqual([]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("intelligently");
+      expect(rule!.content.trim()).toBe(
         "# Legacy Cursor Rules\n\nThis is a legacy .cursorrules file.",
       );
-      expect(rule.filename).toBe("cursor-rules");
+      expect(rule!.filename).toBe("cursor-rules");
     });
 
     it("should ignore non-.mdc files in .cursor/rules directory", async () => {
@@ -198,7 +200,7 @@ ruletype: always
 
       expect(result.errors).toEqual([]);
       expect(result.rules).toHaveLength(1);
-      expect(result.rules[0].filename).toBe("cursor-valid");
+      expect(result.rules[0]!.filename).toBe("cursor-valid");
     });
 
     it("should handle empty content files", async () => {
@@ -402,12 +404,12 @@ This rule is always applied.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("Any description"); // always pattern preserves original description
-      expect(rule.frontmatter.globs).toEqual(["**/*"]);
-      expect(rule.frontmatter.cursorRuleType).toBe("always");
-      expect(rule.filename).toBe("cursor-always-rule");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe("Any description"); // always pattern preserves original description
+      expect(rule!.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("always");
+      expect(rule!.filename).toBe("cursor-always-rule");
     });
 
     it("should handle 'manual' pattern (empty description and empty globs)", async () => {
@@ -433,12 +435,12 @@ This is a manual rule with no file patterns.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("");
-      expect(rule.frontmatter.globs).toEqual([]);
-      expect(rule.frontmatter.cursorRuleType).toBe("manual");
-      expect(rule.filename).toBe("cursor-manual-rule");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe("");
+      expect(rule!.frontmatter.globs).toEqual([]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("manual");
+      expect(rule!.filename).toBe("cursor-manual-rule");
     });
 
     it("should handle 'auto attached' pattern (empty description and non-empty globs)", async () => {
@@ -464,12 +466,12 @@ This rule is automatically attached to Python files.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
-      expect(rule.frontmatter.globs).toEqual(["**/*.py", "**/*.pyc"]);
-      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
-      expect(rule.filename).toBe("cursor-auto-attached");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
+      expect(rule!.frontmatter.globs).toEqual(["**/*.py", "**/*.pyc"]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule!.filename).toBe("cursor-auto-attached");
     });
 
     it("should handle 'auto attached' pattern with single glob", async () => {
@@ -495,12 +497,12 @@ This rule applies to TypeScript files only.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
-      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]);
-      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
-      expect(rule.filename).toBe("cursor-single-glob");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
+      expect(rule!.frontmatter.globs).toEqual(["**/*.ts"]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule!.filename).toBe("cursor-single-glob");
     });
 
     it("should handle 'agent_request' pattern (non-empty description)", async () => {
@@ -526,12 +528,12 @@ This rule is triggered by agent requests.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("When writing Python code");
-      expect(rule.frontmatter.globs).toEqual([]);
-      expect(rule.frontmatter.cursorRuleType).toBe("intelligently");
-      expect(rule.filename).toBe("cursor-agent-request");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe("When writing Python code");
+      expect(rule!.frontmatter.globs).toEqual([]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("intelligently");
+      expect(rule!.filename).toBe("cursor-agent-request");
     });
 
     it("should handle edge case: non-empty description and non-empty globs (should be specificFiles)", async () => {
@@ -557,12 +559,12 @@ This has both description and globs, but should be treated as specificFiles acco
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
-      expect(rule.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved
-      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
-      expect(rule.filename).toBe("cursor-edge-case");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe(""); // specificFiles pattern: description is empty
+      expect(rule!.frontmatter.globs).toEqual(["**/*.ts"]); // globs is preserved
+      expect(rule!.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule!.filename).toBe("cursor-edge-case");
     });
 
     it("should handle undefined alwaysApply (should default to false)", async () => {
@@ -587,11 +589,11 @@ This rule has no alwaysApply field.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("");
-      expect(rule.frontmatter.globs).toEqual([]);
-      expect(rule.filename).toBe("cursor-default-always");
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe("");
+      expect(rule!.frontmatter.globs).toEqual([]);
+      expect(rule!.filename).toBe("cursor-default-always");
     });
 
     it("should handle empty array globs", async () => {
@@ -617,11 +619,12 @@ This rule has empty array globs.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("");
-      expect(rule.frontmatter.globs).toEqual([]);
-      expect(rule.filename).toBe("cursor-empty-array");
+      expect(rule).toBeDefined();
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe("");
+      expect(rule!.frontmatter.globs).toEqual([]);
+      expect(rule!.filename).toBe("cursor-empty-array");
     });
   });
 
@@ -790,12 +793,13 @@ This rule should fall back to manual.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.root).toBe(false);
-      expect(rule.frontmatter.targets).toEqual(["*"]);
-      expect(rule.frontmatter.description).toBe("");
-      expect(rule.frontmatter.globs).toEqual([]);
-      expect(rule.frontmatter.cursorRuleType).toBe("manual");
-      expect(rule.filename).toBe("cursor-fallback");
+      expect(rule).toBeDefined();
+      expect(rule!.frontmatter.root).toBe(false);
+      expect(rule!.frontmatter.targets).toEqual(["*"]);
+      expect(rule!.frontmatter.description).toBe("");
+      expect(rule!.frontmatter.globs).toEqual([]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("manual");
+      expect(rule!.filename).toBe("cursor-fallback");
     });
 
     it("should handle normalizeValue edge cases", async () => {
@@ -821,7 +825,7 @@ This has no frontmatter values set.
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.cursorRuleType).toBe("manual");
+      expect(rule!.frontmatter.cursorRuleType).toBe("manual");
     });
   });
 
@@ -846,9 +850,9 @@ These rules apply to all files in the project.`;
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.cursorRuleType).toBe("always");
-      expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("always");
+      expect(rule!.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule!.frontmatter.globs).toEqual(["**/*"]);
     });
 
     it("should set appropriate cursorRuleType for .cursorrules without alwaysApply", async () => {
@@ -871,9 +875,9 @@ These rules apply to TypeScript files.`;
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.cursorRuleType).toBe("specificFiles");
-      expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.globs).toEqual(["**/*.ts", "**/*.tsx"]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("specificFiles");
+      expect(rule!.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule!.frontmatter.globs).toEqual(["**/*.ts", "**/*.tsx"]);
     });
 
     it("should handle alwaysApply as string 'true' in .cursorrules", async () => {
@@ -896,9 +900,9 @@ Testing alwaysApply as string 'true'.`;
       expect(result.rules).toHaveLength(1);
 
       const rule = result.rules[0];
-      expect(rule.frontmatter.cursorRuleType).toBe("always");
-      expect(rule.frontmatter.targets).toEqual(["cursor"]);
-      expect(rule.frontmatter.globs).toEqual(["**/*"]);
+      expect(rule!.frontmatter.cursorRuleType).toBe("always");
+      expect(rule!.frontmatter.targets).toEqual(["cursor"]);
+      expect(rule!.frontmatter.globs).toEqual(["**/*"]);
     });
   });
 });
