@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateClineMcpConfiguration } from "./cline";
+import { generateClineMcpConfiguration } from "./cline.js";
 
 describe("generateClineMcpConfiguration", () => {
   it("should generate Cline MCP configuration with all servers", () => {

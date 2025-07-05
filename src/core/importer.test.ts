@@ -1,8 +1,8 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import * as parsers from "../parsers";
-import { importConfiguration } from "./importer";
+import * as parsers from "../parsers/index.js";
+import { importConfiguration } from "./importer.js";
 
 vi.mock("../parsers");
 

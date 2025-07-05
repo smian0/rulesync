@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateCursorMcpConfiguration } from "./cursor";
+import { generateCursorMcpConfiguration } from "./cursor.js";
 
 describe("generateCursorMcpConfiguration", () => {
   it("should generate Cursor MCP configuration with all servers", () => {

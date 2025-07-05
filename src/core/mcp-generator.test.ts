@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { generateMcpConfigurations } from "./mcp-generator";
-import { parseMcpConfig } from "./mcp-parser";
+import { generateMcpConfigurations } from "./mcp-generator.js";
+import { parseMcpConfig } from "./mcp-parser.js";
 
 describe("generateMcpConfigurations", () => {
   const testDir = join(__dirname, "test-temp-mcp");

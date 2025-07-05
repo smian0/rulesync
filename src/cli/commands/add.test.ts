@@ -19,6 +19,7 @@ const mockConfig = {
     cline: ".clinerules",
     claudecode: ".",
     roo: ".roo/rules",
+    geminicli: ".geminicli/rules",
   },
   defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
   watchEnabled: false,

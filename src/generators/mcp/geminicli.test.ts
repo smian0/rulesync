@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateGeminiCliMcpConfiguration } from "./geminicli";
+import { generateGeminiCliMcpConfiguration } from "./geminicli.js";
 
 describe("generateGeminiCliMcpConfiguration", () => {
   it("should generate Gemini MCP configuration with all servers", () => {

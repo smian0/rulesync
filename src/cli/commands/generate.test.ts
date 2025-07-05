@@ -28,6 +28,7 @@ const mockConfig = {
     cline: ".clinerules",
     claudecode: ".",
     roo: ".roo/rules",
+    geminicli: ".geminicli/rules",
   },
   defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
   watchEnabled: false,
@@ -38,7 +39,7 @@ const mockRules = [
     filename: "test",
     filepath: ".rulesync/test.md",
     frontmatter: {
-      targets: ["*"],
+      targets: ["*"] as ["*"],
       root: true,
       description: "Test rule",
       globs: ["**/*.ts"],
@@ -49,7 +50,7 @@ const mockRules = [
 
 const mockOutputs = [
   {
-    tool: "copilot",
+    tool: "copilot" as const,
     filepath: ".github/instructions/test.md",
     content: "Generated content",
   },

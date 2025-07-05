@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateRooMcpConfiguration } from "./roo";
+import { generateRooMcpConfiguration } from "./roo.js";
 
 describe("generateRooMcpConfiguration", () => {
   it("should generate Roo MCP configuration with all servers", () => {
