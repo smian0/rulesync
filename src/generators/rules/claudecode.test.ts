@@ -96,7 +96,7 @@ describe("claudecode generator", () => {
   });
 
   it("should include rule metadata", async () => {
-    const outputs = await generateClaudecodeConfig([mockRules[0]], config);
+    const outputs = await generateClaudecodeConfig([mockRules[0]!], config);
 
     expect(outputs[0]!.content).not.toContain("### Overview coding rule");
     expect(outputs[0]!.content).toContain("Use TypeScript for all new code.");
@@ -195,7 +195,7 @@ describe("claudecode generator", () => {
     await generateClaudecodeConfig(mockRules, config);
 
     const callArgs = vi.mocked(writeFileContent).mock.calls[0];
-    const settingsContent = JSON.parse(callArgs[1] as string);
+    const settingsContent = JSON.parse(callArgs?.[1] as string);
 
     expect(settingsContent.permissions.deny).toContain("Bash(sudo:*)");
     expect(settingsContent.permissions.deny).toContain("Read(*.test.md)");
