@@ -136,9 +136,9 @@ describe("generateMcpConfigurations", () => {
     const outputs = await generateMcpConfigurations(parsedConfig, testDir, ["cline"]);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs[0].filepath).toBe(join(testDir, ".cline/mcp.json"));
+    expect(outputs[0]!.filepath).toBe(join(testDir, ".cline/mcp.json"));
 
-    const config = JSON.parse(outputs[0].content);
+    const config = JSON.parse(outputs[0]!.content);
     expect(config.mcpServers["file-server"]).toEqual({
       command: "server-from-file",
       args: ["--config", "file.json"],
@@ -162,7 +162,7 @@ describe("generateMcpConfigurations", () => {
 
     const outputs = await generateMcpConfigurations(mcpConfig, testDir, ["roo"]);
 
-    const config = JSON.parse(outputs[0].content);
+    const config = JSON.parse(outputs[0]!.content);
     expect(config.mcpServers["complex-server"]).toEqual({
       command: "complex",
       args: ["--verbose"],
@@ -193,8 +193,8 @@ describe("generateMcpConfigurations", () => {
     const outputs1 = await generateMcpConfigurations(mcpConfig, baseDir1, ["claudecode"]);
     const outputs2 = await generateMcpConfigurations(mcpConfig, baseDir2, ["claudecode"]);
 
-    expect(outputs1[0].filepath).toBe(join(baseDir1, ".claude/settings.json"));
-    expect(outputs2[0].filepath).toBe(join(baseDir2, ".claude/settings.json"));
+    expect(outputs1[0]!.filepath).toBe(join(baseDir1, ".claude/settings.json"));
+    expect(outputs2[0]!.filepath).toBe(join(baseDir2, ".claude/settings.json"));
   });
 
   it("should handle tool-specific formatting differences", async () => {

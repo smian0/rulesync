@@ -18,8 +18,9 @@ const mockConfig = {
     cline: ".clinerules",
     claudecode: ".",
     roo: ".roo/rules",
+    geminicli: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as any,
   watchEnabled: false,
 } as const;
 
@@ -28,7 +29,7 @@ const mockRules = [
     filename: "rule1",
     filepath: ".rulesync/rule1.md",
     frontmatter: {
-      targets: ["*"],
+      targets: ["*"] as any,
       root: true,
       description: "Rule 1",
       globs: ["**/*.ts"],
@@ -40,7 +41,7 @@ const mockRules = [
     filename: "rule2",
     filepath: ".rulesync/rule2.md",
     frontmatter: {
-      targets: ["copilot", "cursor"],
+      targets: ["copilot", "cursor"] as any,
       root: false,
       description: "Rule 2",
       globs: ["**/*.js"],
@@ -149,7 +150,7 @@ describe("statusCommand", () => {
         filename: "rule1",
         filepath: ".rulesync/rule1.md",
         frontmatter: {
-          targets: ["*"],
+          targets: ["*"] as any,
           root: true,
           description: "Rule 1",
           globs: ["**/*.ts"],

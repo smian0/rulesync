@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ToolTarget } from "../../types/index.js";
 import { generateClineMcpConfiguration } from "./cline.js";
 
 describe("generateClineMcpConfiguration", () => {
@@ -18,9 +19,9 @@ describe("generateClineMcpConfiguration", () => {
     const result = generateClineMcpConfiguration(mcpServers);
 
     expect(result).toHaveLength(1);
-    expect(result[0].filepath).toBe(".cline/mcp.json");
+    expect(result[0]!.filepath).toBe(".cline/mcp.json");
 
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
     expect(config.mcpServers).toEqual(mcpServers);
   });
 
@@ -28,15 +29,15 @@ describe("generateClineMcpConfiguration", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        targets: ["cline", "cursor"],
+        targets: ["cline", "cursor"] as ToolTarget[],
       },
       server2: {
         command: "server2",
-        targets: ["cursor"],
+        targets: ["cursor"] as ToolTarget[],
       },
       server3: {
         command: "server3",
-        targets: ["*"],
+        targets: ["*"] as ["*"],
       },
       server4: {
         command: "server4",
@@ -45,7 +46,7 @@ describe("generateClineMcpConfiguration", () => {
     };
 
     const result = generateClineMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(Object.keys(config.mcpServers)).toHaveLength(3);
     expect(config.mcpServers).toHaveProperty("server1");
@@ -59,12 +60,12 @@ describe("generateClineMcpConfiguration", () => {
       "api-server": {
         url: "http://api.example.com",
         headers: { "X-API-Key": "secret" },
-        targets: ["cline"],
+        targets: ["cline"] as ToolTarget[],
       },
     };
 
     const result = generateClineMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers["api-server"]).toEqual({
       url: "http://api.example.com",
@@ -75,7 +76,7 @@ describe("generateClineMcpConfiguration", () => {
 
   it("should handle empty servers object", () => {
     const result = generateClineMcpConfiguration({});
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toEqual({});
   });
@@ -88,7 +89,7 @@ describe("generateClineMcpConfiguration", () => {
     };
 
     const result = generateClineMcpConfiguration(mcpServers, "/workspace/project");
-    expect(result[0].filepath).toBe("/workspace/project/.cline/mcp.json");
+    expect(result[0]!.filepath).toBe("/workspace/project/.cline/mcp.json");
   });
 
   it("should handle mix of stdio and HTTP servers", () => {
@@ -114,7 +115,7 @@ describe("generateClineMcpConfiguration", () => {
     };
 
     const result = generateClineMcpConfiguration(mcpServers);
-    const config = JSON.parse(result[0].content);
+    const config = JSON.parse(result[0]!.content);
 
     expect(config.mcpServers).toHaveProperty("stdio-server");
     expect(config.mcpServers).toHaveProperty("http-server");
@@ -144,11 +145,11 @@ describe("generateClineMcpConfiguration", () => {
     const result = generateClineMcpConfiguration(mcpServers);
 
     // Check that JSON is properly formatted
-    expect(result[0].content).toContain('  "mcpServers": {');
-    expect(result[0].content).toContain('    "server": {');
-    expect(result[0].content).toContain('      "command": "test"');
-    expect(result[0].content).toContain('      "args": [');
-    expect(result[0].content).toContain('        "arg1",');
-    expect(result[0].content).toContain('      "env": {');
+    expect(result[0]!.content).toContain('  "mcpServers": {');
+    expect(result[0]!.content).toContain('    "server": {');
+    expect(result[0]!.content).toContain('      "command": "test"');
+    expect(result[0]!.content).toContain('      "args": [');
+    expect(result[0]!.content).toContain('        "arg1",');
+    expect(result[0]!.content).toContain('      "env": {');
   });
 });

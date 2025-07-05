@@ -19,8 +19,9 @@ const mockConfig = {
     cline: ".clinerules",
     claudecode: ".",
     roo: ".roo/rules",
+    geminicli: ".",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"] as any,
   watchEnabled: false,
 } as const;
 
@@ -29,7 +30,7 @@ const mockRules = [
     filename: "rule1",
     filepath: ".rulesync/rule1.md",
     frontmatter: {
-      targets: ["*"],
+      targets: ["*"] as any,
       root: true,
       description: "Rule 1",
       globs: ["**/*.ts"],

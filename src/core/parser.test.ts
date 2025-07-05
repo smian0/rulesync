@@ -278,8 +278,8 @@ globs: ["**/*.js"]
       const rules = await parseRulesFromDirectory(testDir);
 
       expect(rules).toHaveLength(2);
-      expect(rules[0].filename).toBe("rule1");
-      expect(rules[1].filename).toBe("rule2");
+      expect(rules[0]!.filename).toBe("rule1");
+      expect(rules[1]!.filename).toBe("rule2");
     });
 
     it("should ignore non-markdown files", async () => {
@@ -300,7 +300,7 @@ globs: ["**/*.ts"]
       const rules = await parseRulesFromDirectory(testDir);
 
       expect(rules).toHaveLength(1);
-      expect(rules[0].filename).toBe("rule");
+      expect(rules[0]!.filename).toBe("rule");
     });
 
     it("should return empty array for non-existent directory", async () => {
