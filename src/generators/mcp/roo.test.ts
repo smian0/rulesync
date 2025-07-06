@@ -29,11 +29,11 @@ describe("generateRooMcpConfiguration", () => {
     const mcpServers = {
       server1: {
         command: "server1",
-        targets: ["roo", "claudecode"] as ToolTarget[],
+        targets: ["roo", "claudecode"] satisfies ToolTarget[],
       },
       server2: {
         command: "server2",
-        targets: ["claudecode", "cursor"] as ToolTarget[],
+        targets: ["claudecode", "cursor"] satisfies ToolTarget[],
       },
       server3: {
         command: "server3",
@@ -61,7 +61,7 @@ describe("generateRooMcpConfiguration", () => {
         command: "custom",
         args: ["--config", "roo.json"],
         env: { MODE: "production" },
-        targets: ["roo"] as ToolTarget[],
+        targets: ["roo"] satisfies ToolTarget[],
       },
     };
 
@@ -205,7 +205,7 @@ describe("generateRooMcpConfiguration", () => {
     const mcpServers = {
       "http-server-1": {
         httpUrl: "http://api.example.com",
-        transport: "http",
+        transport: "http" as const,
       },
       "http-server-2": {
         url: "http://fallback.example.com",
@@ -213,11 +213,11 @@ describe("generateRooMcpConfiguration", () => {
       },
       "sse-server": {
         url: "ws://sse.example.com",
-        transport: "sse",
+        transport: "sse" as const,
       },
       "sse-type-server": {
         url: "ws://sse2.example.com",
-        type: "sse",
+        type: "sse" as const,
       },
     };
 
@@ -313,7 +313,7 @@ describe("generateRooMcpConfiguration", () => {
         args: ["--stdio"],
         url: "http://should-be-ignored.com",
         httpUrl: "http://also-ignored.com",
-        transport: "http",
+        transport: "http" as const,
       },
     };
 

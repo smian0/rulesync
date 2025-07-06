@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import type { ToolTarget } from "../../types/tool-targets.js";
 import { generateCursorMcpConfiguration } from "./cursor.js";
 
 describe("generateCursorMcpConfiguration", () => {
@@ -38,7 +39,13 @@ describe("generateCursorMcpConfiguration", () => {
         command: "server3",
         targets: ["*"],
       },
-    };
+    } satisfies Record<
+      string,
+      {
+        command: string;
+        targets: ToolTarget[] | ["*"];
+      }
+    >;
 
     const result = generateCursorMcpConfiguration(mcpServers);
     const config = JSON.parse(result[0]!.content);
@@ -69,7 +76,14 @@ describe("generateCursorMcpConfiguration", () => {
         args: ["--stdio"],
         targets: ["cursor"],
       },
-    };
+    } satisfies Record<
+      string,
+      {
+        command: string;
+        args: string[];
+        targets: ToolTarget[] | ["*"];
+      }
+    >;
 
     const result = generateCursorMcpConfiguration(mcpServers);
     const config = JSON.parse(result[0]!.content);
