@@ -26,7 +26,7 @@ async function createSampleFiles(aiRulesDir: string): Promise<void> {
 root: true
 targets: ["*"]
 description: "Project overview and general development guidelines"
-globs: ["**/*.ts", "**/*.js", "**/*.tsx", "**/*.jsx"]
+globs: ["**/*."]
 ---
 
 # Project Overview
