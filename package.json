@@ -46,7 +46,7 @@
 		"oxlint": "oxlint . --max-warnings 0",
 		"oxlint:fix": "oxlint . --fix --max-warnings 0",
 		"prepublishOnly": "pnpm build",
-		"secretlint": "secretlint \"**/*\"",
+		"secretlint": "secretlint --secretlintignore .gitignore \"**/*\"",
 		"sort": "sort-package-json",
 		"test": "vitest run --silent",
 		"test:coverage": "vitest run --coverage --silent",

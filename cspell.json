@@ -138,6 +138,23 @@
         "autoapprove",
         "autoblock",
         "awslabs",
-        "FASTMCP"
+        "FASTMCP",
+        "gibo",
+        "fseventsd",
+        "icns",
+        "timemachine",
+        "donotpresent",
+        "apdisk",
+        "pids",
+        "jscoverage",
+        "wscript",
+        "jspm",
+        "eslintcache",
+        "stylelintcache",
+        "Microbundle",
+        "dotenv",
+        "Nuxt",
+        "nuxt",
+        "vuepress"
     ]
 }
