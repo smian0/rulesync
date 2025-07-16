@@ -119,6 +119,25 @@
         "bashhistory",
         "commandhistory",
         "POWERLEVEL",
-        "GITSTATUS"
+        "GITSTATUS",
+        "procps",
+        "dnsutils",
+        "NOPASSWD",
+        "HISTFILE",
+        "dpkg",
+        "powerline",
+        "ccinstall",
+        "Kiro",
+        "kiro",
+        "Kiro's",
+        "aiignore",
+        "kirodeignore",
+        "tfstate",
+        "pycache",
+        "venv",
+        "autoapprove",
+        "autoblock",
+        "awslabs",
+        "FASTMCP"
     ]
 }
