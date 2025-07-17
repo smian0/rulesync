@@ -1,34 +1,14 @@
 import { mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { parseCursorConfiguration } from "./cursor.js";
 
 const testDir = join(process.cwd(), "test-tmp-cursor");
 
 describe("cursor parser", () => {
   beforeEach(() => {
-    try {
-      rmSync(testDir, { recursive: true });
-    } catch {}
+    rmSync(testDir, { recursive: true, force: true });
     mkdirSync(testDir, { recursive: true });
-  });
-
-  afterEach(async () => {
-    try {
-      // Reset permissions before cleanup
-      const { chmod } = await import("node:fs/promises");
-      const cursorRulesDir = join(testDir, ".cursor", "rules");
-      const cursorIgnore = join(testDir, ".cursorignore");
-      const cursorrules = join(testDir, ".cursorrules");
-
-      try {
-        await chmod(cursorRulesDir, 0o755);
-        await chmod(cursorIgnore, 0o644);
-        await chmod(cursorrules, 0o644);
-      } catch {}
-
-      rmSync(testDir, { recursive: true });
-    } catch {}
   });
 
   describe("parseCursorConfiguration", () => {

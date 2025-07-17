@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { parseRulesFromDirectory } from "../../core/index.js";
-import type { ToolTarget } from "../../types/tool-targets.js";
+import { createMockConfig } from "../../test-utils/index.js";
+import type { ParsedRule } from "../../types/index.js";
 import { fileExists, getDefaultConfig } from "../../utils/index.js";
 import { statusCommand } from "./status.js";
 
@@ -11,39 +12,17 @@ const mockParseRulesFromDirectory = vi.mocked(parseRulesFromDirectory);
 const mockFileExists = vi.mocked(fileExists);
 const mockGetDefaultConfig = vi.mocked(getDefaultConfig);
 
-const mockConfig = {
-  aiRulesDir: ".rulesync",
-  outputPaths: {
-    copilot: ".github/instructions",
-    cursor: ".cursor/rules",
-    cline: ".clinerules",
-    claudecode: ".",
-    roo: ".roo/rules",
-    geminicli: ".",
-    kiro: ".kiro/steering",
-  },
-  defaultTargets: [
-    "copilot",
-    "cursor",
-    "cline",
-    "claudecode",
-    "roo",
-    "geminicli",
-    "kiro",
-  ] satisfies ToolTarget[],
-  watchEnabled: false,
-};
+const mockConfig = createMockConfig();
 
-const mockRules = [
+const mockRules: ParsedRule[] = [
   {
     filename: "rule1",
     filepath: ".rulesync/rule1.md",
     frontmatter: {
-      targets: ["*"] satisfies ["*"],
+      targets: ["*"],
       root: true,
       description: "Rule 1",
       globs: ["**/*.ts"],
-      priority: "high",
     },
     content: "Rule 1 content",
   },
@@ -51,11 +30,10 @@ const mockRules = [
     filename: "rule2",
     filepath: ".rulesync/rule2.md",
     frontmatter: {
-      targets: ["copilot", "cursor"] satisfies ToolTarget[],
+      targets: ["copilot", "cursor"],
       root: false,
       description: "Rule 2",
       globs: ["**/*.js"],
-      priority: "low",
     },
     content: "Rule 2 content",
   },
@@ -155,12 +133,12 @@ describe("statusCommand", () => {
   });
 
   it("should handle rules with root field correctly", async () => {
-    const rulesWithRoot = [
+    const rulesWithRoot: ParsedRule[] = [
       {
         filename: "rule1",
         filepath: ".rulesync/rule1.md",
         frontmatter: {
-          targets: ["*"] satisfies ["*"],
+          targets: ["*"],
           root: true,
           description: "Rule 1",
           globs: ["**/*.ts"],
