@@ -12,6 +12,7 @@ describe("config utils", () => {
       expect(config.outputPaths.cline).toBe(".clinerules");
       expect(config.outputPaths.claudecode).toBe(".");
       expect(config.outputPaths.geminicli).toBe(".gemini/memories");
+      expect(config.outputPaths.kiro).toBe(".kiro/steering");
       expect(config.defaultTargets).toEqual([
         "copilot",
         "cursor",
@@ -19,6 +20,7 @@ describe("config utils", () => {
         "claudecode",
         "roo",
         "geminicli",
+        "kiro",
       ]);
       expect(config.watchEnabled).toBe(false);
     });
@@ -29,7 +31,7 @@ describe("config utils", () => {
 
     it("should resolve * to all default targets", () => {
       const targets = resolveTargets(["*"], config);
-      expect(targets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"]);
+      expect(targets).toEqual(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"]);
     });
 
     it("should return specific targets as-is", () => {

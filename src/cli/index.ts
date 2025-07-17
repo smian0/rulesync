@@ -47,6 +47,7 @@ program
   .option("--claudecode", "Generate only for Claude Code")
   .option("--roo", "Generate only for Roo Code")
   .option("--geminicli", "Generate only for Gemini CLI")
+  .option("--kiro", "Generate only for Kiro IDE")
   .option("--delete", "Delete all existing files in output directories before generating")
   .option(
     "-b, --base-dir <paths>",
@@ -61,6 +62,7 @@ program
     if (options.claudecode) tools.push("claudecode");
     if (options.roo) tools.push("roo");
     if (options.geminicli) tools.push("geminicli");
+    if (options.kiro) tools.push("kiro");
 
     const generateOptions: {
       verbose?: boolean;

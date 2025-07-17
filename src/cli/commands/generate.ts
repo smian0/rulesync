@@ -75,6 +75,9 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
           case "geminicli":
             deleteTasks.push(removeDirectory(config.outputPaths.geminicli));
             break;
+          case "kiro":
+            deleteTasks.push(removeDirectory(config.outputPaths.kiro));
+            break;
         }
       }
 
