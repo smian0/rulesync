@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { Config, ParsedRule } from "../../types/index.js";
+import { createMinimalMockConfig } from "../../test-utils/index.js";
+import type { ParsedRule } from "../../types/index.js";
 import { loadIgnorePatterns } from "../../utils/ignore.js";
 import { generateRooConfig } from "./roo.js";
 
@@ -12,19 +13,7 @@ describe("generateRooConfig", () => {
     vi.clearAllMocks();
   });
 
-  const mockConfig: Config = {
-    aiRulesDir: ".rulesync",
-    outputPaths: {
-      copilot: ".github/instructions",
-      cursor: ".cursor/rules",
-      cline: ".clinerules",
-      claudecode: "",
-      roo: ".roo/rules",
-      geminicli: "",
-    },
-    watchEnabled: false,
-    defaultTargets: [],
-  };
+  const mockConfig = createMinimalMockConfig("roo", { defaultTargets: [] });
 
   const mockRule: ParsedRule = {
     frontmatter: {

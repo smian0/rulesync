@@ -11,9 +11,10 @@ export function getDefaultConfig(): Config {
       claudecode: ".",
       roo: ".roo/rules",
       geminicli: ".gemini/memories",
+      kiro: ".kiro/steering",
     },
     watchEnabled: false,
-    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"],
+    defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"],
   };
 }
 

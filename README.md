@@ -17,6 +17,7 @@ rulesync supports both **generation** and **import** for the following AI develo
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
 - **Roo Code Rules** (`.roo/rules/*.md` + `.roo/instructions.md`)
 - **Gemini CLI** (`GEMINI.md` + `.gemini/memories/*.md`)
+- **Kiro IDE Custom Steering Documents** (`.kiro/steering/*.md`)
 
 ## Installation
 
@@ -99,6 +100,26 @@ Avoid vendor lock-in completely. If you decide to stop using rulesync, you can c
 
 ### 🎯 **Consistency Across Tools**
 Apply consistent rules across all AI tools, improving code quality and development experience for the entire team.
+
+## Kiro IDE Integration
+
+### Custom Steering Documents Only
+
+rulesync supports **Custom Steering Documents** for Kiro IDE, complementing Kiro's built-in project management system.
+
+**Important**: rulesync does NOT generate the core steering files (`product.md`, `structure.md`, `tech.md`) as these are better managed directly by Kiro IDE itself. Instead, rulesync focuses on generating additional custom steering documents that contain project-specific rules and guidelines.
+
+### What rulesync provides for Kiro:
+- **Custom steering documents**: Additional `.md` files in `.kiro/steering/` directory
+- **Project-specific rules**: Team coding standards, security guidelines, deployment processes
+- **Rule synchronization**: Keep custom rules consistent across team members
+
+### What Kiro IDE handles directly:
+- **Core steering files**: `product.md` (user requirements), `structure.md` (architecture), `tech.md` (tech stack)
+- **Spec management**: Feature specifications in `.kiro/specs/`
+- **Agent hooks**: Automated context application
+
+This division of responsibility ensures that rulesync enhances Kiro's capabilities without duplicating its core functionality.
 
 ## Claude Code Integration
 
@@ -186,6 +207,7 @@ npx rulesync generate --cline
 npx rulesync generate --claudecode
 npx rulesync generate --roo
 npx rulesync generate --geminicli
+npx rulesync generate --kiro
 
 # Clean build (delete existing files first)
 npx rulesync generate --delete
@@ -207,7 +229,7 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 - `--delete`: Remove all existing generated files before creating new ones
 - `--verbose`: Show detailed output during generation process
-- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`, `--geminicli`: Generate only for specified tools
+- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--roo`, `--geminicli`, `--kiro`: Generate only for specified tools
 - `--base-dir <paths>`: Generate configuration files in specified base directories (comma-separated for multiple paths). Useful for monorepo setups where you want to generate tool-specific configurations in different project directories.
 
 ### 4. Import Existing Configurations
@@ -399,6 +421,7 @@ globs: "**/*.ts,**/*.tsx"
 | **Claude Code** | `./CLAUDE.md` (root)<br>`.claude/memories/*.md` (non-root) | Plain Markdown | Root goes to CLAUDE.md<br>Non-root go to separate memory files<br>CLAUDE.md includes `@filename` references |
 | **Roo Code** | `.roo/rules/*.md` | Plain Markdown | Both levels use same format with description header |
 | **Gemini CLI** | `GEMINI.md` (root)<br>`.gemini/memories/*.md` (non-root) | Plain Markdown | Root goes to GEMINI.md<br>Non-root go to separate memory files<br>GEMINI.md includes `@filename` references |
+| **Kiro IDE** | `.kiro/steering/*.md` | Plain Markdown | Both levels use same format for custom steering docs |
 
 ## Validation
 

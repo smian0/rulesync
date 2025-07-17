@@ -7,6 +7,7 @@ export const ToolTargetSchema = z.enum([
   "claudecode",
   "roo",
   "geminicli",
+  "kiro",
 ]);
 
 export type ToolTarget = z.infer<typeof ToolTargetSchema>;

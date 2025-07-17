@@ -3,6 +3,7 @@ import { generateClineConfig } from "../generators/rules/cline.js";
 import { generateCopilotConfig } from "../generators/rules/copilot.js";
 import { generateCursorConfig } from "../generators/rules/cursor.js";
 import { generateGeminiConfig } from "../generators/rules/geminicli.js";
+import { generateKiroConfig } from "../generators/rules/kiro.js";
 import { generateRooConfig } from "../generators/rules/roo.js";
 import type { Config, GeneratedOutput, ParsedRule, ToolTarget } from "../types/index.js";
 import { resolveTargets } from "../utils/index.js";
@@ -67,6 +68,8 @@ async function generateForTool(
       return generateRooConfig(rules, config, baseDir);
     case "geminicli":
       return generateGeminiConfig(rules, config, baseDir);
+    case "kiro":
+      return generateKiroConfig(rules, config, baseDir);
     default:
       console.warn(`Unknown tool: ${tool}`);
       return null;
