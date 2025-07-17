@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
-import type { Config } from "../../types/config.js";
+import { createMockConfig } from "../../test-utils/index.js";
 import {
   fileExists,
   getDefaultConfig,
@@ -21,8 +21,7 @@ const mockWriteFileContent = vi.mocked(writeFileContent);
 const mockRemoveDirectory = vi.mocked(removeDirectory);
 const mockRemoveClaudeGeneratedFiles = vi.mocked(removeClaudeGeneratedFiles);
 
-const mockConfig: Config = {
-  aiRulesDir: ".rulesync",
+const mockConfig = createMockConfig({
   outputPaths: {
     copilot: ".github/instructions",
     cursor: ".cursor/rules",
@@ -30,10 +29,9 @@ const mockConfig: Config = {
     claudecode: ".",
     roo: ".roo/rules",
     geminicli: ".geminicli/rules",
+    kiro: ".kiro/steering",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo"],
-  watchEnabled: false,
-};
+});
 
 const mockRules = [
   {

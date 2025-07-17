@@ -21,6 +21,7 @@ describe("generateCursorConfig", () => {
       claudecode: "",
       roo: ".roo/rules",
       geminicli: "",
+      kiro: ".kiro/steering",
     },
     watchEnabled: false,
     defaultTargets: ["cursor"],

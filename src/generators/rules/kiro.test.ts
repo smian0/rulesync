@@ -1,22 +1,10 @@
 import { describe, expect, it } from "vitest";
-import type { Config, ParsedRule } from "../../types/index.js";
+import type { ParsedRule } from "../../types/index.js";
+import { createMinimalMockConfig } from "../../test-utils/index.js";
 import { generateKiroConfig } from "./kiro.js";
 
 describe("generateKiroConfig", () => {
-  const mockConfig: Config = {
-    aiRulesDir: ".rulesync",
-    outputPaths: {
-      copilot: ".github/instructions",
-      cursor: ".cursor/rules",
-      cline: ".clinerules",
-      claudecode: "",
-      roo: ".roo/rules",
-      geminicli: "",
-      kiro: ".kiro/steering",
-    },
-    watchEnabled: false,
-    defaultTargets: ["kiro"],
-  };
+  const mockConfig = createMinimalMockConfig("kiro");
 
   const mockRule: ParsedRule = {
     frontmatter: {

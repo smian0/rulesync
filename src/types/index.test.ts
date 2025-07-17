@@ -57,8 +57,9 @@ describe("types/index", () => {
         claudecode: ".",
         roo: ".roo/rules",
         geminicli: ".geminicli/rules",
+        kiro: ".kiro/steering",
       },
-      defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"],
+      defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"],
       watchEnabled: false,
     };
 
@@ -76,10 +77,11 @@ describe("types/index", () => {
       "claudecode",
       "roo",
       "geminicli",
+      "kiro",
     ];
 
     for (const target of validTargets) {
-      expect(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"]).toContain(target);
+      expect(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"]).toContain(target);
     }
   });
 

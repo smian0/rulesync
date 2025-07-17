@@ -21,6 +21,7 @@ const mockConfig = {
     claudecode: ".",
     roo: ".roo/rules",
     geminicli: ".",
+    kiro: ".kiro/steering",
   },
   defaultTargets: [
     "copilot",
@@ -29,6 +30,7 @@ const mockConfig = {
     "claudecode",
     "roo",
     "geminicli",
+    "kiro",
   ] satisfies ToolTarget[],
   watchEnabled: false,
 };

@@ -16,8 +16,9 @@ const mockConfig: Config = {
     claudecode: ".",
     roo: ".roo/rules",
     geminicli: ".gemini/memories",
+    kiro: ".kiro/steering",
   },
-  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli"],
+  defaultTargets: ["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"],
   watchEnabled: false,
 };
 
