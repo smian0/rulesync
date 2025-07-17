@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import micromatch from "micromatch";
-import { fileExists, readFileContent } from "./file-ops.js";
+import { fileExists, readFileContent } from "./file.js";
 
 interface IgnorePatterns {
   patterns: string[];

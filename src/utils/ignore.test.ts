@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { fileExists, readFileContent } from "./file-ops.js";
+import { fileExists, readFileContent } from "./file.js";
 import {
   clearIgnoreCache,
   filterIgnoredFiles,
@@ -8,7 +8,7 @@ import {
   parseIgnoreFile,
 } from "./ignore.js";
 
-vi.mock("./file-ops.js", () => ({
+vi.mock("./file.js", () => ({
   fileExists: vi.fn(),
   readFileContent: vi.fn(),
 }));
