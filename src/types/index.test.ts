@@ -81,7 +81,9 @@ describe("types/index", () => {
     ];
 
     for (const target of validTargets) {
-      expect(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"]).toContain(target);
+      expect(["copilot", "cursor", "cline", "claudecode", "roo", "geminicli", "kiro"]).toContain(
+        target,
+      );
     }
   });
 

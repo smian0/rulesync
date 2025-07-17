@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import type { ParsedRule } from "../../types/index.js";
 import { createMinimalMockConfig } from "../../test-utils/index.js";
+import type { ParsedRule } from "../../types/index.js";
 import { generateKiroConfig } from "./kiro.js";
 
 describe("generateKiroConfig", () => {
