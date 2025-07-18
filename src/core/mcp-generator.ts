@@ -5,6 +5,7 @@ import {
   generateCopilotMcp,
   generateCursorMcp,
   generateGeminiCliMcp,
+  generateKiroMcp,
   generateRooMcp,
 } from "../generators/mcp/index.js";
 import type { RulesyncMcpConfig, RulesyncMcpServer } from "../types/mcp.js";
@@ -57,6 +58,11 @@ export async function generateMcpConfigs(
       generate: () => generateGeminiCliMcp(config),
     },
     {
+      tool: "kiro-project",
+      path: path.join(targetRoot, ".kiro", "mcp.json"),
+      generate: () => generateKiroMcp(config),
+    },
+    {
       tool: "roo-project",
       path: path.join(targetRoot, ".roo", "mcp.json"),
       generate: () => generateRooMcp(config),
@@ -73,6 +79,7 @@ export async function generateMcpConfigs(
         generator.tool.includes("cline") ||
         generator.tool.includes("cursor") ||
         generator.tool.includes("gemini") ||
+        generator.tool.includes("kiro") ||
         generator.tool.includes("roo")
       ) {
         if (!parsed.mcpServers || Object.keys(parsed.mcpServers).length === 0) {
@@ -146,6 +153,8 @@ export async function generateMcpConfigurations(
         servers,
         dir,
       ),
+    kiro: async (servers, dir) =>
+      (await import("../generators/mcp/kiro.js")).generateKiroMcpConfiguration(servers, dir),
   };
 
   const tools = targetTools || Object.keys(toolMap);

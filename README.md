@@ -458,6 +458,7 @@ rulesync can also manage MCP server configurations for supported AI tools. This 
 - **Cursor** (`.cursor/mcp.json`)
 - **Cline** (`.cline/mcp.json`)
 - **Gemini CLI** (`.gemini/settings.json`)
+- **Kiro IDE** (`.kiro/mcp.json`)
 - **Roo Code** (`.roo/mcp.json`)
 
 ### MCP Configuration
@@ -493,6 +494,32 @@ Create a `.rulesync/.mcp.json` file in your project:
     - Use `["*"]` to deploy to all supported tools
     - If omitted, server is deployed to all tools by default
 
+### Kiro IDE-Specific MCP Fields
+
+For Kiro IDE, you can use additional configuration fields:
+
+- **`kiroAutoApprove`**: Array of tool names to automatically approve without user prompts
+- **`kiroAutoBlock`**: Array of tool names to automatically block
+
+Example with Kiro-specific fields:
+```json
+{
+  "mcpServers": {
+    "aws-tools": {
+      "command": "python",
+      "args": ["-m", "aws_mcp_server"],
+      "env": {
+        "AWS_PROFILE": "dev",
+        "AWS_REGION": "us-east-1"
+      },
+      "kiroAutoApprove": ["describe_instances", "list_buckets"],
+      "kiroAutoBlock": ["delete_bucket", "terminate_instances"],
+      "targets": ["kiro"]
+    }
+  }
+}
+```
+
 ### Generating MCP Configurations
 
 MCP configurations are generated alongside rule files:
@@ -502,7 +529,7 @@ MCP configurations are generated alongside rule files:
 npx rulesync generate
 
 # Generate only for specific tools
-npx rulesync generate --claudecode --cursor
+npx rulesync generate --claudecode --cursor --kiro
 
 # Generate in specific directories (monorepo)
 npx rulesync generate --base-dir ./packages/frontend
