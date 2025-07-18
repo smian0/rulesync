@@ -18,6 +18,8 @@ export const McpServerBaseSchema = z.object({
   type: z.optional(z.enum(["sse", "streamable-http"])),
   alwaysAllow: z.optional(z.array(z.string())),
   tools: z.optional(z.array(z.string())),
+  kiroAutoApprove: z.optional(z.array(z.string())),
+  kiroAutoBlock: z.optional(z.array(z.string())),
 });
 
 export const RulesyncMcpServerSchema = z.extend(McpServerBaseSchema, {

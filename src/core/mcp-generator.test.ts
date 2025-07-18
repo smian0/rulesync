@@ -31,7 +31,7 @@ describe("generateMcpConfigurations", () => {
 
     // Should generate for all supported tools by default
     // Copilot generates 2 files, others generate 1 each
-    expect(outputs).toHaveLength(7);
+    expect(outputs).toHaveLength(8);
 
     const filepaths = outputs.map((o) => o.filepath);
     expect(filepaths).toContain(join(testDir, ".claude/settings.json"));
@@ -41,6 +41,7 @@ describe("generateMcpConfigurations", () => {
     expect(filepaths).toContain(join(testDir, ".cline/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".roo/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".gemini/settings.json"));
+    expect(filepaths).toContain(join(testDir, ".kiro/mcp.json"));
   });
 
   it("should generate configurations for specific targets", async () => {
