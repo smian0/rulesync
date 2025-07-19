@@ -125,6 +125,7 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
       console.log("\nGenerating MCP configurations...");
     }
 
+    let totalMcpOutputs = 0;
     for (const baseDir of baseDirs) {
       const mcpResults = await generateMcpConfigs(
         process.cwd(),
@@ -141,12 +142,21 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
       for (const result of mcpResults) {
         if (result.status === "success") {
           console.log(`✅ Generated ${result.tool} MCP configuration: ${result.path}`);
+          totalMcpOutputs++;
         } else if (result.status === "error") {
           console.error(`❌ Failed to generate ${result.tool} MCP configuration: ${result.error}`);
         } else if (options.verbose && result.status === "skipped") {
           console.log(`⏭️  Skipped ${result.tool} MCP configuration (no servers configured)`);
         }
       }
+    }
+
+    // Final success message
+    const totalGenerated = totalOutputs + totalMcpOutputs;
+    if (totalGenerated > 0) {
+      console.log(
+        `\n🎉 All done! Generated ${totalGenerated} file(s) total (${totalOutputs} configurations + ${totalMcpOutputs} MCP configurations)`,
+      );
     }
   } catch (error) {
     console.error("❌ Failed to generate configurations:", error);
