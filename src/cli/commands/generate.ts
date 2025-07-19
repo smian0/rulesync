@@ -118,8 +118,6 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
       return;
     }
 
-    console.log(`\n🎉 Successfully generated ${totalOutputs} configuration file(s)!`);
-
     // Generate MCP configurations
     if (options.verbose) {
       console.log("\nGenerating MCP configurations...");
