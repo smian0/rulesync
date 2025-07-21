@@ -74,3 +74,56 @@ export function generateIgnoreFile(patterns: string[], tool: ToolTarget): string
 
   return lines.join("\n");
 }
+
+export interface ComplexRuleGeneratorConfig {
+  tool: ToolTarget;
+  fileExtension: string;
+  ignoreFileName: string;
+  generateContent: (rule: ParsedRule) => string;
+  getOutputPath: (rule: ParsedRule, outputDir: string) => string;
+}
+
+/**
+ * Generic generator for complex rule files (like Copilot and Cursor)
+ */
+export async function generateComplexRulesConfig(
+  rules: ParsedRule[],
+  config: Config,
+  generatorConfig: ComplexRuleGeneratorConfig,
+  baseDir?: string,
+): Promise<GeneratedOutput[]> {
+  const outputs: GeneratedOutput[] = [];
+
+  // Generate individual rule files for all rules
+  for (const rule of rules) {
+    const content = generatorConfig.generateContent(rule);
+    const outputDir = baseDir
+      ? join(baseDir, config.outputPaths[generatorConfig.tool])
+      : config.outputPaths[generatorConfig.tool];
+    const filepath = generatorConfig.getOutputPath(rule, outputDir);
+
+    outputs.push({
+      tool: generatorConfig.tool,
+      filepath,
+      content,
+    });
+  }
+
+  // Generate ignore file if .rulesyncignore exists
+  const ignorePatterns = await loadIgnorePatterns(baseDir);
+  if (ignorePatterns.patterns.length > 0) {
+    const ignorePath = baseDir
+      ? join(baseDir, generatorConfig.ignoreFileName)
+      : generatorConfig.ignoreFileName;
+
+    const ignoreContent = generateIgnoreFile(ignorePatterns.patterns, generatorConfig.tool);
+
+    outputs.push({
+      tool: generatorConfig.tool,
+      filepath: ignorePath,
+      content: ignoreContent,
+    });
+  }
+
+  return outputs;
+}

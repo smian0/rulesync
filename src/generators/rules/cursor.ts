@@ -1,45 +1,26 @@
 import { join } from "node:path";
 import type { Config, GeneratedOutput, ParsedRule } from "../../types/index.js";
-import { loadIgnorePatterns } from "../../utils/ignore.js";
-import { generateIgnoreFile } from "./shared-helpers.js";
+import { generateComplexRulesConfig } from "./shared-helpers.js";
 
 export async function generateCursorConfig(
   rules: ParsedRule[],
   config: Config,
   baseDir?: string,
 ): Promise<GeneratedOutput[]> {
-  const outputs: GeneratedOutput[] = [];
-
-  // Generate rule files
-  for (const rule of rules) {
-    const content = generateCursorMarkdown(rule);
-    const outputDir = baseDir
-      ? join(baseDir, config.outputPaths.cursor)
-      : config.outputPaths.cursor;
-    const filepath = join(outputDir, `${rule.filename}.mdc`);
-
-    outputs.push({
+  return generateComplexRulesConfig(
+    rules,
+    config,
+    {
       tool: "cursor",
-      filepath,
-      content,
-    });
-  }
-
-  // Generate .cursorignore if .rulesyncignore exists
-  const ignorePatterns = await loadIgnorePatterns(baseDir);
-  if (ignorePatterns.patterns.length > 0) {
-    const cursorIgnorePath = baseDir ? join(baseDir, ".cursorignore") : ".cursorignore";
-
-    const cursorIgnoreContent = generateIgnoreFile(ignorePatterns.patterns, "cursor");
-
-    outputs.push({
-      tool: "cursor",
-      filepath: cursorIgnorePath,
-      content: cursorIgnoreContent,
-    });
-  }
-
-  return outputs;
+      fileExtension: ".mdc",
+      ignoreFileName: ".cursorignore",
+      generateContent: generateCursorMarkdown,
+      getOutputPath: (rule: ParsedRule, outputDir: string) => {
+        return join(outputDir, `${rule.filename}.mdc`);
+      },
+    },
+    baseDir,
+  );
 }
 
 function generateCursorMarkdown(rule: ParsedRule): string {

@@ -1,47 +1,27 @@
 import { join } from "node:path";
 import type { Config, GeneratedOutput, ParsedRule } from "../../types/index.js";
-import { loadIgnorePatterns } from "../../utils/ignore.js";
-import { generateIgnoreFile } from "./shared-helpers.js";
+import { generateComplexRulesConfig } from "./shared-helpers.js";
 
 export async function generateCopilotConfig(
   rules: ParsedRule[],
   config: Config,
   baseDir?: string,
 ): Promise<GeneratedOutput[]> {
-  const outputs: GeneratedOutput[] = [];
-
-  // Generate individual instruction files for all rules
-  for (const rule of rules) {
-    const content = generateCopilotMarkdown(rule);
-    const baseFilename = rule.filename.replace(/\.md$/, "");
-    const outputDir = baseDir
-      ? join(baseDir, config.outputPaths.copilot)
-      : config.outputPaths.copilot;
-    const filepath = join(outputDir, `${baseFilename}.instructions.md`);
-
-    outputs.push({
+  return generateComplexRulesConfig(
+    rules,
+    config,
+    {
       tool: "copilot",
-      filepath,
-      content,
-    });
-  }
-
-  // Generate .copilotignore if .rulesyncignore exists
-  // Note: This is unofficial support for community tools
-  const ignorePatterns = await loadIgnorePatterns(baseDir);
-  if (ignorePatterns.patterns.length > 0) {
-    const copilotIgnorePath = baseDir ? join(baseDir, ".copilotignore") : ".copilotignore";
-
-    const copilotIgnoreContent = generateIgnoreFile(ignorePatterns.patterns, "copilot");
-
-    outputs.push({
-      tool: "copilot",
-      filepath: copilotIgnorePath,
-      content: copilotIgnoreContent,
-    });
-  }
-
-  return outputs;
+      fileExtension: ".instructions.md",
+      ignoreFileName: ".copilotignore",
+      generateContent: generateCopilotMarkdown,
+      getOutputPath: (rule: ParsedRule, outputDir: string) => {
+        const baseFilename = rule.filename.replace(/\.md$/, "");
+        return join(outputDir, `${baseFilename}.instructions.md`);
+      },
+    },
+    baseDir,
+  );
 }
 
 function generateCopilotMarkdown(rule: ParsedRule): string {
