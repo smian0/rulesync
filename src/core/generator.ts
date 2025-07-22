@@ -1,4 +1,5 @@
 import { generateKiroIgnoreFiles } from "../generators/ignore/kiro.js";
+import { generateAugmentcodeConfig } from "../generators/rules/augmentcode.js";
 import { generateClaudecodeConfig } from "../generators/rules/claudecode.js";
 import { generateClineConfig } from "../generators/rules/cline.js";
 import { generateCopilotConfig } from "../generators/rules/copilot.js";
@@ -6,6 +7,7 @@ import { generateCursorConfig } from "../generators/rules/cursor.js";
 import { generateGeminiConfig } from "../generators/rules/geminicli.js";
 import { generateKiroConfig } from "../generators/rules/kiro.js";
 import { generateRooConfig } from "../generators/rules/roo.js";
+import { createOutputsArray } from "../generators/rules/shared-helpers.js";
 import type { Config, GeneratedOutput, ParsedRule, ToolTarget } from "../types/index.js";
 import { resolveTargets } from "../utils/index.js";
 
@@ -15,7 +17,7 @@ export async function generateConfigurations(
   targetTools?: ToolTarget[],
   baseDir?: string,
 ): Promise<GeneratedOutput[]> {
-  const outputs: GeneratedOutput[] = [];
+  const outputs = createOutputsArray();
   const toolsToGenerate = targetTools || config.defaultTargets;
 
   // Check for root files
@@ -57,6 +59,8 @@ async function generateForTool(
   baseDir?: string,
 ): Promise<GeneratedOutput[] | null> {
   switch (tool) {
+    case "augmentcode":
+      return await generateAugmentcodeConfig(rules, config, baseDir);
     case "copilot":
       return generateCopilotConfig(rules, config, baseDir);
     case "cursor":
