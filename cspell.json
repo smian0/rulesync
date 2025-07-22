@@ -10,6 +10,8 @@
     "words": [
         "agentrequested",
         "aiexclude",
+        "augmentcode",
+        "augmentignore",
         "argparse",
         "autoattached",
         "bcheck",
@@ -155,6 +157,8 @@
         "dotenv",
         "Nuxt",
         "nuxt",
-        "vuepress"
+        "vuepress",
+        "Sandboxing",
+        "projectbrief"
     ]
 }
