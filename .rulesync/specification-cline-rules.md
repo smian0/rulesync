@@ -27,6 +27,34 @@ A mechanism to provide "system-level guidance" to Cline projects and conversatio
 - Organize rules by concern (e.g., documentation, coding standards)
 - Control file order with numeric prefixes (optional)
 
+## Subdirectory Support
+
+### Directory Nesting
+- **Current Status**: **No subdirectory support**
+- **Limitation**: Cline only scans one level deep in `.clinerules/`
+- **File Discovery**: Only `*.md` and `*.mdx` files directly in `.clinerules/` are loaded
+- **Nested Files**: Files in subdirectories like `.clinerules/backend/api.md` are **ignored**
+
+### Workarounds for Organization
+- **Flat Structure**: Keep all rule files directly in `.clinerules/`
+- **Rules Bank Pattern**: Use parallel directory like `clinerules-bank/` for organization
+- **File Management**: Copy/move specific files to `.clinerules/` when needed
+- **Naming Conventions**: Use descriptive prefixes or numeric prefixes for ordering
+
+### File Organization Example
+```
+project/
+├── .clinerules/           # Active rules (flat structure)
+│   ├── 01-coding-style.md
+│   ├── 02-api-patterns.md
+│   └── 03-testing.md
+└── clinerules-bank/       # Organized storage (not loaded)
+    ├── backend/
+    │   └── api-patterns.md
+    └── frontend/
+        └── component-guide.md
+```
+
 ## Folder System Features
 - Support multiple rule files within `.clinerules/`
 - Can maintain inactive rule sets as "rules bank"
