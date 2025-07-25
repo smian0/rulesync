@@ -58,6 +58,7 @@
 		"pre-commit": "pnpm exec lint-staged"
 	},
 	"dependencies": {
+		"c12": "3.1.0",
 		"chokidar": "4.0.3",
 		"commander": "14.0.0",
 		"gray-matter": "4.0.3",
