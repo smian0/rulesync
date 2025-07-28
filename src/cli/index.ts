@@ -38,6 +38,7 @@ program
   .option("--cline", "Import from Cline (.cline/instructions.md)")
   .option("--roo", "Import from Roo Code (.roo/instructions.md)")
   .option("--geminicli", "Import from Gemini CLI (GEMINI.md)")
+  .option("--junie", "Import from JetBrains Junie (.junie/guidelines.md)")
   .option("-v, --verbose", "Verbose output")
   .action(importCommand);
 
@@ -52,6 +53,7 @@ program
   .option("--claudecode", "Generate only for Claude Code")
   .option("--roo", "Generate only for Roo Code")
   .option("--geminicli", "Generate only for Gemini CLI")
+  .option("--junie", "Generate only for JetBrains Junie")
   .option("--kiro", "Generate only for Kiro IDE")
   .option("--delete", "Delete all existing files in output directories before generating")
   .option(
@@ -71,6 +73,7 @@ program
     if (options.claudecode) tools.push("claudecode");
     if (options.roo) tools.push("roo");
     if (options.geminicli) tools.push("geminicli");
+    if (options.junie) tools.push("junie");
     if (options.kiro) tools.push("kiro");
 
     const generateOptions: {
