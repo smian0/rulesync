@@ -1,4 +1,5 @@
 import { generateAugmentCodeIgnoreFiles } from "../generators/ignore/augmentcode.js";
+import { generateJunieIgnoreFiles } from "../generators/ignore/junie.js";
 import { generateKiroIgnoreFiles } from "../generators/ignore/kiro.js";
 import { generateAugmentcodeConfig } from "../generators/rules/augmentcode.js";
 import { generateAugmentcodeLegacyConfig } from "../generators/rules/augmentcode-legacy.js";
@@ -93,8 +94,11 @@ async function generateForTool(
       return generateRooConfig(rules, config, baseDir);
     case "geminicli":
       return generateGeminiConfig(rules, config, baseDir);
-    case "junie":
-      return generateJunieConfig(rules, config, baseDir);
+    case "junie": {
+      const junieRulesOutputs = await generateJunieConfig(rules, config, baseDir);
+      const junieIgnoreOutputs = await generateJunieIgnoreFiles(rules, config, baseDir);
+      return [...junieRulesOutputs, ...junieIgnoreOutputs];
+    }
     case "kiro": {
       const kiroRulesOutputs = await generateKiroConfig(rules, config, baseDir);
       const kiroIgnoreOutputs = await generateKiroIgnoreFiles(rules, config, baseDir);
