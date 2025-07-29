@@ -217,4 +217,6 @@ test-*
 **/.aiignore
 **/.kiro/steering/
 **/.augmentignore
+
 **/.junie/guidelines.md
+**/.noai
