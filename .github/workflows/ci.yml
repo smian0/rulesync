@@ -26,7 +26,15 @@ jobs:
           version: 10.12.2
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --ignore-scripts
+
+      - name: Check no files generated after install
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "Error: Files were generated or modified after pnpm install"
+            git status --porcelain
+            exit 1
+          fi
 
       - name: Run check
         run: pnpm check
