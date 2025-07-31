@@ -10,7 +10,7 @@ Please complete all of the following tasks.
 
 Important: `.rulesync/*.md` files must include the required frontmatter. Refer to @README.md for frontmatter specification details.
 
-rulesync-md-creator subagentを可能な限り並列で呼び出し、以下のファイルを作成してください。
+Call the rulesync-md-creator subagent in parallel as much as possible to create the following files:
 
 - `.rulesync/specification-{tool_name_in_rulesync}-rules.md`
   - Research the specifications for rules or memories text files of target_tool_name.
@@ -19,5 +19,5 @@ rulesync-md-creator subagentを可能な限り並列で呼び出し、以下の�
 - `.rulesync/specification-{tool_name_in_rulesync}-ignore.md`
   - Research the specifications for ignore text files of target_tool_name. Ignore files are configuration files used to specify files that should not be read or written by AI coding tools, such as files containing secret information.
 
-いずれも可能な限り仕様を不足なく網羅的に調査・記述するよう、subagentに指示してください。
+For all files, instruct the subagent to research and document the specifications as comprehensively and thoroughly as possible without omissions.
 

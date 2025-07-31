@@ -1,6 +1,6 @@
-以下を並列で実行してください。
+Execute the following in parallel:
 
-- code-reviewer subagentを実行する
-- security-reviewer subagentを実行する
+- Execute code-reviewer subagent
+- Execute security-reviewer subagent
 
-それぞれのsubagentの実行結果を統合して報告してください。
+Integrate and report the execution results from each subagent.
