@@ -10,17 +10,14 @@ Please complete all of the following tasks.
 
 Important: `.rulesync/*.md` files must include the required frontmatter. Refer to @README.md for frontmatter specification details.
 
-## specification-{tool_name_in_rulesync}-rules
+rulesync-md-creator subagentを可能な限り並列で呼び出し、以下のファイルを作成してください。
 
-1. Research the specifications for rules or memories text files of target_tool_name by using "o3-search" mcp server.
-2. Output the researched content in as much detail as possible, comprehensively covering the specifications, to `.rulesync/specification-{tool_name_in_rulesync}-rules.md`.
+- `.rulesync/specification-{tool_name_in_rulesync}-rules.md`
+  - Research the specifications for rules or memories text files of target_tool_name.
+- `.rulesync/specification-{tool_name_in_rulesync}-mcp.md`
+  - Research the specifications for MCP configuration text files of target_tool_name.
+- `.rulesync/specification-{tool_name_in_rulesync}-ignore.md`
+  - Research the specifications for ignore text files of target_tool_name. Ignore files are configuration files used to specify files that should not be read or written by AI coding tools, such as files containing secret information.
 
-## specification-{tool_name_in_rulesync}-mcp
+いずれも可能な限り仕様を不足なく網羅的に調査・記述するよう、subagentに指示してください。
 
-1. Research the specifications for MCP configuration text files of target_tool_name by using "o3-search" mcp server.
-2. Output the researched content in as much detail as possible, comprehensively covering the specifications, to `.rulesync/specification-{tool_name_in_rulesync}-mcp.md`.
-
-## specification-{tool_name_in_rulesync}-ignore
-
-1. Research the specifications for ignore text files of target_tool_name by using "o3-search" mcp server. Ignore files are configuration files used to specify files that should not be read or written by AI coding tools, such as files containing secret information.
-2. Output the researched content in as much detail as possible, comprehensively covering the specifications, to `.rulesync/specification-{tool_name_in_rulesync}-ignore.md`.
