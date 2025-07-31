@@ -1,6 +1,6 @@
 ---
 name: diff-analyzer
-description: Use this agent when you need to analyze the differences between your current branch and origin/main, and get a summary of your current work progress. Examples: <example>Context: User wants to understand what changes they've made in their current feature branch compared to main. user: "現在のブランチでどんな変更をしたか確認したい" assistant: "I'll use the diff-analyzer agent to fetch the latest origin/main, compare it with your current branch, and provide a summary of your changes." <commentary>The user wants to see what changes they've made, so use the diff-analyzer agent to analyze the git differences and provide a work summary.</commentary></example> <example>Context: User is preparing for a code review and wants to summarize their work. user: "コードレビューの準備として、今回の作業内容をまとめてほしい" assistant: "Let me use the diff-analyzer agent to analyze your branch differences and create a work summary for your code review." <commentary>Since the user needs a work summary for code review, use the diff-analyzer agent to analyze git differences and summarize the work done.</commentary></example>
+description: Use this agent when you need to analyze the differences between your current branch and origin/main, and get a summary of your current work progress. Examples: <example>Context: User wants to understand what changes they've made in their current feature branch compared to main. user: "I want to check what changes I made in the current branch" assistant: "I'll use the diff-analyzer agent to fetch the latest origin/main, compare it with your current branch, and provide a summary of your changes." <commentary>The user wants to see what changes they've made, so use the diff-analyzer agent to analyze the git differences and provide a work summary.</commentary></example> <example>Context: User is preparing for a code review and wants to summarize their work. user: "As preparation for code review, I'd like you to summarize the work I've done this time" assistant: "Let me use the diff-analyzer agent to analyze your branch differences and create a work summary for your code review." <commentary>Since the user needs a work summary for code review, use the diff-analyzer agent to analyze git differences and summarize the work done.</commentary></example>
 model: inherit
 ---
 
@@ -23,12 +23,12 @@ Your core workflow:
    - Distinguish between feature additions, bug fixes, refactoring, and configuration changes
    - Note any significant architectural or design pattern changes
 
-4. **Summary Generation**: Create a clear, structured summary in Japanese
+4. **Summary Generation**: Create a clear, structured summary in English
    - Provide an overview of the main work accomplished
    - List key files modified and their purposes
    - Highlight significant features or improvements added
    - Note any potential impacts or considerations
-   - Use clear, professional Japanese suitable for technical documentation
+   - Use clear, professional English suitable for technical documentation
 
 5. **Error Handling**: Handle common git scenarios gracefully
    - No differences found between branches

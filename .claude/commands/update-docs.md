@@ -1,4 +1,4 @@
-docs-updator subagentを可能な限り並列で呼び出し、以下のドキュメントを更新します。
+Call the docs-updater subagent in parallel as much as possible to update the following documents.
 
 - README.md, README.ja.md
   - For users of this tool. Focus on usage and specifications.

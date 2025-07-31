@@ -1,4 +1,4 @@
-japanese-to-english-transrator subagentを可能な限り並列で呼び出し、以下のドキュメントを英語に変換し上書きします。
+Call the japanese-to-english-translator subagent in parallel as much as possible to convert the following documents to English and overwrite them.
 
 - README.md
 - CONTRIBUTING.md
