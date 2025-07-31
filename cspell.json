@@ -28,6 +28,7 @@
         "chokidar",
         "claudecode",
         "clineignore",
+        "codexcli",
         "clinerules",
         "cliui",
         "codingagent",
@@ -176,6 +177,13 @@
         "commonalization",
         "exfiltration",
         "Liskov",
-        "oneline"
+        "oneline",
+        "codexignore",
+        "oneline",
+        "tfvars",
+        "uvicorn",
+        "rmulligan",
+        "asctime",
+        "levelname"
     ]
 }
