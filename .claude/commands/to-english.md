@@ -1,6 +1,9 @@
-Convert any documents written in Japanese to English and update them in the following locations:
+Call the diff-analyzer subagent to detect the changes of docs in current branch.
+
+And then, call the japanese-to-english-translator subagent in parallel as much as possible to convert the following documents to English and overwrite them.
 
 - README.md
 - CONTRIBUTING.md
 - .claude/commands/*.md
+- .claude/agents/*.md
 - .rulesync/*.md

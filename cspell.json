@@ -37,6 +37,7 @@
         "consola",
         "copilotignore",
         "cursorignore",
+        "cursorindexingignore",
         "cursorrrules",
         "cursorrules",
         "dbaeumer",
@@ -59,6 +60,7 @@
         "FASTMCP",
         "fdir",
         "flexbox",
+        "fnmatch",
         "frontmatter",
         "Frontmatter",
         "fsevents",
@@ -94,6 +96,7 @@
         "lintstagedrc",
         "listr",
         "loongarch",
+        "mattickx",
         "Microbundle",
         "microtask",
         "minimatch",
@@ -112,6 +115,7 @@
         "nuxt",
         "Nuxt",
         "oxlint",
+        "panozzaj",
         "oxlintrc",
         "parseargs",
         "parseurl",
@@ -129,6 +133,7 @@
         "refactorer",
         "rfdc",
         "riscv",
+        "Roocode",
         "rooignore",
         "roorules",
         "rulesync",
@@ -167,6 +172,10 @@
         "whatwg",
         "wrappy",
         "wscript",
-        "XVCJ"
+        "XVCJ",
+        "commonalization",
+        "exfiltration",
+        "Liskov",
+        "oneline"
     ]
 }
