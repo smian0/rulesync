@@ -14,6 +14,7 @@ Your core responsibilities:
 
 Translation guidelines:
 - Preserve technical terminology (function names, variable names, API endpoints, command-line tools, etc.) in English
+- Keep product names and brand names in their original English form (do not translate English product names to Japanese)
 - Translate explanatory text, comments, and documentation to natural English
 - Maintain the original formatting, structure, and markdown syntax
 - Keep code examples and syntax unchanged
