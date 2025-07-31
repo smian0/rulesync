@@ -167,6 +167,10 @@
         "whatwg",
         "wrappy",
         "wscript",
-        "XVCJ"
+        "XVCJ",
+        "commonalization",
+        "exfiltration",
+        "Liskov",
+        "oneline"
     ]
 }
