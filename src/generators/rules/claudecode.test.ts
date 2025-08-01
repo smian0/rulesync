@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import type { ParsedRule } from "../../types/index.js";
 import { getDefaultConfig } from "../../utils/config.js";
-import { fileExists, readFileContent, writeFileContent } from "../../utils/file.js";
+import { fileExists, readFileContent, resolvePath, writeFileContent } from "../../utils/file.js";
 import { loadIgnorePatterns } from "../../utils/ignore.js";
 import { generateClaudecodeConfig } from "./claudecode.js";
 
@@ -14,6 +14,7 @@ vi.mock("../../utils/file.js", () => ({
   readFileContent: vi.fn(),
   writeFileContent: vi.fn(),
   ensureDir: vi.fn(),
+  resolvePath: vi.fn(),
 }));
 
 describe("claudecode generator", () => {
@@ -22,6 +23,9 @@ describe("claudecode generator", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(loadIgnorePatterns).mockResolvedValue({ patterns: [] });
+    vi.mocked(resolvePath).mockImplementation((path: string, baseDir?: string) =>
+      baseDir ? `${baseDir}/${path}` : path,
+    );
   });
 
   const mockRules: ParsedRule[] = [

@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { ClaudeSettingsSchema } from "../../types/claudecode.js";
 import type { Config, GeneratedOutput, ParsedRule } from "../../types/index.js";
-import { fileExists, readFileContent, writeFileContent } from "../../utils/file.js";
+import { fileExists, readFileContent, resolvePath, writeFileContent } from "../../utils/file.js";
 import { type EnhancedRuleGeneratorConfig, generateComplexRules } from "./shared-helpers.js";
 
 export async function generateClaudecodeConfig(
@@ -12,19 +12,17 @@ export async function generateClaudecodeConfig(
   const generatorConfig: EnhancedRuleGeneratorConfig = {
     tool: "claudecode",
     fileExtension: ".md",
-    ignoreFileName: ".claude/settings.json",
-    generateContent: () => "", // Not used in complex generator
+    ignoreFileName: ".aiignore",
+    generateContent: generateMemoryFile,
     generateRootContent: generateClaudeMarkdown,
     rootFilePath: "CLAUDE.md",
     generateDetailContent: generateMemoryFile,
     detailSubDir: ".claude/memories",
     updateAdditionalConfig: async (ignorePatterns: string[], baseDir?: string) => {
-      const settingsPath = baseDir
-        ? join(baseDir, ".claude", "settings.json")
-        : join(".claude", "settings.json");
+      const settingsPath = resolvePath(join(".claude", "settings.json"), baseDir);
 
       await updateClaudeSettings(settingsPath, ignorePatterns);
-      return []; // Settings update doesn't create additional outputs
+      return []; // updateClaudeSettings modifies existing file, doesn't return new outputs
     },
   };
 

@@ -15,6 +15,7 @@ rulesyncは以下のAI開発ツールの**生成**と**インポート**の両�
 - **Cursor Project Rules** (`.cursor/rules/*.mdc` + `.cursorrules`) 
 - **Cline Rules** (`.clinerules/*.md` + `.cline/instructions.md`)
 - **Claude Code Memory** (`./CLAUDE.md` + `.claude/memories/*.md`)
+- **OpenAI Codex CLI** (`codex.md` + `.codex/mcp-config.json` + `.codexignore`)
 - **AugmentCode Rules** (`.augment/rules/*.md`)
 - **Roo Code Rules** (`.roo/rules/*.md` + `.roo/instructions.md`)
 - **Gemini CLI** (`GEMINI.md` + `.gemini/memories/*.md`)
@@ -98,11 +99,12 @@ AI開発ツールは新しいツールが頻繁に登場し、急速に進化し
 - Cursor：リファクタリング
 - Claude Code：アーキテクチャ設計
 - Cline：デバッグ支援
+- OpenAI Codex CLI：GPT-4を活用した開発
 - Gemini CLI：知的コード解析
 - JetBrains Junie：自律的AIコーディング
 
 ### 🔓 **ベンダーロックインなし**
-ベンダーロックインを完全に回避できます。rulesyncの使用を停止することを決定した場合でも、生成されたルールファイル（`.github/instructions/`、`.cursor/rules/`、`.clinerules/`、`CLAUDE.md`、`GEMINI.md`、`.junie/guidelines.md`など）をそのまま使い続けることができます。
+ベンダーロックインを完全に回避できます。rulesyncの使用を停止することを決定した場合でも、生成されたルールファイル（`.github/instructions/`、`.cursor/rules/`、`.clinerules/`、`CLAUDE.md`、`codex.md`、`GEMINI.md`、`.junie/guidelines.md`など）をそのまま使い続けることができます。
 
 ### 🎯 **ツール間の一貫性**
 すべてのAIツールに一貫したルールを適用し、チーム全体のコード品質と開発体験を向上させます。
@@ -136,6 +138,59 @@ rulesyncは、Kiro IDEの組み込みプロジェクト管理システムを補�
 
 この責任分担により、rulesyncはKiroのコア機能を複製することなく、その機能を強化します。
 
+## OpenAI Codex CLI統合
+
+### 階層メモリシステム
+
+rulesyncは**OpenAI Codex CLI**の階層メモリシステムをサポートしており、GPT-4を活用した開発ワークフローに持続的なコンテキストとプロジェクト固有のルールを提供します。
+
+**主要機能**：
+- **階層インストラクション**: グローバルユーザーインストラクション → プロジェクトレベルインストラクション → ディレクトリ固有インストラクション
+- **MCP統合**: ラッパーサーバーを通じたModel Context Protocolサポートで機能拡張
+- **GPT-4モデル**: GPT-4、GPT-4 Turbo、o1-mini、その他のOpenAIモデルをサポート
+- **プレーンMarkdown形式**: 複雑なフロントマターなしのクリーンで読みやすいインストラクションファイル
+- **コミュニティIgnoreサポート**: 機密ファイルをAIアクセスから除外するオプションの`.codexignore`ファイル
+
+### ファイル構造
+
+rulesyncはOpenAI Codex CLI用に以下のファイルを生成します：
+
+- **`codex.md`**: メインのプロジェクトレベルインストラクション（ルートルールから生成）
+- **`<filename>.md`**: 追加のインストラクションファイル（非ルートルールから生成）
+- **`.codex/mcp-config.json`**: ラッパーサーバー用のMCPサーバー設定
+- **`.codexignore`**: コミュニティツールとプライバシー強化用のオプション除外ファイル
+
+### OpenAIモデルでの使用
+
+OpenAI Codex CLIは様々なOpenAIモデルで動作します：
+- **GPT-4**: 複雑な推論とアーキテクチャ決定に最適
+- **GPT-4 Turbo**: パフォーマンスとコスト効率を最適化
+- **o1-mini**: コーディングタスクと問題解決に特化
+- **GPT-4o-mini**: 日常的な開発タスクでバランスの取れたパフォーマンス
+
+階層メモリシステムにより、すべてのモデルとのやり取りで一貫したコーディング標準とプロジェクトコンテキストが保証されます。
+
+### 使用例
+
+OpenAI Codex CLI設定ファイルを生成：
+
+```bash
+# OpenAI Codex CLI専用で生成
+npx rulesync generate --codexcli
+
+# ラッパーサーバー用のMCP設定付きで生成
+npx rulesync generate --codexcli --verbose
+
+# 特定のディレクトリに生成（monorepoに便利）
+npx rulesync generate --codexcli --base-dir ./packages/frontend
+```
+
+これにより以下が作成されます：
+- `codex.md` プロジェクトレベルのインストラクション
+- 特定のルールカテゴリ用の追加`.md`ファイル
+- `.codex/mcp-config.json` MCPラッパーサーバー統合用
+- `.codexignore` プライバシー制御強化用（`.rulesyncignore`が存在する場合）
+
 ## Claude Code統合
 
 ### カスタムスラッシュコマンドの作成
@@ -147,7 +202,19 @@ Claude Codeの組み込み`/init`コマンドを使用する代わりに、rules
 **`.claude/commands/init-rulesync.md`**
 
 ```markdown
-このプロジェクトのコードベースを分析し、必要に応じて .rulesync/overview.md ファイルを更新してください。
+Analyze this project's codebase and update .rulesync/overview.md files as needed.
+
+Please ensure the following frontmatter is defined in .rulesync/overview.md:
+
+---
+root: true | false               # Required: Rule level (true for overview, false for details)
+targets: ["*"]                   # Required: Target tools (* = all, or specific tools)
+description: "" # Required: Rule description
+globs: ["**/*"]                  # Required: File patterns
+cursorRuleType: "always"         # Optional: Cursor-specific rule type (always, manual, specificFiles, intelligently)
+---
+
+In .rulesync/overview.md, root should be set to true. Please write an appropriate description in the description field.
 ```
 
 ### 統合のメリット
@@ -206,6 +273,7 @@ npx rulesync generate --copilot
 npx rulesync generate --cursor  
 npx rulesync generate --cline
 npx rulesync generate --claudecode
+npx rulesync generate --codexcli
 npx rulesync generate --augmentcode
 npx rulesync generate --roo
 npx rulesync generate --geminicli
@@ -216,7 +284,7 @@ npx rulesync generate --kiro
 npx rulesync generate --delete
 
 # 特定ツール用のクリーンビルド
-npx rulesync generate --copilot --cursor --delete
+npx rulesync generate --copilot --cursor --codexcli --delete
 
 # 詳細出力
 npx rulesync generate --verbose
@@ -232,8 +300,10 @@ npx rulesync generate --base-dir ./apps/web,./apps/api,./packages/shared
 
 - `--delete`: 新しいファイルを作成する前に既存の生成済みファイルをすべて削除
 - `--verbose`: 生成プロセス中に詳細出力を表示
-- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--augmentcode`, `--roo`, `--geminicli`, `--junie`, `--kiro`: 指定されたツールのみ生成
+- `--copilot`, `--cursor`, `--cline`, `--claudecode`, `--codexcli`, `--augmentcode`, `--roo`, `--geminicli`, `--junie`, `--kiro`: 指定されたツールのみ生成
 - `--base-dir <paths>`: 指定されたベースディレクトリに設定ファイルを生成（複数パスの場合はカンマ区切り）。異なるプロジェクトディレクトリにツール固有の設定を生成したいmonorepoセットアップに便利。
+- `--config <path>`: 特定の設定ファイルを使用
+- `--no-config`: 設定ファイルの読み込みを無効化
 
 ### 4. 既存設定のインポート
 
@@ -296,6 +366,100 @@ Cursorからのインポートでは、以下の4つのルールタイプが自�
 - `.cursor/rules/*.mdc` (モダンな推奨形式)
 - `.cursorrules` (レガシーな形式)
 
+### 設定ファイル
+
+rulesyncは、繰り返しコマンドライン引数を避けるために設定ファイルをサポートしています。設定は（優先順位順に）以下から読み込まれます：
+
+1. `--config`フラグで指定されたパス
+2. `rulesync.jsonc` (コメント付きJSONC形式)
+3. `rulesync.ts` (TypeScript形式)
+4. `rulesync.config.ts`
+5. `rulesync.config.jsonc`
+6. `package.json` (`"rulesync"`フィールド内)
+
+#### 設定ファイルの例
+
+**JSONC形式 (`rulesync.jsonc`):**
+```jsonc
+{
+  // 設定を生成するツールのリスト
+  "targets": ["copilot", "cursor", "claudecode", "codexcli"],
+  
+  // 生成から除外するツール（targetsをオーバーライド）
+  "exclude": ["roo"],
+  
+  // 特定ツール用のカスタム出力パス
+  "outputPaths": {
+    "copilot": ".github/copilot-instructions.md"
+  },
+  
+  // 生成用のベースディレクトリまたはディレクトリ群
+  "baseDir": "./packages",
+  
+  // 生成前に既存ファイルを削除
+  "delete": false,
+  
+  // 詳細出力を有効化
+  "verbose": true,
+  
+  // ルールファイルを含むディレクトリ
+  "aiRulesDir": ".rulesync",
+  
+  // 監視設定
+  "watch": {
+    "enabled": false,
+    "interval": 1000,
+    "ignore": ["node_modules/**", ".git/**", "dist/**", "build/**"]
+  }
+}
+```
+
+**TypeScript形式 (`rulesync.ts`):**
+```typescript
+import type { ConfigOptions } from "rulesync";
+
+const config: ConfigOptions = {
+  targets: ["copilot", "cursor", "claudecode", "codexcli"],
+  exclude: ["roo"],
+  outputPaths: {
+    copilot: ".github/copilot-instructions.md"
+  },
+  baseDir: "./packages",
+  delete: false,
+  verbose: true
+};
+
+export default config;
+```
+
+#### 設定オプション
+
+- `targets`: 設定を生成するツールの配列（デフォルトターゲットをオーバーライド）
+- `exclude`: 生成から除外するツールの配列
+- `outputPaths`: 特定ツール用のカスタム出力パス
+- `baseDir`: 生成用のベースディレクトリまたはディレクトリ配列
+- `delete`: 生成前に既存ファイルを削除（デフォルト: false）
+- `verbose`: 詳細出力を有効化（デフォルト: false）
+- `aiRulesDir`: ルールファイルを含むディレクトリ（デフォルト: ".rulesync"）
+- `watch`: `enabled`、`interval`、`ignore`オプション付きの監視設定
+  - `enabled`: ファイル監視を有効化（デフォルト: false）
+  - `interval`: 監視間隔（ミリ秒、デフォルト: 1000）
+  - `ignore`: 監視中に無視するパターンの配列
+
+#### 設定の管理
+
+```bash
+# 現在の設定を表示
+npx rulesync config
+
+# 設定ファイルを初期化
+npx rulesync config --init
+
+# 特定の形式で初期化
+npx rulesync config --init --format jsonc  # デフォルト、コメントをサポート
+npx rulesync config --init --format ts     # 型安全性を持つTypeScript
+```
+
 ### 5. その他のコマンド
 
 ```bash
@@ -318,6 +482,10 @@ npx rulesync watch
 
 # 生成されたファイルを.gitignoreに追加
 npx rulesync gitignore
+
+# 設定を表示または管理
+npx rulesync config
+npx rulesync config --init  # 設定ファイルを作成
 ```
 
 ## 設定ファイル構造
@@ -369,7 +537,7 @@ draft-*.md
 root: true | false               # 必須: ルールレベル (概要の場合true、詳細の場合false)
 targets: ["*"]                   # 必須: ターゲットツール (* = すべて、または特定のツール)
 description: "簡潔な説明"        # 必須: ルールの説明
-globs: "**/*.ts,**/*.js"          # 必須: ファイルパターン (カンマ区切りまたは空文字列)
+globs: ["**/*"]                  # 必須: ファイルパターン (配列形式)
 cursorRuleType: "always"         # オプション: Cursor固有のルールタイプ (always, manual, specificFiles, intelligently)
 ---
 ```
@@ -391,7 +559,7 @@ Cursorツール用の追加メタデータフィールド：
 root: true
 targets: ["*"]
 description: "プロジェクト概要と開発思想"
-globs: "src/**/*.ts"
+globs: ["src/**/*.ts"]
 ---
 
 # プロジェクト開発ガイドライン
@@ -405,7 +573,7 @@ globs: "src/**/*.ts"
 root: false
 targets: ["copilot", "cursor", "roo"]
 description: "TypeScriptコーディング標準"
-globs: "**/*.ts,**/*.tsx"
+globs: ["**/*.ts", "**/*.tsx"]
 ---
 
 # TypeScriptコーディングルール
@@ -423,6 +591,7 @@ globs: "**/*.ts,**/*.tsx"
 | **Cursor**         | `.cursor/rules/*.mdc`                                        | MDC (YAMLヘッダー + Markdown) | ルート: `cursorRuleType: always`<br>非ルート: `cursorRuleType: specificFiles` (globs指定時)<br>非ルート: `cursorRuleType: intelligently` (description指定時)<br>非ルート: `cursorRuleType: manual` (デフォルト) |
 | **Cline**          | `.clinerules/*.md`                                           | プレーンMarkdown              | 両レベルとも同じフォーマットを使用                                                                                                                                                                              |
 | **Claude Code**    | `./CLAUDE.md` (ルート)<br>`.claude/memories/*.md` (非ルート) | プレーンMarkdown              | ルートはCLAUDE.mdに移動<br>非ルートは別メモリファイルに移動<br>CLAUDE.mdは`@filename`参照を含む                                                                                                                 |
+| **OpenAI Codex CLI** | `codex.md` (ルート)<br>`<filename>.md` (非ルート) | プレーンMarkdown | ルートはcodex.mdに移動<br>非ルートは別インストラクションファイルに移動<br>階層メモリシステム |
 | **AugmentCode**    | `.augment/rules/*.md`                                        | YAMLフロントマター + Markdown | ルート: `type: always`<br>非ルート: `type: auto` (description指定時) または `type: manual` (デフォルト)                                                                                                        |
 | **Roo Code**       | `.roo/rules/*.md`                                            | プレーンMarkdown              | 両レベルとも説明ヘッダー付きの同じフォーマットを使用                                                                                                                                                            |
 | **Gemini CLI**     | `GEMINI.md` (ルート)<br>`.gemini/memories/*.md` (非ルート)   | プレーンMarkdown              | ルートはGEMINI.mdに移動<br>非ルートは別メモリファイルに移動<br>GEMINI.mdは`@filename`参照を含む                                                      |
@@ -453,6 +622,7 @@ rulesyncは、対応するAIツール用のMCPサーバー設定も管理でき�
 - **GitHub Copilot** (`.vscode/mcp.json`)
 - **Cursor** (`.cursor/mcp.json`)
 - **Cline** (`.cline/mcp.json`)
+- **OpenAI Codex CLI** (`.codex/mcp-config.json`)
 - **Gemini CLI** (`.gemini/settings.json`)
 - **JetBrains Junie** (`.junie/mcp.json`)
 - **Kiro IDE** (`.kiro/mcp.json`)
@@ -526,7 +696,7 @@ MCP設定はルールファイルと一緒に生成されます：
 npx rulesync generate
 
 # 特定のツールのみ生成
-npx rulesync generate --claudecode --cursor --junie --kiro
+npx rulesync generate --claudecode --cursor --codexcli --junie --kiro
 
 # 特定のディレクトリに生成（monorepo）
 npx rulesync generate --base-dir ./packages/frontend
