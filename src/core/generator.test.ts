@@ -71,11 +71,14 @@ describe("generateConfigurations", () => {
     const outputs = await generateConfigurations(mockRules, mockConfig, ["claudecode"]);
 
     expect(outputs.length).toBeGreaterThan(0);
-    expect(outputs[0]!.tool).toBe("claudecode");
-    expect(outputs[0]!.filepath).toBe("CLAUDE.md");
-    expect(outputs[0]!.content).toContain("This is a test rule");
-    expect(outputs[0]!.content).toContain("@.claude/memories/claudecode-only.md");
-    expect(outputs[0]!.content).not.toContain("This is a copilot only rule");
+
+    // Find the root CLAUDE.md file
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.tool).toBe("claudecode");
+    expect(rootOutput!.content).toContain("This is a test rule");
+    expect(rootOutput!.content).toContain("@.claude/memories/claudecode-only.md");
+    expect(rootOutput!.content).not.toContain("This is a copilot only rule");
   });
 
   it("should handle empty rules gracefully", async () => {
