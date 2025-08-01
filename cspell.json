@@ -106,6 +106,7 @@
         "minipass",
         "mlly",
         "modelcontextprotocol",
+        "modelcontext",
         "msvc",
         "musleabihf",
         "newai",
@@ -185,6 +186,21 @@
         "uvicorn",
         "rmulligan",
         "asctime",
-        "levelname"
+        "levelname",
+        "codeiumignore",
+        "deepview",
+        "Laravel",
+        "ovpn",
+        "PGHOST",
+        "PGUSER",
+        "PGPASSWORD",
+        "asyncio",
+        "Antipatterns",
+        "rooveterinaryinc",
+        "saoudrizwan",
+        "secops",
+        "sandboxed",
+        "Grazie",
+        "USERPROFILE"
     ]
 }

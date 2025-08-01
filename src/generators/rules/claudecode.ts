@@ -14,8 +14,7 @@ export async function generateClaudecodeConfig(
     fileExtension: ".md",
     ignoreFileName: ".aiignore",
     generateContent: generateMemoryFile,
-    generateRootContent: (rootRule, detailRules) =>
-      generateClaudeMarkdown(rootRule ? [rootRule] : [], detailRules),
+    generateRootContent: generateClaudeMarkdown,
     rootFilePath: "CLAUDE.md",
     generateDetailContent: generateMemoryFile,
     detailSubDir: ".claude/memories",
@@ -30,7 +29,10 @@ export async function generateClaudecodeConfig(
   return generateComplexRules(rules, config, generatorConfig, baseDir);
 }
 
-function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule[]): string {
+function generateClaudeMarkdown(
+  rootRule: ParsedRule | undefined,
+  detailRules: ParsedRule[],
+): string {
   const lines: string[] = [];
 
   // Add introductory text and references to memory files at the top
@@ -48,12 +50,10 @@ function generateClaudeMarkdown(rootRules: ParsedRule[], detailRules: ParsedRule
     lines.push("");
   }
 
-  // Add root rules
-  if (rootRules.length > 0) {
-    for (const rule of rootRules) {
-      lines.push(rule.content);
-      lines.push("");
-    }
+  // Add root rule content
+  if (rootRule) {
+    lines.push(rootRule.content);
+    lines.push("");
   }
 
   return lines.join("\n");

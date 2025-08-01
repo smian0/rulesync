@@ -67,25 +67,21 @@ describe("claudecode generator", () => {
   it("should generate claudecode configuration", async () => {
     const outputs = await generateClaudecodeConfig(mockRules, config);
 
-    expect(outputs).toHaveLength(3); // 2 detail memory files + 1 main file
+    expect(outputs).toHaveLength(3); // 1 main file + 2 detail memory files
 
-    // Check detail files are generated first
-    expect(outputs[0]!.tool).toBe("claudecode");
-    expect(outputs[0]!.filepath).toBe(".claude/memories/architecture-rule.md");
-    expect(outputs[1]!.tool).toBe("claudecode");
-    expect(outputs[1]!.filepath).toBe(".claude/memories/naming-rule.md");
-
-    // Check main CLAUDE.md file (should be last)
-    const mainFile = outputs[2]!;
-    expect(mainFile.tool).toBe("claudecode");
-    expect(mainFile.filepath).toBe("CLAUDE.md");
-    expect(mainFile.content).not.toContain("# Claude Code Memory - Project Instructions");
-    expect(mainFile.content).not.toContain("Generated from rulesync configuration");
-    expect(mainFile.content).toContain("Please also reference the following documents as needed:");
-    expect(mainFile.content).toContain(
+    // Find the root CLAUDE.md file
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.tool).toBe("claudecode");
+    expect(rootOutput!.content).not.toContain("# Claude Code Memory - Project Instructions");
+    expect(rootOutput!.content).not.toContain("Generated from rulesync configuration");
+    expect(rootOutput!.content).toContain(
+      "Please also reference the following documents as needed:",
+    );
+    expect(rootOutput!.content).toContain(
       '@.claude/memories/architecture-rule.md description: "Detail architecture rule" globs: "**/*.tsx"',
     );
-    expect(mainFile.content).toContain(
+    expect(rootOutput!.content).toContain(
       '@.claude/memories/naming-rule.md description: "Detail naming rule" globs: "**/*.js"',
     );
   });
@@ -93,27 +89,42 @@ describe("claudecode generator", () => {
   it("should separate overview and detail rules", async () => {
     const outputs = await generateClaudecodeConfig(mockRules, config);
 
-    // Main CLAUDE.md should contain overview rules and memory references (at index 2)
-    const mainFile = outputs[2]!;
-    expect(mainFile.content).toContain("Use TypeScript for all new code.");
-    expect(mainFile.content).toContain("Please also reference the following documents as needed:");
-    expect(mainFile.content).toContain(
+    // Find the root CLAUDE.md file
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+
+    // Main CLAUDE.md should contain overview rules and memory references
+    expect(rootOutput!.content).toContain("Use TypeScript for all new code.");
+    expect(rootOutput!.content).toContain(
+      "Please also reference the following documents as needed:",
+    );
+    expect(rootOutput!.content).toContain(
       '@.claude/memories/architecture-rule.md description: "Detail architecture rule" globs: "**/*.tsx"',
     );
-    expect(mainFile.content).toContain(
+    expect(rootOutput!.content).toContain(
       '@.claude/memories/naming-rule.md description: "Detail naming rule" globs: "**/*.js"',
     );
 
     // Detail rules should be in separate memory files
-    expect(outputs[0]!.filepath).toBe(".claude/memories/architecture-rule.md");
-    expect(outputs[1]!.filepath).toBe(".claude/memories/naming-rule.md");
+    const detailOutputs = outputs.filter((output) =>
+      output.filepath.startsWith(".claude/memories/"),
+    );
+    expect(detailOutputs).toHaveLength(2);
+    expect(
+      detailOutputs.some((output) => output.filepath === ".claude/memories/architecture-rule.md"),
+    ).toBe(true);
+    expect(
+      detailOutputs.some((output) => output.filepath === ".claude/memories/naming-rule.md"),
+    ).toBe(true);
   });
 
   it("should include rule metadata", async () => {
     const outputs = await generateClaudecodeConfig([mockRules[0]!], config);
 
-    expect(outputs[0]!.content).not.toContain("### Overview coding rule");
-    expect(outputs[0]!.content).toContain("Use TypeScript for all new code.");
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.content).not.toContain("### Overview coding rule");
+    expect(rootOutput!.content).toContain("Use TypeScript for all new code.");
   });
 
   it("should handle rules without description", async () => {
@@ -131,8 +142,10 @@ describe("claudecode generator", () => {
 
     const outputs = await generateClaudecodeConfig([ruleWithoutDescription], config);
 
-    expect(outputs[0]!.content).not.toContain("### Test rule");
-    expect(outputs[0]!.content).toContain("Some rule content.");
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.content).not.toContain("### Test rule");
+    expect(rootOutput!.content).toContain("Some rule content.");
   });
 
   it("should handle rules without globs", async () => {
@@ -150,15 +163,19 @@ describe("claudecode generator", () => {
 
     const outputs = await generateClaudecodeConfig([ruleWithoutGlobs], config);
 
-    expect(outputs[0]!.content).toContain("Some rule content.");
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.content).toContain("Some rule content.");
   });
 
   it("should handle empty rules array", async () => {
     const outputs = await generateClaudecodeConfig([], config);
 
     expect(outputs).toHaveLength(1);
-    expect(outputs[0]!.content).not.toContain("# Claude Code Memory - Project Instructions");
-    expect(outputs[0]!.content).not.toContain("@");
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.content).not.toContain("# Claude Code Memory - Project Instructions");
+    expect(rootOutput!.content).not.toContain("@");
   });
 
   it("should generate memory files for detail rules", async () => {
@@ -360,7 +377,9 @@ describe("claudecode generator", () => {
 
     const outputs = await generateClaudecodeConfig([ruleWithQuotes], config);
 
-    expect(outputs[1]!.content).toContain(
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.content).toContain(
       '@.claude/memories/quoted-rule.md description: "Rule with \\"double quotes\\" in description" globs: "**/*.ts"',
     );
   });
@@ -380,7 +399,9 @@ describe("claudecode generator", () => {
 
     const outputs = await generateClaudecodeConfig([ruleWithMultipleGlobs], config);
 
-    expect(outputs[1]!.content).toContain(
+    const rootOutput = outputs.find((output) => output.filepath === "CLAUDE.md");
+    expect(rootOutput).toBeDefined();
+    expect(rootOutput!.content).toContain(
       '@.claude/memories/multi-glob-rule.md description: "Rule with multiple globs" globs: "**/*.ts,**/*.tsx,src/**/*.js"',
     );
   });

@@ -1,6 +1,11 @@
 import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
-import type { BaseMcpServer, GeminiSettings } from "../../types/mcp-config.js";
-import { shouldIncludeServer } from "../../utils/mcp-helpers.js";
+import type { BaseMcpServer } from "../../types/mcp-config.js";
+import {
+  configWrappers,
+  generateMcpConfig,
+  generateMcpConfigurationFiles,
+  type McpServerMapping,
+} from "./shared-factory.js";
 
 type GeminiServer = BaseMcpServer & {
   // Allow additional properties that might be present in the server config
@@ -8,77 +13,63 @@ type GeminiServer = BaseMcpServer & {
 };
 
 export function generateGeminiCliMcp(config: RulesyncMcpConfig): string {
-  const geminiSettings: GeminiSettings = {
-    mcpServers: {},
-  };
+  return generateMcpConfig(config, {
+    target: "geminicli",
+    configPaths: [".gemini/settings.json"],
+    serverTransform: (server: RulesyncMcpServer): McpServerMapping => {
+      const geminiServer: GeminiServer = {};
 
-  for (const [serverName, server] of Object.entries(config.mcpServers)) {
-    if (!shouldIncludeServer(server, "geminicli")) continue;
-
-    const geminiServer: GeminiServer = {};
-
-    if (server.command) {
-      geminiServer.command = server.command;
-      if (server.args) geminiServer.args = server.args;
-    } else if (server.url || server.httpUrl) {
-      if (server.httpUrl) {
-        geminiServer.httpUrl = server.httpUrl;
-      } else if (server.url) {
-        geminiServer.url = server.url;
-      }
-    }
-
-    if (server.env) {
-      geminiServer.env = {};
-      for (const [key, value] of Object.entries(server.env)) {
-        if (value.startsWith("${") && value.endsWith("}")) {
-          geminiServer.env[key] = value;
-        } else {
-          geminiServer.env[key] = `\${${value}}`;
+      if (server.command) {
+        geminiServer.command = server.command;
+        if (server.args) geminiServer.args = server.args;
+      } else if (server.url || server.httpUrl) {
+        if (server.httpUrl) {
+          geminiServer.httpUrl = server.httpUrl;
+        } else if (server.url) {
+          geminiServer.url = server.url;
         }
       }
-    }
 
-    if (server.timeout !== undefined) {
-      geminiServer.timeout = server.timeout;
-    }
+      if (server.env) {
+        geminiServer.env = server.env;
+      }
 
-    if (server.trust !== undefined) {
-      geminiServer.trust = server.trust;
-    }
+      if (server.timeout !== undefined) {
+        geminiServer.timeout = server.timeout;
+      }
 
-    geminiSettings.mcpServers[serverName] = geminiServer;
-  }
+      if (server.trust !== undefined) {
+        geminiServer.trust = server.trust;
+      }
 
-  return JSON.stringify(geminiSettings, null, 2);
+      return geminiServer;
+    },
+    configWrapper: configWrappers.mcpServers,
+  });
 }
 
 export function generateGeminiCliMcpConfiguration(
   mcpServers: Record<string, RulesyncMcpServer>,
   baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
-  const filepath = baseDir ? `${baseDir}/.gemini/settings.json` : ".gemini/settings.json";
-
-  const config: GeminiSettings = {
-    mcpServers: {},
-  };
-
-  for (const [serverName, server] of Object.entries(mcpServers)) {
-    // Check if this server should be included for geminicli
-    if (!shouldIncludeServer(server, "geminicli")) {
-      continue;
-    }
-
-    // Clone server config and remove targets
-    const { targets: _, ...serverConfig } = server;
-    // Convert to GeminiServer format preserving all properties
-    config.mcpServers[serverName] = { ...serverConfig };
-  }
-
-  return [
+  return generateMcpConfigurationFiles(
+    mcpServers,
     {
-      filepath,
-      content: `${JSON.stringify(config, null, 2)}\n`,
+      target: "geminicli",
+      configPaths: [".gemini/settings.json"],
+      serverTransform: (server: RulesyncMcpServer): McpServerMapping => {
+        const { targets: _, ...serverConfig } = server;
+        const geminiServer: GeminiServer = { ...serverConfig };
+
+        // Preserve environment variables as-is for Gemini CLI
+        if (server.env) {
+          geminiServer.env = server.env;
+        }
+
+        return geminiServer;
+      },
+      configWrapper: configWrappers.mcpServers,
     },
-  ];
+    baseDir,
+  );
 }
