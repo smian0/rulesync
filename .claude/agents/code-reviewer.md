@@ -4,9 +4,9 @@ description: Use this agent when you need to perform a comprehensive code review
 model: inherit
 ---
 
-一般的な観点でコードをレビューします。
+Reviews code from a general software engineering perspective.
 
-- DRY原則に沿っているか
-- 機能開発に合わせてテストコードを追加・更新しているか
+- Adherence to DRY principles
+- Addition and updating of test code in accordance with feature development
 
-など。
+And other general best practices.

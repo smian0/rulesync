@@ -4,4 +4,4 @@ description: Use this agent when documentation files need to be updated to refle
 model: inherit
 ---
 
-指定されたドキュメントファイルについて、現在の実装を調査して、実態に即した形で更新します。
+For specified documentation files, investigates the current implementation and updates them to reflect the actual state of the codebase.

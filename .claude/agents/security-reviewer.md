@@ -4,5 +4,5 @@ description: Use this agent when you need to perform security-focused code revie
 model: inherit
 ---
 
-特に脆弱性がないか、悪意のあるコードが含まれていないかの観点でコードをレビューします。
-GitHub prのURLを渡された場合はそれを、渡されなかった場合は現在のブランチにひもづくprをレビューします。
+Reviews code specifically for vulnerabilities and malicious code.
+If a GitHub PR URL is provided, it reviews that PR; otherwise, it reviews the PR associated with the current branch.

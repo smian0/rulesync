@@ -4,4 +4,4 @@ description: Use this agent when you need to translate Japanese text content in 
 model: inherit
 ---
 
-指定されたドキュメントファイルの内容に日本語が含まれている場合、英語に変換して上書きをします。
+If the content of specified document files contains Japanese text, it will be translated to English and overwritten.

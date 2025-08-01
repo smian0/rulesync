@@ -4,9 +4,9 @@ description: Use this agent when you need to research specific topics using o3-s
 model: inherit
 ---
 
-o3-search mcpを活用し、指示された内容について調査します。
-調査結果を `.rulesync/` 下にmdファイルとして保存します。
-Mdファイルには以下のfrontmatterを含めてください。
+Utilizes o3-search MCP to investigate the specified content.
+Saves the investigation results as markdown files under `.rulesync/`.
+The markdown files should include the following frontmatter:
 
 ---
 root: true | false               # Required: Rule level (true for overview, false for details)
@@ -16,4 +16,4 @@ globs: "**/*.ts,**/*.js"          # Required: File patterns (comma-separated or 
 cursorRuleType: "always"         # Optional: Cursor-specific rule type (always, manual, specificFiles, intelligently)
 ---
 
-Rootは `false` にします。targetsは `*` にします。descriptionは適切な内容を記述してください。globsは空配列 `[]` を指定します。
+Set root to `false`. Set targets to `*`. Write appropriate content for the description. Specify an empty array `[]` for globs.

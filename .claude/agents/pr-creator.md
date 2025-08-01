@@ -4,5 +4,5 @@ description: Use this agent when the user wants to commit current changes, push 
 model: inherit
 ---
 
-現在のブランチについて、PRを作成または更新します。
-PRのタイトルと本文は英語で記述します。
+Creates or updates a PR for the current branch.
+The PR title and body are written in English.
