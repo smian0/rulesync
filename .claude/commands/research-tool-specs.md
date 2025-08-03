@@ -21,3 +21,14 @@ Use the o3 search MCP to research the specifications and create the following fi
 
 For all files, research and document the specifications as comprehensively and thoroughly as possible without omissions.
 
+The markdown files should include the following frontmatter:
+
+---
+root: true | false               # Required: Rule level (true for overview, false for details)
+targets: ["*"]                   # Required: Target tools (* = all, or specific tools)
+description: "Brief description" # Required: Rule description
+globs: []                        # Required: File patterns to match (e.g., ["*.md", "*.txt"])
+cursorRuleType: "always"         # Optional: Cursor-specific rule type (always, manual, specificFiles, intelligently)
+---
+
+Set root to `false`. Set targets to `*`. Write appropriate content for the description. Specify an empty array `[]` for globs.
