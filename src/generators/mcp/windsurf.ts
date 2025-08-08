@@ -4,13 +4,13 @@ import {
   generateMcpFromRegistry,
 } from "./shared-factory.js";
 
-export function generateJunieMcp(config: RulesyncMcpConfig): string {
-  return generateMcpFromRegistry("junie", config);
+export function generateWindsurfMcp(config: RulesyncMcpConfig): string {
+  return generateMcpFromRegistry("windsurf", config);
 }
 
-export function generateJunieMcpConfiguration(
+export function generateWindsurfMcpConfiguration(
   mcpServers: Record<string, RulesyncMcpServer>,
   baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
-  return generateMcpConfigurationFilesFromRegistry("junie", mcpServers, baseDir);
+  return generateMcpConfigurationFilesFromRegistry("windsurf", mcpServers, baseDir);
 }
