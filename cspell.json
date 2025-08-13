@@ -209,6 +209,8 @@
         "windsurfignore",
         "windsurf",
         "ENOENT",
-        "namespacing"
+        "namespacing",
+        "roomodes",
+        "PYTHONPATH"
     ]
 }
