@@ -131,7 +131,7 @@ rulesync/
 │   │   │   ├── init.ts                 # Initialize project with comprehensive rule templates
 │   │   │   ├── add.ts                  # Add new rule files interactively
 │   │   │   ├── generate.ts             # Generate configurations (registry-driven)
-│   │   │   ├── import.ts               # Import existing configurations
+│   │   │   ├── import.ts               # Import existing configurations (enhanced with command detection)
 │   │   │   ├── watch.ts                # Real-time file watching
 │   │   │   ├── status.ts               # Project status and health checks
 │   │   │   ├── validate.ts             # Rule validation with detailed reporting
@@ -141,10 +141,12 @@ rulesync/
 │   ├── core/
 │   │   ├── parser.ts                  # Parse .rulesync/*.md files
 │   │   ├── generator.ts               # Orchestrate generation (registry-aware)
-│   │   ├── importer.ts                # Import existing configurations
+│   │   ├── importer.ts                # Import existing configurations (enhanced)
 │   │   ├── validator.ts               # Comprehensive rule validation
 │   │   ├── mcp-generator.ts           # MCP-specific generation with factory pattern
-│   │   └── mcp-parser.ts              # MCP configuration parsing
+│   │   ├── mcp-parser.ts              # MCP configuration parsing
+│   │   ├── command-generator.ts       # ⭐ NEW: Orchestrate custom command generation
+│   │   └── command-parser.ts          # ⭐ NEW: Parse command definitions from rules
 │   ├── generators/                    # Organized by output type with shared patterns
 │   │   ├── rules/                     # Standard rule generators
 │   │   │   ├── generator-registry.ts  # ⭐ NEW: Registry pattern for rule generation
@@ -163,10 +165,15 @@ rulesync/
 │   │   ├── mcp/                       # MCP configuration generators
 │   │   │   ├── shared-factory.ts      # ⭐ NEW: Shared MCP configuration factory
 │   │   │   └── [tool].ts              # Individual MCP generators (11 tools)
-│   │   └── ignore/                    # Ignore file generators
+│   │   ├── ignore/                    # Ignore file generators
 │   │       ├── shared-factory.ts      # ⭐ NEW: Shared ignore file factory
 │   │       ├── shared-helpers.ts      # ⭐ NEW: Common ignore pattern utilities
 │   │       └── [tool].ts              # Security-focused ignore generators (6 tools)
+│   │   └── commands/                  # ⭐ NEW: Custom command generators
+│   │       ├── cursor.ts              # Cursor command generation
+│   │       ├── cline.ts               # Cline command generation
+│   │       ├── roo.ts                 # Roo Cline command generation
+│   │       └── windsurf.ts            # Windsurf command generation
 │   ├── parsers/                       # Tool-specific parsers (comprehensive coverage)
 │   │   ├── shared-helpers.ts          # ⭐ NEW: Shared parsing utilities
 │   │   ├── augmentcode.ts             # Parse AugmentCode (.augmentcode + legacy)
@@ -185,6 +192,7 @@ rulesync/
 │   │   ├── mcp.ts                     # MCP-specific types
 │   │   ├── mcp-config.ts              # ⭐ NEW: MCP configuration types
 │   │   ├── claudecode.ts              # ⭐ NEW: Claude Code specific types
+│   │   ├── commands.ts                # ⭐ NEW: Custom command types and interfaces
 │   │   ├── tool-targets.ts            # Updated tool target definitions (12 tools)
 │   │   └── config-options.ts          # Configuration option types
 │   ├── test-utils/                    # ⭐ NEW: Shared testing utilities
@@ -236,23 +244,242 @@ export const RuleFrontmatterSchema = z.object({
 - Backward compatibility maintained for existing rule files
 - Enhanced validation with clear error messages
 
+### Import Command Technical Enhancements (ENHANCED)
+
+The `import` command has been significantly improved to handle the expanded rulesync ecosystem and new command generation features:
+
+#### Enhanced Import Capabilities
+
+1. **Command Detection and Import**
+   - Automatically detects existing commands in imported configurations
+   - Extracts command definitions from tool-specific formats
+   - Converts to unified command frontmatter format
+   - Preserves keyboard shortcuts and metadata
+
+2. **Improved Tool Discovery**
+   - Enhanced detection patterns for all 12 supported AI tools
+   - Better handling of hierarchical configurations (Claude Code, Codex CLI)
+   - Support for multi-file patterns (Windsurf, Cursor)
+   - MCP configuration detection and import
+
+3. **Advanced Configuration Parsing**
+   - Robust parsing of complex configuration formats
+   - Error recovery for malformed configurations
+   - Metadata preservation during import process
+   - Frontmatter standardization across tools
+
+#### Import Process Flow
+
+```typescript
+// Enhanced import workflow
+async function importConfigurations(tools: string[], options: ImportOptions) {
+  for (const tool of tools) {
+    // 1. Discover existing configurations
+    const configs = await discoverToolConfigurations(tool);
+    
+    // 2. Parse configurations with command extraction
+    const parsed = await parseConfigurationsWithCommands(configs);
+    
+    // 3. Convert to unified rule format
+    const rules = await convertToUnifiedFormat(parsed);
+    
+    // 4. Generate rulesync-compatible files
+    await generateRulesyncFiles(rules, tool);
+  }
+}
+```
+
+#### Testing Import Enhancements
+
+```bash
+# Test import command with command detection
+pnpm test src/core/importer               # Core import logic
+pnpm test src/cli/commands/import         # CLI import command
+pnpm test src/parsers/                    # All tool parsers
+
+# Test specific tool imports with commands
+pnpm test:import cursor                   # Test Cursor import with commands
+pnpm test:import cline                    # Test Cline import
+pnpm test:import roo                      # Test Roo Cline import
+
+# Integration testing
+pnpm test:e2e import                      # End-to-end import testing
+```
+
+### Custom Command Generation Architecture (NEW)
+
+The project now includes a **custom command generation system** that allows AI tools to register and execute custom commands defined in rule files. This feature is currently supported for tools that have command execution capabilities:
+
+#### Core Components
+
+1. **CommandParser (`src/core/command-parser.ts`)**
+   - Extracts command definitions from rule frontmatter
+   - Validates command syntax and structure
+   - Supports inline commands and command blocks
+   - Handles command metadata including description and keybindings
+   - Example frontmatter:
+     ```yaml
+     commands:
+       - name: "test"
+         description: "Run project tests"
+         content: "npm test"
+         key: "t"  # Optional keyboard shortcut
+       - name: "build"
+         description: "Build the project for production"
+         content: |
+           npm run clean
+           npm run compile
+           npm run bundle
+         key: "b"
+     ```
+
+2. **CommandGenerator (`src/core/command-generator.ts`)**
+   - Orchestrates command generation across supported tools
+   - Routes to appropriate tool-specific generators
+   - Handles command file creation and formatting
+   - Manages command registration and deduplication
+   - Integrates with rule processing pipeline
+
+3. **Tool-Specific Command Generators (`src/generators/commands/`)**
+   - **cursor.ts**: Generates Cursor commands with inline integration
+   - **cline.ts**: Creates Cline-compatible command instructions
+   - **roo.ts**: Produces Roo Cline trigger definitions with keybindings
+   - **windsurf.ts**: Generates Windsurf command configurations
+
+#### Command Definition Format
+
+Commands are defined in rule frontmatter using the following structure:
+
+```typescript
+interface CommandDefinition {
+  name: string;        // Command identifier (unique within scope)
+  description: string; // Human-readable description
+  content: string;     // Command script (single or multi-line)
+  key?: string;        // Optional keyboard shortcut (tool-specific)
+}
+```
+
+#### Generator Pattern
+
+Each tool's command generator follows this pattern:
+
+```typescript
+export async function generateToolCommands(
+  rules: ParsedRule[],
+  config: Config,
+  baseDir?: string
+): Promise<GeneratedOutput[]> {
+  // 1. Extract commands from rules
+  const commands = CommandParser.extractCommands(rules);
+  
+  // 2. Format commands for the specific tool
+  const formattedCommands = formatCommandsForTool(commands);
+  
+  // 3. Generate output file(s)
+  return [{
+    path: getCommandFilePath(config, baseDir),
+    content: formattedCommands
+  }];
+}
+```
+
+#### Testing Command Generation
+
+Command generation includes comprehensive test coverage:
+
+```bash
+# Test command parsing and validation
+pnpm test src/core/command-parser
+
+# Test command generation orchestration
+pnpm test src/core/command-generator
+
+# Test all tool-specific command generators
+pnpm test src/generators/commands/
+
+# Test individual tool command generation
+pnpm test src/generators/commands/cursor    # Cursor command integration
+pnpm test src/generators/commands/cline     # Cline instruction generation
+pnpm test src/generators/commands/roo       # Roo Cline trigger definitions
+pnpm test src/generators/commands/windsurf  # Windsurf command configuration
+
+# Test command integration in rule processing
+pnpm test src/core/generator.integration   # End-to-end with commands
+
+# Test command generation in development environment
+pnpm dev generate --target cursor --commands  # Include command generation
+pnpm dev generate --target cline --commands   # Test with Cline
+pnpm dev generate --target roo --commands     # Test with Roo Cline
+pnpm dev generate --target windsurf --commands # Test with Windsurf
+```
+
+#### Adding Command Support to New Tools
+
+To add command support for a new AI tool:
+
+1. **Check Tool Capabilities**: Verify the tool supports custom command execution
+2. **Create Command Generator**: Add `src/generators/commands/newtool.ts`
+3. **Define Output Format**: Determine how the tool expects commands to be formatted
+4. **Register in CommandGenerator**: Add to the tool switch in `command-generator.ts`
+5. **Add Types**: Update `src/types/commands.ts` if needed
+6. **Write Tests**: Create comprehensive tests for the new generator
+7. **Update Documentation**: Document the command format in tool specification
+8. **Integration Testing**: Test command generation with the actual AI tool
+
+Example implementation:
+```typescript
+// src/generators/commands/newtool.ts
+export async function generateNewToolCommands(
+  rules: ParsedRule[],
+  config: Config,
+  baseDir?: string
+): Promise<GeneratedOutput[]> {
+  const commands = CommandParser.extractCommands(rules);
+  
+  if (commands.length === 0) {
+    return [];
+  }
+  
+  const content = formatNewToolCommands(commands);
+  const outputPath = join(
+    baseDir ?? config.outputDirectory ?? process.cwd(),
+    ".newtool",
+    "commands.json"
+  );
+  
+  return [{
+    path: outputPath,
+    content: JSON.stringify(content, null, 2)
+  }];
+}
+```
+
 ### Key Dependencies
 
-- **Commander.js**: CLI framework for command-line interface
+#### Core Dependencies
+- **Commander.js**: CLI framework for command-line interface and argument parsing
 - **gray-matter**: Frontmatter parsing for Markdown files (supports YAML, TOML, JSON)
-- **marked**: Markdown parsing and rendering
+- **marked**: Markdown parsing and rendering for content processing
 - **chokidar**: File watching for `watch` command with high performance
-- **c12**: Configuration loading with support for multiple formats
-- **micromatch**: Glob pattern matching for file filtering
-- **zod**: Runtime type validation and schema definition
-- **js-yaml**: YAML parsing and stringification
-- **tsup**: Build system (outputs both CJS and ESM)
-- **tsx**: TypeScript execution for development
-- **Biome**: Unified linter and formatter (primary)
-- **ESLint**: Additional linting with custom plugins
+- **c12**: Configuration loading with support for multiple formats (JSON, JSONC, TS)
+- **micromatch**: Glob pattern matching for file filtering and rule targeting
+- **zod**: Runtime type validation and schema definition with enhanced command types
+- **js-yaml**: YAML parsing and stringification for frontmatter and configuration
+
+#### Development and Build
+- **tsup**: Build system (outputs both CJS and ESM with type definitions)
+- **tsx**: TypeScript execution for development and testing
+- **Biome**: Unified linter and formatter (primary tool)
+- **ESLint**: Additional linting with custom plugins (zod-import, no-type-assertion)
 - **Oxlint**: Fast Rust-based linter for additional checks
-- **Vitest**: Testing framework with coverage
+- **Vitest**: Testing framework with coverage and snapshot testing
 - **cspell**: Spell checker for code and documentation
+
+#### Command Generation Dependencies
+- **Command parsing utilities**: Enhanced frontmatter handling for command definitions
+- **Tool-specific formatters**: Custom formatting for each AI tool's command format
+- **Validation helpers**: Command schema validation and error reporting
+- **Template engines**: Dynamic command file generation with metadata preservation
 
 ### Build System
 
@@ -291,14 +518,27 @@ export const RuleFrontmatterSchema = z.object({
 #### Pull Request Process
 
 1. Fork and create a feature branch
-2. Write your code and tests
+2. Write your code and tests (including command generation if applicable)
 3. Run the full test suite: `pnpm test`
 4. Run code quality checks: `pnpm check`
 5. Check for secrets: `pnpm secretlint`
 6. Check spelling: `pnpm cspell`
-7. Set up git hooks: `npx simple-git-hooks` (first time only)
-7. Commit your changes with a clear message
-8. Push to your fork and create a pull request
+7. Test command generation functionality if applicable: `pnpm test src/generators/commands/`
+8. Set up git hooks: `npx simple-git-hooks` (first time only)
+9. Commit your changes with a clear message
+10. Push to your fork and create a pull request
+
+#### Development Workflow for Command Features
+
+When working on command generation features:
+
+1. **Design Command Format**: Define how commands should be represented for the target tool
+2. **Implement Parser**: Add command detection to the tool's parser if importing is needed
+3. **Create Generator**: Implement the command generator following the established pattern
+4. **Add Validation**: Ensure command definitions are properly validated
+5. **Write Tests**: Cover parsing, generation, validation, and error scenarios
+6. **Integration Testing**: Test with real AI tool configurations
+7. **Documentation**: Update tool specifications with command format details
 
 #### Commit Message Format
 
@@ -323,8 +563,12 @@ Types:
 
 Examples:
 - `feat(generators): add support for new AI tool`
+- `feat(commands): add command generation for Cursor integration`
 - `fix(parser): handle missing frontmatter gracefully`
+- `fix(commands): resolve command deduplication issue`
+- `enhance(import): improve command detection during import`
 - `docs(readme): update installation instructions`
+- `test(commands): add comprehensive command generation tests`
 
 ## Code Style
 
@@ -436,6 +680,11 @@ pnpm test src/generators/ignore/           # All ignore generators
 # Integration tests
 pnpm test src/core/generator.integration   # End-to-end generation
 pnpm test src/cli/commands/                # CLI command testing
+
+# Command generation tests
+pnpm test src/core/command-parser          # Command parsing logic
+pnpm test src/core/command-generator       # Command generation orchestration
+pnpm test src/generators/commands/         # All command generators
 ```
 
 ### Test Coverage Expectations
@@ -443,10 +692,11 @@ pnpm test src/cli/commands/                # CLI command testing
 **Current Coverage by Module** (Target: 80%+):
 
 - **cli/commands**: **Excellent** - All commands fully tested with edge cases
-- **core**: **High** - Parser, generator, importer, validator extensively tested
+- **core**: **High** - Parser, generator, importer, validator, command-parser, command-generator extensively tested
 - **generators/rules**: **High** - All 12 tools with 250-350 lines each
 - **generators/mcp**: **High** - All transport types and configurations
 - **generators/ignore**: **High** - Security patterns and factory functions
+- **generators/commands**: **High** - Command generation for supported tools (Cursor, Cline, Roo, Windsurf)
 - **parsers**: **High** - Discovery patterns and error handling for all tools
 - **utils**: **High** - File operations, config loading, error handling
 - **test-utils**: **Full** - Mock factories and shared helpers
@@ -483,6 +733,40 @@ it("should support pattern re-inclusion with negation", async () => { /* ... */ 
 it("should discover hierarchical configurations", async () => { /* ... */ });
 it("should handle multi-file patterns", async () => { /* ... */ });
 it("should validate frontmatter during parsing", async () => { /* ... */ });
+```
+
+#### Command Generation Testing
+```typescript
+// Test command extraction from frontmatter
+it("should extract commands from rule frontmatter", async () => {
+  const commands = CommandParser.extractCommands(rules);
+  expect(commands).toHaveLength(3);
+  expect(commands[0]).toHaveProperty("name");
+  expect(commands[0]).toHaveProperty("description");
+  expect(commands[0]).toHaveProperty("content");
+  expect(commands[0]).toHaveProperty("key"); // Optional keyboard shortcut
+});
+
+// Test multi-line command handling
+it("should handle multi-line command scripts", async () => { /* ... */ });
+
+// Test command validation
+it("should validate command definitions", async () => {
+  // Test required fields, unique names, valid keys
+});
+
+// Test command deduplication
+it("should deduplicate commands with same name", async () => { /* ... */ });
+
+// Test tool-specific formatting
+it("should format commands for Cursor's embedded format", async () => { /* ... */ });
+it("should generate Cline's command instructions", async () => { /* ... */ });
+it("should create Roo's trigger definitions with keybindings", async () => { /* ... */ });
+it("should produce Windsurf's command markdown", async () => { /* ... */ });
+
+// Test error handling
+it("should handle invalid command definitions gracefully", async () => { /* ... */ });
+it("should report parsing errors with helpful messages", async () => { /* ... */ });
 ```
 
 ### Major Architecture Improvements

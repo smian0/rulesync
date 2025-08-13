@@ -72,6 +72,27 @@ pnpm cspell
 pnpm typecheck
 ```
 
+### 開発環境でのコマンド機能テスト
+
+```bash
+# カスタムコマンド生成機能をテスト
+pnpm dev generate --target claudecode --commands  # Claude Codeのスラッシュコマンド生成
+pnpm dev generate --target geminicli --commands   # Gemini CLIのTOMLコマンド生成
+
+# コマンドファイルの作成と編集
+# .rulesync/commands/my-command.md を作成
+# フロントマターには description と targets を記述
+
+# 生成されたコマンドファイルの確認
+ls .claude/commands/        # Claude Code用コマンド
+ls .gemini/commands/        # Gemini CLI用コマンド
+
+# 統合テスト
+pnpm dev init               # プロジェクト初期化
+pnpm dev add --name "test-command"  # 新しいコマンドファイル追加
+pnpm dev generate --all     # 全ツール向け生成（コマンド含む）
+```
+
 ## プロジェクトアーキテクチャ
 
 ### レジストリパターンアーキテクチャ
@@ -129,7 +150,9 @@ rulesync/
 │   │   ├── importer.ts     # 既存設定のインポート
 │   │   ├── validator.ts    # ルール構造の検証
 │   │   ├── mcp-generator.ts # MCP固有の生成ロジック
-│   │   └── mcp-parser.ts   # MCP固有のパースロジック
+│   │   ├── mcp-parser.ts   # MCP固有のパースロジック
+│   │   ├── command-generator.ts # ⭐ 新機能: カスタムコマンド生成オーケストレーション
+│   │   └── command-parser.ts    # ⭐ 新機能: ルールからのコマンド定義パース
 │   ├── generators/         # ツール固有のジェネレーター（出力タイプ別に整理）
 │   │   ├── rules/          # 標準ルールジェネレーター
 │   │   │   ├── augmentcode.ts  # AugmentCode Rules
@@ -147,10 +170,14 @@ rulesync/
 │   │   ├── mcp/            # MCP設定ジェネレーター
 │   │   │   ├── shared-factory.ts # 統一されたMCP設定生成ファクトリー
 │   │   │   └── [tool].ts   # 各ツール用のMCP固有設定
-│   │   └── ignore/         # Ignoreファイルジェネレーター
+│   │   ├── ignore/         # Ignoreファイルジェネレーター
 │   │       ├── shared-factory.ts # 統一されたignore設定生成ファクトリー
 │   │       ├── shared-helpers.ts # 共通ignoreパターンヘルパー
 │   │       └── [tool].ts   # ツール固有のignore設定
+│   │   └── commands/       # ⭐ 新機能: カスタムスラッシュコマンドジェネレーター
+│   │       ├── claudecode.ts    # Claude Code用メモリファイル生成（.claude/commands/*.md）
+│   │       ├── geminicli.ts     # Gemini CLI用TOMLファイル生成（.gemini/commands/*.toml）
+│   │       └── index.ts         # コマンドジェネレーター統合エクスポート
 │   ├── parsers/           # インポート機能用ツール固有パーサー
 │   │   ├── augmentcode.ts # AugmentCode設定のパース
 │   │   ├── copilot.ts     # GitHub Copilot設定のパース (.github/copilot-instructions.md)
@@ -169,6 +196,7 @@ rulesync/
 │   │   ├── rules.ts       # ルールとフロントマター型
 │   │   ├── mcp.ts         # MCP固有型
 │   │   ├── mcp-config.ts  # 共有MCP設定インターフェース
+│   │   ├── commands.ts    # ⭐ 新機能: カスタムスラッシュコマンド型とインターフェース
 │   │   ├── tool-targets.ts # ツールターゲット定義
 │   │   └── config-options.ts # 設定オプション型
 │   └── utils/
@@ -215,6 +243,96 @@ export const RuleFrontmatterSchema = z.object({
 - 既存ルールファイルとの後方互換性を維持
 - 明確なエラーメッセージによる強化された検証
 
+### カスタムコマンド生成アーキテクチャ (新機能)
+
+プロジェクトは**カスタムスラッシュコマンド生成システム**を導入しました。これにより、AIツールは`.rulesync/commands/*.md`で定義されたカスタムコマンドを登録・実行できるようになります。この機能は現在、コマンド実行機能を持つツールでサポートされています：
+
+#### コアコンポーネント
+
+1. **CommandParser (`src/core/command-parser.ts`)**
+   - `.rulesync/commands/`ディレクトリからコマンド定義を読み込み
+   - Markdownファイルのフロントマターとコンテンツを解析
+   - コマンド構文と構造の検証
+   - ツール間の構文変換サポート（例: `$ARGUMENTS` → `{{args}}`）
+   - フロントマター例（簡素化版）:
+     ```yaml
+     ---
+     description: "GitHub issue修正を実行"
+     targets:
+       - claudecode
+       - geminicli
+     ---
+     ```
+
+2. **CommandGenerator (`src/core/command-generator.ts`)**
+   - サポートされているツール全体でのコマンド生成をオーケストレーション
+   - 適切なツール固有ジェネレーターへのルーティング
+   - コマンドファイルの作成とフォーマット処理
+   - サブディレクトリ名前空間をサポート
+
+3. **ツール固有コマンドジェネレーター (`src/generators/commands/`)**
+   - **claudecode.ts**: Claude Code用のメモリファイル生成（`.claude/commands/*.md`）
+   - **geminicli.ts**: Gemini CLI用のTOMLファイル生成（`.gemini/commands/*.toml`）
+
+#### コマンド定義フォーマット
+
+コマンドは`.rulesync/commands/`ディレクトリのMarkdownファイルで定義されます:
+
+```typescript
+interface CommandDefinition {
+  name: string;        // ファイル名から自動生成
+  description: string; // フロントマターから取得
+  content: string;     // Markdownコンテンツ（コマンドスクリプト）
+  targets: string[];   // 対象ツール配列
+}
+```
+
+#### 生成される出力フォーマット
+
+**Claude Code**: Markdownファイル（フロントマター付き）
+```markdown
+---
+description: "GitHub issue修正を実行"
+---
+# GitHub issue修正を実行
+
+このコマンドは以下の手順で...
+```
+
+**Gemini CLI**: TOMLファイル
+```toml
+description = "GitHub issue修正を実行"
+
+[command]
+content = """
+このコマンドは以下の手順で...
+"""
+```
+
+#### ジェネレーターパターン
+
+各ツールのコマンドジェネレーターは以下のパターンに従います:
+
+```typescript
+export async function generateToolCommands(
+  commandsDir: string,
+  config: Config,
+  baseDir?: string
+): Promise<GeneratedOutput[]> {
+  // 1. .rulesync/commands/からコマンドファイルを読み込み
+  const commands = await CommandParser.parseCommandsDirectory(commandsDir);
+  
+  // 2. 特定のツール用にコマンドをフォーマット
+  const formattedCommands = formatCommandsForTool(commands);
+  
+  // 3. 出力ファイルを生成
+  return formattedCommands.map(cmd => ({
+    path: getCommandFilePath(cmd.name, config, baseDir),
+    content: cmd.content
+  }));
+}
+```
+
 ### 主要な依存関係
 
 - **Commander.js**: コマンドラインインターフェース用のCLIフレームワーク
@@ -240,6 +358,69 @@ export const RuleFrontmatterSchema = z.object({
 - **出力**: CommonJS（`dist/index.js`）とESM（`dist/index.mjs`）の両方
 - **バイナリ**: `dist/index.js`（実行可能エントリーポイント）
 - **型**: ビルド出力に含まれる
+
+## 日本語開発者向けのコントリビューション手順
+
+### コマンド機能開発の流れ
+
+1. **コマンド定義の作成**
+   ```bash
+   # .rulesync/commands/ディレクトリに新しいコマンドファイルを作成
+   mkdir -p .rulesync/commands
+   touch .rulesync/commands/my-new-command.md
+   ```
+
+2. **フロントマターの記述** (v0.57.0+の簡素化フォーマット)
+   ```yaml
+   ---
+   description: "新しいコマンドの説明"
+   targets:
+     - claudecode
+     - geminicli
+   ---
+   ```
+
+3. **コマンド内容の記述**
+   - Markdownコンテンツ部分にコマンドの詳細を記述
+   - 必要に応じて構文変換（`$ARGUMENTS` → `{{args}}`等）
+
+4. **生成とテスト**
+   ```bash
+   # 開発環境で生成をテスト
+   pnpm dev generate --target claudecode --commands
+   pnpm dev generate --target geminicli --commands
+   
+   # 生成されたファイルを確認
+   cat .claude/commands/my-new-command.md
+   cat .gemini/commands/my-new-command.toml
+   ```
+
+5. **テストの作成**
+   - コマンドパーサーのテスト
+   - ジェネレーターのテスト
+   - 統合テストの追加
+
+### 新しいコマンドサポートツールの追加手順
+
+1. **事前調査**
+   - ツールがカスタムコマンド実行をサポートするかの確認
+   - コマンド定義フォーマットの調査（JSON、TOML、Markdown等）
+
+2. **ジェネレーター実装**
+   ```bash
+   # 新しいジェネレーターファイルを作成
+   touch src/generators/commands/newtool.ts
+   ```
+
+3. **パターンテンプレートの使用**
+   - 既存のclaudecode.tsやgeminicli.tsを参考
+   - `parseCommandsDirectory`でコマンドを読み込み
+   - ツール固有フォーマットに変換
+
+4. **統合とテスト**
+   - `src/core/command-generator.ts`に追加
+   - 包括的テストケースの作成
+   - E2Eテストでの検証
 
 ## 貢献方法
 
@@ -359,13 +540,29 @@ pnpm test src/generators/copilot.test.ts
 # 特定機能のテストを実行
 pnpm test src/cli/commands/import.test.ts  # インポート機能のテスト
 pnpm test src/parsers/                     # すべてのパーサーのテスト
+
+# コマンド生成のテスト
+pnpm test src/core/command-parser          # コマンドパース
+pnpm test src/core/command-generator       # コマンド生成オーケストレーション
+pnpm test src/generators/commands/         # すべてのコマンドジェネレーター
+
+# 特定ツールのコマンド生成テスト
+pnpm test src/generators/commands/claudecode  # Claude Code用スラッシュコマンド
+pnpm test src/generators/commands/geminicli   # Gemini CLI用TOMLコマンド
+
+# 開発環境でのコマンド機能テスト
+pnpm dev generate --target claudecode --commands  # Claude Codeコマンド生成を含む
+pnpm dev generate --target geminicli --commands   # Gemini CLIコマンド生成を含む
 ```
 
 ### モジュール別テストカバレッジ
 
 - **cli/commands**: 優秀なカバレッジ
-- **core**: 高カバレッジを達成
-- **generators**: すべてのモジュールで高カバレッジ
+- **core**: 高カバレッジを達成（command-parser、command-generatorを含む）
+- **generators/rules**: すべてのツールで高カバレッジ
+- **generators/mcp**: すべてのMCP設定で高カバレッジ
+- **generators/ignore**: セキュリティパターンで高カバレッジ
+- **generators/commands**: コマンド生成で高カバレッジ（Claude Code、Gemini CLI用スラッシュコマンド）
 - **parsers**: すべてのパーサーで良好なカバレッジ
 - **utils**: すべてのモジュールで高カバレッジ
 - **types**: 型定義ファイルのため測定対象外
@@ -376,6 +573,13 @@ pnpm test src/parsers/                     # すべてのパーサーのテス�
 - **Windsurf AIコードエディター**: 完全サポート（ジェネレーター、パーサー、MCP、ignoreファイル）
 - **包括的テストカバレッジ**: 新ツール向けの包括的テストスイート実装
 
+**カスタムスラッシュコマンド生成システム** (新機能):
+- **コマンドパーサー**: `.rulesync/commands/`からのコマンド定義読み込み
+- **コマンドジェネレーター**: ツール固有のコマンドファイル生成
+- **サポートツール**: Claude Code（.claude/commands/*.md）、Gemini CLI（.gemini/commands/*.toml）
+- **フロントマター簡素化**: v0.57.0でdescriptionとtargetsのみの簡潔な形式に変更
+- **拡張可能アーキテクチャ**: 新ツールへのコマンドサポート追加が容易
+
 **アーキテクチャリファクタリング**:
 - **レジストリパターン実装**: 中央集権的なツール設定管理システム
 - **共有ファクトリーパターン**: 統一されたMCPおよびignoreファイル生成
@@ -384,9 +588,9 @@ pnpm test src/parsers/                     # すべてのパーサーのテス�
 
 **強化された開発体験**:
 - **型安全性向上**: Zodスキーマと適切な型ガードの実装
-- **包括的テスト**: 全モジュールで1,200+行のテストコード（250-350行/ファイル）
+- **包括的テスト**: 全モジュールで1,500+行のテストコード（250-350行/ファイル）
 - **開発ツール強化**: Biome + ESLint + Oxlintによる多層品質チェック
-- **改善された組織化**: rules/、mcp/、ignore/サブディレクトリによる明確な構造
+- **改善された組織化**: rules/、mcp/、ignore/、commands/サブディレクトリによる明確な構造
 
 **高度なMCP統合**:
 - **マルチトランスポート**: stdio、SSE、HTTPの完全サポート
@@ -398,6 +602,68 @@ pnpm test src/parsers/                     # すべてのパーサーのテス�
 - **階層ルールシステム**: マルチレベルルール優先順位システム
 - **改善された検証**: 堅牢なルール構造とフロントマター検証
 - **シリアル実行**: 安定性向上のための順次処理実装
+
+### importコマンドの技術的改修
+
+**importコマンド**は拡張されたrulesyncエコシステムと新しいコマンド生成機能に対応するため大幅に改良されました：
+
+#### 改良されたインポート機能
+
+1. **コマンド検出とインポート**
+   - 既存設定内のコマンドを自動検出
+   - ツール固有フォーマットからコマンド定義を抽出
+   - 統一コマンドフロントマター形式に変換
+   - キーボードショートカットとメタデータを保持
+
+2. **改良されたツール発見**
+   - 12のサポートされているAIツール全てで強化された検出パターン
+   - 階層設定の改良された処理（Claude Code、Codex CLI）
+   - マルチファイルパターンのサポート（Windsurf、Cursor）
+   - MCP設定の検出とインポート
+
+3. **高度な設定パース**
+   - 複雑な設定フォーマットの堅牢なパース
+   - 不正な設定に対するエラー回復
+   - インポートプロセス中のメタデータ保持
+   - ツール間でのフロントマター標準化
+
+#### インポートプロセスフロー
+
+```typescript
+// 強化されたインポートワークフロー
+async function importConfigurations(tools: string[], options: ImportOptions) {
+  for (const tool of tools) {
+    // 1. 既存設定を発見
+    const configs = await discoverToolConfigurations(tool);
+    
+    // 2. コマンド抽出付きで設定をパース
+    const parsed = await parseConfigurationsWithCommands(configs);
+    
+    // 3. 統一ルールフォーマットに変換
+    const rules = await convertToUnifiedFormat(parsed);
+    
+    // 4. rulesync互換ファイルを生成
+    await generateRulesyncFiles(rules, tool);
+  }
+}
+```
+
+#### インポート改良のテスト
+
+```bash
+# コマンド検出付きimportコマンドのテスト
+pnpm test src/core/importer               # コアインポートロジック
+pnpm test src/cli/commands/import         # CLIインポートコマンド
+pnpm test src/parsers/                    # 全ツールパーサー
+
+# コマンド付き特定ツールインポートのテスト
+pnpm test:import cursor                   # Cursorコマンド付きインポートテスト
+pnpm test:import cline                    # Clineインポートテスト
+pnpm test:import roo                      # Roo Clineインポートテスト
+
+# 統合テスト
+pnpm test:e2e import                      # エンドツーエンドインポートテスト
+```
 
 ## 新しいAIツールの追加
 
@@ -475,12 +741,121 @@ export const ignoreConfigs = {
 - [ ] **CLI統合**: `src/cli/index.ts`にオプション追加
 - [ ] **型定義**: `tool-targets.ts`の`ALL_TOOL_TARGETS`に追加
 - [ ] **設定パス**: `src/utils/config.ts`で出力パス定義
-- [ ] **包括的テスト**: 全機能の徹底的テストカバレッジ
+- [ ] **コマンドサポート**: ツールがコマンド実行をサポートする場合、コマンドジェネレーターを追加
+- [ ] **包括的テスト**: 全機能の徹底的テストカバレッジ（コマンド生成テストを含む）
 - [ ] **レジストリ統合**: 該当する場合は共有ファクトリーレジストリに追加
 - [ ] **ドキュメント更新**: README.mdとREADME.ja.md
 - [ ] **仕様書作成**: `.rulesync/specification-[tool]-*.md`
 
-### 5. アーキテクチャパターンに従った実装
+### 5. 新しいツールへのコマンドサポート追加
+
+ツールがカスタムコマンド実行をサポートする場合:
+
+1. **ツール機能の確認**: ツールがスラッシュコマンドやカスタムコマンド実行をサポートしているか確認
+2. **コマンドジェネレーター作成**: `src/generators/commands/newtool.ts`を追加
+3. **出力フォーマット定義**: ツールが期待するコマンドフォーマットを決定（Markdown、JSON、TOML等）
+4. **CommandGeneratorへの登録**: `command-generator.ts`のツールスイッチに追加
+5. **型の追加**: 必要に応じて`src/types/commands.ts`を更新
+6. **包括的テスト作成**: 新しいジェネレーターのテストを作成
+7. **ドキュメント更新**: ツール仕様書にコマンドフォーマットを記載
+
+実装例（新しいパターン）:
+```typescript
+// src/generators/commands/newtool.ts
+export async function generateNewToolCommands(
+  commandsDir: string,
+  config: Config,
+  baseDir?: string
+): Promise<GeneratedOutput[]> {
+  // .rulesync/commands/からコマンドを読み込み
+  const commands = await CommandParser.parseCommandsDirectory(commandsDir);
+  
+  if (commands.length === 0) {
+    return [];
+  }
+  
+  // 各コマンドをツール固有フォーマットに変換
+  return commands.map(command => {
+    const content = formatNewToolCommand(command);
+    const outputPath = join(
+      baseDir ?? config.outputDirectory ?? process.cwd(),
+      ".newtool",
+      "commands",
+      `${command.name}.json`
+    );
+    
+    return {
+      path: outputPath,
+      content: JSON.stringify(content, null, 2)
+    };
+  });
+}
+
+function formatNewToolCommand(command: CommandDefinition): any {
+  return {
+    name: command.name,
+    description: command.description,
+    script: convertSyntax(command.content, "newtool"),
+    metadata: {
+      source: "rulesync",
+      targets: command.targets
+    }
+  };
+}
+```
+
+#### コマンド生成のテスト
+
+```typescript
+// コマンドディレクトリからの読み込みテスト
+it("should parse commands from .rulesync/commands/ directory", async () => {
+  const commands = await CommandParser.parseCommandsDirectory(commandsDir);
+  expect(commands).toHaveLength(3);
+  expect(commands[0]).toHaveProperty("name");       // ファイル名から自動生成
+  expect(commands[0]).toHaveProperty("description"); // フロントマターから取得
+  expect(commands[0]).toHaveProperty("content");     // Markdownコンテンツ
+  expect(commands[0]).toHaveProperty("targets");     // 対象ツール配列
+});
+
+// フロントマター簡素化のテスト（v0.57.0+）
+it("should handle simplified frontmatter with description and targets only", async () => {
+  // descriptionとtargetsのみのフロントマターをサポート
+  expect(command.frontmatter).toEqual({
+    description: "GitHub issue修正を実行",
+    targets: ["claudecode", "geminicli"]
+  });
+});
+
+// ツール固有フォーマット生成のテスト
+it("should generate Claude Code memory files", async () => {
+  const outputs = await generateClaudeCodeCommands(commandsDir, config);
+  expect(outputs[0].path).toMatch(/\.claude\/commands\/.*\.md$/);
+  expect(outputs[0].content).toContain("---\ndescription:");
+});
+
+it("should generate Gemini CLI TOML files", async () => {
+  const outputs = await generateGeminiCliCommands(commandsDir, config);
+  expect(outputs[0].path).toMatch(/\.gemini\/commands\/.*\.toml$/);
+  expect(outputs[0].content).toContain('description = ');
+});
+
+// 構文変換のテスト
+it("should convert syntax between tool formats", async () => {
+  // $ARGUMENTS → {{args}} などの構文変換をテスト
+  const converted = convertSyntax(command.content, "geminicli");
+  expect(converted).not.toContain("$ARGUMENTS");
+  expect(converted).toContain("{{args}}");
+});
+
+// サブディレクトリ名前空間のテスト
+it("should support subdirectory namespacing", async () => {
+  // .rulesync/commands/feature/test.md → .claude/commands/feature/test.md
+  const command = await parseCommandFile("feature/test.md");
+  expect(command.namespace).toBe("feature");
+});
+```
+
+### 6. アーキテクチャパターンに従った実装
 
 **保守性重視**:
 - 共通ロジックは共有ヘルパーに移動

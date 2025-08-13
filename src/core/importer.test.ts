@@ -10,11 +10,13 @@ vi.mock("../parsers");
 describe("importConfiguration", () => {
   const testDir = join(__dirname, "test-temp-importer");
   const rulesDir = join(testDir, ".rulesync");
+  const commandsDir = join(rulesDir, "commands");
 
   beforeEach(async () => {
     const { mkdir } = await import("node:fs/promises");
     await mkdir(testDir, { recursive: true });
     await mkdir(rulesDir, { recursive: true });
+    await mkdir(commandsDir, { recursive: true });
     vi.resetAllMocks();
   });
 
@@ -68,7 +70,7 @@ describe("importConfiguration", () => {
     expect(createdFile).toContain("# Main content");
   });
 
-  it("should handle unique filename generation", async () => {
+  it("should overwrite files with same filename", async () => {
     const mockRules = [
       {
         frontmatter: {
@@ -106,10 +108,10 @@ describe("importConfiguration", () => {
 
     expect(result.rulesCreated).toBe(2);
 
-    const file1 = await readFile(join(rulesDir, "rules.md"), "utf-8");
-    const file2 = await readFile(join(rulesDir, "rules-1.md"), "utf-8");
-    expect(file1).toContain("Content 1");
-    expect(file2).toContain("Content 2");
+    // The last rule with the same filename should overwrite the previous one
+    const file = await readFile(join(rulesDir, "rules.md"), "utf-8");
+    expect(file).toContain("Content 2");
+    expect(file).not.toContain("Content 1");
   });
 
   it("should create .rulesyncignore file when ignore patterns exist", async () => {
@@ -369,5 +371,81 @@ describe("importConfiguration", () => {
     expect(calls.some((msg) => msg.includes("Created .mcp.json with 2 servers"))).toBe(true);
 
     consoleSpy.mockRestore();
+  });
+
+  it("should import commands files from Claude Code", async () => {
+    const mockRules = [
+      {
+        frontmatter: {
+          description: "Command: fix-issue",
+          targets: ["claudecode"] satisfies ToolTarget[],
+          root: false,
+          globs: ["**/*"],
+        },
+        content: "Fix GitHub issue #$ARGUMENTS by following these steps:",
+        filename: "fix-issue",
+        filepath: "/test/.claude/commands/fix-issue.md",
+        type: "command" as const,
+      },
+    ];
+
+    vi.spyOn(parsers, "parseClaudeConfiguration").mockResolvedValueOnce({
+      rules: mockRules,
+      errors: [],
+    });
+
+    const result = await importConfiguration({
+      tool: "claudecode",
+      baseDir: testDir,
+    });
+
+    expect(result.rulesCreated).toBe(1);
+    expect(result.success).toBe(true);
+
+    const createdFile = await readFile(join(rulesDir, "commands", "fix-issue.md"), "utf-8");
+    expect(createdFile).toContain("description: 'Command: fix-issue'");
+    expect(createdFile).toContain("targets:");
+    expect(createdFile).toContain("- claudecode");
+    expect(createdFile).not.toContain("root:");
+    expect(createdFile).not.toContain("globs:");
+    expect(createdFile).toContain("Fix GitHub issue #$ARGUMENTS");
+  });
+
+  it("should import commands files from Gemini CLI", async () => {
+    const mockRules = [
+      {
+        frontmatter: {
+          description: "Command: optimize",
+          targets: ["geminicli"] satisfies ToolTarget[],
+          root: false,
+          globs: ["**/*"],
+        },
+        content: "Optimize the code by following these steps:",
+        filename: "optimize",
+        filepath: "/test/.gemini/commands/optimize.md",
+        type: "command" as const,
+      },
+    ];
+
+    vi.spyOn(parsers, "parseGeminiConfiguration").mockResolvedValueOnce({
+      rules: mockRules,
+      errors: [],
+    });
+
+    const result = await importConfiguration({
+      tool: "geminicli",
+      baseDir: testDir,
+    });
+
+    expect(result.rulesCreated).toBe(1);
+    expect(result.success).toBe(true);
+
+    const createdFile = await readFile(join(rulesDir, "commands", "optimize.md"), "utf-8");
+    expect(createdFile).toContain("description: 'Command: optimize'");
+    expect(createdFile).toContain("targets:");
+    expect(createdFile).toContain("- geminicli");
+    expect(createdFile).not.toContain("root:");
+    expect(createdFile).not.toContain("globs:");
+    expect(createdFile).toContain("Optimize the code by following");
   });
 });
