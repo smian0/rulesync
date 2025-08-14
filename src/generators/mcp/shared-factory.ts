@@ -252,7 +252,7 @@ export const MCP_GENERATOR_REGISTRY: Partial<Record<ToolTarget, McpToolConfig>> 
 
   junie: {
     target: "junie",
-    configPaths: [".junie/mcp-config.json"],
+    configPaths: [".junie/mcp/mcp.json"],
     serverTransform: (server: RulesyncMcpServer, serverName: string): McpServerMapping => {
       const junieServer: BaseMcpServer & {
         name?: string;
