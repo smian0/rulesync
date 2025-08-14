@@ -330,6 +330,27 @@ export function generateMcpFromRegistry(tool: ToolTarget, config: RulesyncMcpCon
 }
 
 /**
+ * Create simple MCP generator functions for tools that use the registry pattern
+ */
+export function createMcpGenerator(toolName: ToolTarget) {
+  return {
+    generateMcp: (config: RulesyncMcpConfig): string => {
+      return generateMcpFromRegistry(toolName, config);
+    },
+    generateMcpConfiguration: (
+      mcpServers: Record<string, RulesyncMcpServer>,
+      baseDir: string = "",
+    ): Array<{ filepath: string; content: string }> => {
+      return generateMcpConfigurationFilesFromRegistry(toolName, mcpServers, baseDir);
+    },
+  };
+}
+
+// Pre-created MCP generators for common tools (only those actually used)
+export const cursorMcpGenerator = createMcpGenerator("cursor");
+export const clineMcpGenerator = createMcpGenerator("cline");
+
+/**
  * Generate MCP configuration files using registry
  */
 export function generateMcpConfigurationFilesFromRegistry(
