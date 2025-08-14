@@ -205,7 +205,7 @@ describe("generateJunieMcpConfiguration", () => {
     const result = generateJunieMcpConfiguration(servers);
 
     expect(result).toHaveLength(1);
-    expect(result[0]?.filepath).toBe(".junie/mcp-config.json");
+    expect(result[0]?.filepath).toBe(".junie/mcp/mcp.json");
 
     const parsed = JSON.parse(result[0]?.content || "{}");
     expect(parsed.mcpServers).toHaveProperty("test-server");
@@ -222,7 +222,7 @@ describe("generateJunieMcpConfiguration", () => {
     const result = generateJunieMcpConfiguration(servers, "/custom/base");
 
     expect(result).toHaveLength(1);
-    expect(result[0]?.filepath).toBe("/custom/base/.junie/mcp-config.json");
+    expect(result[0]?.filepath).toBe("/custom/base/.junie/mcp/mcp.json");
   });
 
   it("should preserve server configuration and add name", () => {
