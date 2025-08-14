@@ -44,7 +44,7 @@ describe("generateMcpConfigurations", () => {
     expect(filepaths).toContain(join(testDir, ".codex/mcp-config.json"));
     expect(filepaths).toContain(join(testDir, ".roo/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".gemini/settings.json"));
-    expect(filepaths).toContain(join(testDir, ".junie/mcp-config.json"));
+    expect(filepaths).toContain(join(testDir, ".junie/mcp/mcp.json"));
     expect(filepaths).toContain(join(testDir, ".kiro/mcp.json"));
     expect(filepaths).toContain(join(testDir, "mcp_config.json")); // Windsurf
   });

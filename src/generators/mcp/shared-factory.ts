@@ -386,10 +386,11 @@ function generateJunieMcpConfigurationFiles(
   mcpServers: Record<string, RulesyncMcpServer>,
   baseDir: string = "",
 ): Array<{ filepath: string; content: string }> {
+  const junieMcpPath = ".junie/mcp/mcp.json";
   // Generate project-level configuration only (as per precautions.md constraint)
   // Junie MCP config is stored in project root - no IDE settings path is used
   // to avoid creating user-level settings
-  const filepath = baseDir ? `${baseDir}/.junie/mcp-config.json` : ".junie/mcp-config.json";
+  const filepath = baseDir ? `${baseDir}/${junieMcpPath}` : junieMcpPath;
 
   const config: BaseMcpConfig = {
     mcpServers: {},
