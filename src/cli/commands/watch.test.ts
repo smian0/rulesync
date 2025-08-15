@@ -3,6 +3,7 @@ import { watch } from "chokidar";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockConfig } from "../../test-utils/index.js";
 import { getDefaultConfig } from "../../utils/index.js";
+import { logger } from "../../utils/logger.js";
 import { generateCommand } from "./generate.js";
 import { watchCommand } from "./watch.js";
 
@@ -37,8 +38,8 @@ describe("watchCommand", () => {
     mockWatch.mockReturnValue(mockWatcher as FSWatcher);
 
     // Mock console methods
-    vi.spyOn(console, "log").mockImplementation(() => {});
-    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.spyOn(logger, "log").mockImplementation(() => {});
+    vi.spyOn(logger, "error").mockImplementation(() => {});
     vi.spyOn(process, "exit").mockImplementation(() => {
       throw new Error("process.exit called");
     });
@@ -51,8 +52,8 @@ describe("watchCommand", () => {
     // Wait a bit for the async operations to start
     await new Promise((resolve) => setTimeout(resolve, 10));
 
-    expect(console.log).toHaveBeenCalledWith("👀 Watching for changes in .rulesync directory...");
-    expect(console.log).toHaveBeenCalledWith("Press Ctrl+C to stop watching");
+    expect(logger.log).toHaveBeenCalledWith("👀 Watching for changes in .rulesync directory...");
+    expect(logger.log).toHaveBeenCalledWith("Press Ctrl+C to stop watching");
     expect(mockGenerateCommand).toHaveBeenCalledWith({ verbose: false });
     expect(mockWatch).toHaveBeenCalledWith(".rulesync/**/*.md", {
       ignoreInitial: true,
@@ -81,15 +82,18 @@ describe("watchCommand", () => {
       return mockWatcher;
     });
 
+    // Mock logger.success
+    vi.spyOn(logger, "success").mockImplementation(() => {});
+
     const _watchPromise = watchCommand();
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     // Simulate file change
     await changeHandler!("test.md");
 
-    expect(console.log).toHaveBeenCalledWith("\n📝 Detected change in test.md");
+    expect(logger.log).toHaveBeenCalledWith("\n📝 Detected change in test.md");
     expect(mockGenerateCommand).toHaveBeenCalledTimes(2); // Initial + change
-    expect(console.log).toHaveBeenCalledWith("✅ Regenerated configuration files");
+    expect(logger.success).toHaveBeenCalledWith("Regenerated configuration files");
   });
 
   it("should handle file additions", async () => {
@@ -107,7 +111,7 @@ describe("watchCommand", () => {
     // Simulate file addition
     await addHandler!("new-rule.md");
 
-    expect(console.log).toHaveBeenCalledWith("\n📝 Detected change in new-rule.md");
+    expect(logger.log).toHaveBeenCalledWith("\n📝 Detected change in new-rule.md");
     expect(mockGenerateCommand).toHaveBeenCalledTimes(2); // Initial + add
   });
 
@@ -126,7 +130,7 @@ describe("watchCommand", () => {
     // Simulate file deletion
     await unlinkHandler!("deleted-rule.md");
 
-    expect(console.log).toHaveBeenCalledWith("\n🗑️  Removed deleted-rule.md");
+    expect(logger.log).toHaveBeenCalledWith("\n🗑️  Removed deleted-rule.md");
     expect(mockGenerateCommand).toHaveBeenCalledTimes(2); // Initial + unlink
   });
 
@@ -152,7 +156,7 @@ describe("watchCommand", () => {
     // Simulate file change with error
     await changeHandler!("test.md");
 
-    expect(console.error).toHaveBeenCalledWith("❌ Failed to regenerate:", error);
+    expect(logger.error).toHaveBeenCalledWith("Failed to regenerate:", error);
   });
 
   it("should handle watcher errors", async () => {
@@ -174,7 +178,7 @@ describe("watchCommand", () => {
     // Simulate watcher error
     errorHandler!(error);
 
-    expect(console.error).toHaveBeenCalledWith("❌ Watcher error:", error);
+    expect(logger.error).toHaveBeenCalledWith("Watcher error:", error);
   });
 
   it("should call generateCommand for initial generation", async () => {

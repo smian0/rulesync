@@ -17,7 +17,7 @@
   "rules": {
     "eqeqeq": "error",
     "import/no-cycle": "error",
-    "no-console": "off",
+    "no-console": "error",
     "typescript/no-explicit-any": "warn",
     "unicorn/prefer-node-protocol": "error",
     "unicorn/no-array-reduce": "off"
@@ -35,7 +35,8 @@
     {
       "files": ["**/*.test.ts"],
       "rules": {
-        "typescript/no-explicit-any": "off"
+        "typescript/no-explicit-any": "off",
+        "no-console": "error"
       }
     }
   ]

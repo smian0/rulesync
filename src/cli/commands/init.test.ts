@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createMockConfig } from "../../test-utils/index.js";
 import { loadConfig } from "../../utils/config-loader.js";
 import { ensureDir, fileExists, writeFileContent } from "../../utils/index.js";
+import { logger } from "../../utils/logger.js";
 import { initCommand } from "./init.js";
 
 vi.mock("../../utils/index.js");
@@ -24,7 +25,8 @@ describe("initCommand", () => {
     mockWriteFileContent.mockResolvedValue();
 
     // Mock console methods
-    vi.spyOn(console, "log").mockImplementation(() => {});
+    vi.spyOn(logger, "log").mockImplementation(() => {});
+    vi.spyOn(logger, "success").mockImplementation(() => {});
   });
 
   it("should initialize rulesync successfully", async () => {
@@ -32,11 +34,11 @@ describe("initCommand", () => {
 
     expect(mockEnsureDir).toHaveBeenCalledWith(".rulesync");
     expect(mockEnsureDir).toHaveBeenCalledWith(".rulesync/rules");
-    expect(console.log).toHaveBeenCalledWith("Initializing rulesync...");
-    expect(console.log).toHaveBeenCalledWith("✅ rulesync initialized successfully!");
-    expect(console.log).toHaveBeenCalledWith("\nNext steps:");
-    expect(console.log).toHaveBeenCalledWith("1. Edit rule files in .rulesync/rules/");
-    expect(console.log).toHaveBeenCalledWith(
+    expect(logger.log).toHaveBeenCalledWith("Initializing rulesync...");
+    expect(logger.success).toHaveBeenCalledWith("rulesync initialized successfully!");
+    expect(logger.log).toHaveBeenCalledWith("\nNext steps:");
+    expect(logger.log).toHaveBeenCalledWith("1. Edit rule files in .rulesync/rules/");
+    expect(logger.log).toHaveBeenCalledWith(
       "2. Run 'rulesync generate' to create configuration files",
     );
   });
@@ -50,7 +52,7 @@ describe("initCommand", () => {
     );
     expect(mockWriteFileContent).toHaveBeenCalledTimes(1);
 
-    expect(console.log).toHaveBeenCalledWith("Created .rulesync/rules/overview.md");
+    expect(logger.success).toHaveBeenCalledWith("Created .rulesync/rules/overview.md");
   });
 
   it("should skip existing files", async () => {
@@ -61,9 +63,7 @@ describe("initCommand", () => {
     await initCommand();
 
     expect(mockWriteFileContent).not.toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith(
-      "Skipped .rulesync/rules/overview.md (already exists)",
-    );
+    expect(logger.log).toHaveBeenCalledWith("Skipped .rulesync/rules/overview.md (already exists)");
   });
 
   it("should handle all files existing", async () => {
@@ -72,9 +72,7 @@ describe("initCommand", () => {
     await initCommand();
 
     expect(mockWriteFileContent).not.toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith(
-      "Skipped .rulesync/rules/overview.md (already exists)",
-    );
+    expect(logger.log).toHaveBeenCalledWith("Skipped .rulesync/rules/overview.md (already exists)");
   });
 
   it("should create proper content for root file", async () => {
@@ -112,6 +110,6 @@ describe("initCommand", () => {
       join(".rulesync", "overview.md"),
       expect.stringContaining("root: true"),
     );
-    expect(console.log).toHaveBeenCalledWith("1. Edit rule files in .rulesync/");
+    expect(logger.log).toHaveBeenCalledWith("1. Edit rule files in .rulesync/");
   });
 });
