@@ -1,4 +1,7 @@
 {
+    "cache": {
+        "useCache": true,
+    },
     "useGitignore": true,
     "ignorePaths": [
         "coverage/**",
@@ -21,6 +24,7 @@
         "augmentinclude",
         "autoapprove",
         "autoattached",
+        "opencode",
         "autoblock",
         "awslabs",
         "bashhistory",
