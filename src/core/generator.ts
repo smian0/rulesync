@@ -12,6 +12,7 @@ import { generateCursorConfig } from "../generators/rules/cursor.js";
 import { generateGeminiConfig } from "../generators/rules/geminicli.js";
 import { generateJunieConfig } from "../generators/rules/junie.js";
 import { generateKiroConfig } from "../generators/rules/kiro.js";
+import { generateOpenCodeConfig } from "../generators/rules/opencode.js";
 import { generateRooConfig } from "../generators/rules/roo.js";
 import { createOutputsArray } from "../generators/rules/shared-helpers.js";
 import { generateWindsurfConfig } from "../generators/rules/windsurf.js";
@@ -107,6 +108,8 @@ async function generateForTool(
       const kiroIgnoreOutputs = await generateKiroIgnoreFiles(rules, config, baseDir);
       return [...kiroRulesOutputs, ...kiroIgnoreOutputs];
     }
+    case "opencode":
+      return generateOpenCodeConfig(rules, config, baseDir);
     case "windsurf": {
       const windsurfRulesOutputs = await generateWindsurfConfig(rules, config, baseDir);
       const windsurfIgnoreOutputs = await generateWindsurfIgnore(rules, config, baseDir);

@@ -1,3 +1,4 @@
+import { SCHEMA_URLS } from "../../constants/schemas.js";
 import type { ToolTarget } from "../../types/index.js";
 import type { RulesyncMcpConfig, RulesyncMcpServer } from "../../types/mcp.js";
 import type { BaseMcpConfig, BaseMcpServer } from "../../types/mcp-config.js";
@@ -162,7 +163,7 @@ const serverTransforms = {
 /**
  * Common config wrappers
  */
-export const configWrappers = {
+const configWrappers = {
   /**
    * Standard mcpServers wrapper
    */
@@ -370,6 +371,43 @@ const MCP_GENERATOR_REGISTRY: Partial<Record<ToolTarget, McpToolConfig>> = {
       return geminiServer;
     },
     configWrapper: configWrappers.mcpServers,
+  },
+
+  opencode: {
+    target: "opencode",
+    configPaths: ["opencode.json"],
+    serverTransform: (server: RulesyncMcpServer): McpServerMapping => {
+      const opencodeServer: McpServerMapping = {};
+
+      // Handle local servers (STDIO transport)
+      if (server.command) {
+        opencodeServer.type = "local";
+        opencodeServer.command = Array.isArray(server.command) ? server.command : [server.command];
+        if (server.args) opencodeServer.args = server.args;
+        if (server.env) opencodeServer.environment = server.env;
+        if (server.cwd) opencodeServer.cwd = server.cwd;
+      }
+      // Handle remote servers
+      else if (server.url || server.httpUrl) {
+        opencodeServer.type = "remote";
+        const url = server.httpUrl || server.url;
+        if (url) opencodeServer.url = url;
+        if (server.headers) opencodeServer.headers = server.headers;
+      }
+
+      // Common fields
+      if (server.disabled !== undefined) {
+        opencodeServer.enabled = !server.disabled;
+      } else {
+        opencodeServer.enabled = true;
+      }
+
+      return opencodeServer;
+    },
+    configWrapper: (servers: Record<string, McpServerMapping>) => ({
+      $schema: SCHEMA_URLS.OPENCODE,
+      mcp: servers,
+    }),
   },
 };
 
