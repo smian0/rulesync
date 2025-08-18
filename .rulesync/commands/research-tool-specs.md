@@ -1,3 +1,9 @@
+---
+description: 'Command: research-tool-specs'
+targets:
+  - claudecode
+---
+
 target_tool_name, tool_name_in_rulesync, overwrite, remarks = $ARGUMENTS
 
 target_tool_name: required
