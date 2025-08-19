@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
-import type { ToolTarget } from "../types/index.js";
+import { ALL_TOOL_TARGETS, type ToolTarget } from "../types/index.js";
 import {
   addCommand,
   configCommand,
@@ -56,6 +56,7 @@ program
 program
   .command("generate")
   .description("Generate configuration files for AI tools")
+  .option("--all", "Generate for all supported AI tools")
   .option("--augmentcode", "Generate only for AugmentCode")
   .option("--augmentcode-legacy", "Generate only for AugmentCode legacy format")
   .option("--copilot", "Generate only for GitHub Copilot")
@@ -80,57 +81,37 @@ program
   .option("--no-config", "Disable configuration file loading")
   .action(async (options) => {
     const tools: ToolTarget[] = [];
-    if (options.augmentcode) tools.push("augmentcode");
-    if (options["augmentcode-legacy"]) tools.push("augmentcode-legacy");
-    if (options.copilot) tools.push("copilot");
-    if (options.cursor) tools.push("cursor");
-    if (options.cline) tools.push("cline");
-    if (options.codexcli) tools.push("codexcli");
-    if (options.claudecode) tools.push("claudecode");
-    if (options.roo) tools.push("roo");
-    if (options.geminicli) tools.push("geminicli");
-    if (options.junie) tools.push("junie");
-    if (options.qwencode) tools.push("qwencode");
-    if (options.kiro) tools.push("kiro");
-    if (options.opencode) tools.push("opencode");
-    if (options.windsurf) tools.push("windsurf");
-
-    // Check if at least one tool is specified
-    if (tools.length === 0) {
-      const { logger } = await import("../utils/logger.js");
-      logger.error("❌ Error: At least one tool must be specified.");
-      logger.error("");
-      logger.error("Available tools:");
-      logger.error("  --augmentcode         Generate for AugmentCode");
-      logger.error("  --augmentcode-legacy  Generate for AugmentCode legacy format");
-      logger.error("  --copilot             Generate for GitHub Copilot");
-      logger.error("  --cursor              Generate for Cursor");
-      logger.error("  --cline               Generate for Cline");
-      logger.error("  --codexcli            Generate for OpenAI Codex CLI");
-      logger.error("  --claudecode          Generate for Claude Code");
-      logger.error("  --roo                 Generate for Roo Code");
-      logger.error("  --geminicli           Generate for Gemini CLI");
-      logger.error("  --junie               Generate for JetBrains Junie");
-      logger.error("  --qwencode            Generate for Qwen Code");
-      logger.error("  --kiro                Generate for Kiro IDE");
-      logger.error("  --opencode            Generate for OpenCode");
-      logger.error("  --windsurf            Generate for Windsurf");
-      logger.error("");
-      logger.error("Example:");
-      logger.error("  rulesync generate --copilot --cursor");
-      process.exit(1);
+    if (options.all) {
+      // Add all supported tools when --all is specified
+      tools.push(...ALL_TOOL_TARGETS);
+    } else {
+      // Add individual tools based on specific options
+      if (options.augmentcode) tools.push("augmentcode");
+      if (options["augmentcode-legacy"]) tools.push("augmentcode-legacy");
+      if (options.copilot) tools.push("copilot");
+      if (options.cursor) tools.push("cursor");
+      if (options.cline) tools.push("cline");
+      if (options.codexcli) tools.push("codexcli");
+      if (options.claudecode) tools.push("claudecode");
+      if (options.roo) tools.push("roo");
+      if (options.geminicli) tools.push("geminicli");
+      if (options.junie) tools.push("junie");
+      if (options.qwencode) tools.push("qwencode");
+      if (options.kiro) tools.push("kiro");
+      if (options.opencode) tools.push("opencode");
+      if (options.windsurf) tools.push("windsurf");
     }
 
     const generateOptions: {
       verbose?: boolean;
-      tools?: ToolTarget[];
+      tools?: ToolTarget[] | undefined;
       delete?: boolean;
       baseDirs?: string[];
       config?: string;
       noConfig?: boolean;
     } = {
       verbose: options.verbose,
-      tools: tools,
+      tools: tools.length > 0 ? tools : undefined,
       delete: options.delete,
       config: options.config,
       noConfig: options.noConfig,

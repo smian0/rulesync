@@ -124,8 +124,20 @@ describe("generateCommand", () => {
   });
 
   it("should exit if no tools are specified", async () => {
+    // Mock config with no default targets
+    mockMergeWithCliOptions.mockImplementationOnce((config, cliOptions) => ({
+      ...config,
+      ...cliOptions,
+      defaultTargets: cliOptions.tools || [],
+    }));
+
     await expect(generateCommand()).rejects.toThrow("process.exit called");
-    expect(mockLogger.error).toHaveBeenCalledWith("❌ Error: At least one tool must be specified.");
+    expect(mockLogger.error).toHaveBeenCalledWith(
+      expect.stringContaining("❌ Error: At least one tool must be specified."),
+    );
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("Available tools:"));
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("--copilot"));
+    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("--cursor"));
   });
 
   it("should exit if .rulesync directory does not exist", async () => {
