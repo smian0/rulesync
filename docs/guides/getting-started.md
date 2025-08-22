@@ -137,10 +137,16 @@ globs: ["src/**/*", "lib/**/*"]
 
 ### Step 3: Generate Tool Configurations
 ```bash
-# Generate for all supported tools
-npx rulesync generate
+# Generate all features for all supported tools (recommended)
+npx rulesync generate --targets * --features *
 
-# Or generate for specific tools
+# Generate specific features for specific tools
+npx rulesync generate --targets cursor,claudecode,copilot --features rules,mcp
+
+# Generate only rules (fastest for development)
+npx rulesync generate --targets * --features rules
+
+# Legacy syntax (deprecated, shows warning)
 npx rulesync generate --cursor --claudecode --copilot
 ```
 
@@ -204,8 +210,8 @@ cat .rulesync/cursor-custom-rules.md
 
 ### Step 5: Generate Unified Configurations
 ```bash
-# Generate for all tools
-npx rulesync generate
+# Generate all features for all tools
+npx rulesync generate --targets * --features *
 
 # Validate everything is working
 npx rulesync validate
@@ -248,6 +254,7 @@ For different environments (dev/staging/prod):
 ```jsonc
 {
   "targets": ["cursor", "claudecode"],
+  "features": ["rules", "commands"],  // Skip MCP/ignore for faster iteration
   "verbose": true,
   "delete": true
 }
@@ -257,6 +264,7 @@ For different environments (dev/staging/prod):
 ```jsonc
 {
   "targets": ["*"],
+  "features": "*",  // Generate all features for production
   "verbose": false,
   "delete": false
 }
@@ -271,14 +279,56 @@ npx rulesync generate --config rulesync.dev.jsonc
 npx rulesync generate --config rulesync.prod.jsonc
 ```
 
+## Selective Generation with Features
+
+The `--features` option (introduced in v0.63.0) allows you to generate only specific types of files:
+
+### Feature Types
+- **`rules`**: Core AI assistant rules (fastest)
+- **`commands`**: Custom slash commands
+- **`mcp`**: Model Context Protocol configurations  
+- **`ignore`**: AI access control files
+
+### Common Patterns
+
+```bash
+# Development: Generate only rules for fast iteration
+npx rulesync generate --targets * --features rules
+
+# Add commands when needed
+npx rulesync generate --targets cursor,claudecode --features rules,commands
+
+# Full production setup
+npx rulesync generate --targets * --features *
+
+# MCP setup only
+npx rulesync generate --targets amazonqcli,claudecode --features mcp
+```
+
+### Performance Benefits
+| Features | Time | Use Case |
+|----------|------|----------|
+| `rules` only | ~0.5s | Quick updates |
+| `rules,commands` | ~0.8s | Development |
+| `*` (all) | ~1.5s | Production |
+
+### Configuration
+```jsonc
+{
+  "targets": ["*"],
+  "features": ["rules", "mcp"],  // Customize what gets generated
+  "verbose": true
+}
+```
+
 ## Advanced Setup
 
 ### Monorepo Configuration
 For projects with multiple packages:
 
 ```bash
-# Generate for different packages
-npx rulesync generate --base-dir ./packages/frontend,./packages/backend,./packages/shared
+# Generate for different packages with specific features
+npx rulesync generate --targets * --features rules,mcp --base-dir ./packages/frontend,./packages/backend,./packages/shared
 
 # Or use configuration file
 ```
