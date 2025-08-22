@@ -34,6 +34,11 @@ export class ConfigMerger {
       merged.exclude = undefined;
     }
 
+    // features が指定されている場合は上書き
+    if (cliOptions.features !== undefined) {
+      merged.features = cliOptions.features;
+    }
+
     return merged;
   }
 
@@ -86,6 +91,15 @@ export class ConfigMerger {
       metadata.exclude = {
         source: ConfigSource.CONFIG_FILE, // excludeはCLIから直接指定されない
         value: merged.exclude,
+      };
+    }
+
+    // features
+    if (merged.features !== undefined) {
+      metadata.features = {
+        source:
+          cliOptions.features !== undefined ? ConfigSource.CLI_ARGS : ConfigSource.CONFIG_FILE,
+        value: merged.features,
       };
     }
 

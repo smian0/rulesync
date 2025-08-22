@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 import { Command } from "commander";
+import type { FeatureType } from "../types/config-options.js";
+import { FEATURE_TYPES } from "../types/config-options.js";
 import type { ToolTarget } from "../types/index.js";
 import { logger } from "../utils/logger.js";
 import {
@@ -69,6 +71,17 @@ program
     "-t, --targets <tools>",
     "Comma-separated list of tools to generate for (e.g., 'copilot,cursor,cline' or '*' for all)",
   )
+  .option(
+    "--features <features>",
+    `Comma-separated list of features to generate (${FEATURE_TYPES.join(",")}) or '*' for all`,
+    (value) => {
+      if (value === "*") return "*";
+      return value
+        .split(",")
+        .map((f) => f.trim())
+        .filter(Boolean);
+    },
+  )
   .option("--agentsmd", "[DEPRECATED] Generate only for AGENTS.md (use --targets agentsmd)")
   .option(
     "--amazonqcli",
@@ -124,6 +137,7 @@ program
       const generateOptions: {
         verbose?: boolean;
         tools?: ToolTarget[] | undefined;
+        features?: FeatureType[] | "*" | undefined;
         delete?: boolean;
         baseDirs?: string[];
         config?: string;
@@ -131,6 +145,7 @@ program
       } = {
         verbose: options.verbose,
         tools: tools.length > 0 ? tools : undefined,
+        features: options.features,
         delete: options.delete,
         config: options.config,
         noConfig: options.noConfig,
