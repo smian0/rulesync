@@ -82,44 +82,116 @@ npx rulesync generate [options]
 ```
 
 **Options:**
+- `-t, --targets <tools>`: Comma-separated list of tools to generate for (recommended)
+- `--all`: ⚠️ **[DEPRECATED]** Generate for all supported AI tools (use `--targets *` instead)
 - `--delete`: Remove existing generated files before creating new ones
 - `--verbose`, `-v`: Show detailed generation process
-- `--dry-run`: Show what would be generated without creating files
 - `--config <path>`: Use specific configuration file
 - `--no-config`: Disable configuration file loading
 - `--base-dir <paths>`: Generate in specific directories (comma-separated)
 
-**Tool-Specific Flags:**
-- `--claudecode`: Generate only for Claude Code
-- `--cursor`: Generate only for Cursor
-- `--copilot`: Generate only for GitHub Copilot
-- `--cline`: Generate only for Cline
-- `--codexcli`: Generate only for OpenAI Codex CLI
-- `--augmentcode`: Generate only for AugmentCode
-- `--roo`: Generate only for Roo Code
-- `--geminicli`: Generate only for Gemini CLI
-- `--junie`: Generate only for JetBrains Junie
-- `--qwencode`: Generate only for Qwen Code
-- `--kiro`: Generate only for Kiro IDE
-- `--windsurf`: Generate only for Windsurf
-- `--agentsmd`: Generate only for AgentsMd
+**Validation and Error Handling (Enhanced in v0.59.0):**
+- Validates that at least one target is specified
+- Prevents mixing `*` with specific tool names
+- Shows clear error messages for invalid tool names
+- Provides deprecation warnings for legacy syntax
+- Validates tool names against supported target list
+
+**Target Specification (New in v0.59.0):**
+The `--targets` flag is now the preferred way to specify which tools to generate for:
+- **Single tool**: `--targets copilot`
+- **Multiple tools**: `--targets copilot,cursor,cline`
+- **All tools**: `--targets *` (preferred) or `--targets all`
+- **Validation**: Cannot mix `*` with specific tools (e.g., `--targets *,copilot` is invalid)
+
+**Available Tools (16 total):**
+`agentsmd`, `amazonqcli`, `augmentcode`, `augmentcode-legacy`, `copilot`, `cursor`, `cline`, `claudecode`, `codexcli`, `opencode`, `qwencode`, `roo`, `geminicli`, `kiro`, `junie`, `windsurf`
+
+**Special Target Values:**
+- `*` - All supported tools (preferred syntax)
+- `all` - All supported tools (alternative syntax)
+
+**Validation Rules:**
+- Cannot combine `*` with specific tools
+- Tool names must be from the supported list above
+- At least one target must be specified
+
+**⚠️ Deprecated Tool-Specific Flags (v0.59.0+):**
+Individual tool flags are deprecated and show warnings. Use `--targets` instead for cleaner syntax:
+- `--agentsmd` → `--targets agentsmd`
+- `--amazonqcli` → `--targets amazonqcli`
+- `--augmentcode` → `--targets augmentcode`
+- `--augmentcode-legacy` → `--targets augmentcode-legacy`
+- `--claudecode` → `--targets claudecode`
+- `--cline` → `--targets cline`
+- `--codexcli` → `--targets codexcli`
+- `--copilot` → `--targets copilot`
+- `--cursor` → `--targets cursor`
+- `--geminicli` → `--targets geminicli`
+- `--junie` → `--targets junie`
+- `--kiro` → `--targets kiro`
+- `--opencode` → `--targets opencode`
+- `--qwencode` → `--targets qwencode`
+- `--roo` → `--targets roo`
+- `--windsurf` → `--targets windsurf`
 
 **Examples:**
 ```bash
-# Generate for all tools
-npx rulesync generate
+# Generate for all tools (new preferred syntax)
+npx rulesync generate --targets *
 
-# Generate for specific tools
-npx rulesync generate --cursor --claudecode
+# Generate for all tools (alternative syntax)
+npx rulesync generate --targets all
+
+# Legacy syntax (deprecated, shows warning)
+npx rulesync generate --all
+
+# Generate for specific tools (recommended syntax)
+npx rulesync generate --targets copilot,cursor,cline
+npx rulesync generate --targets claudecode
+npx rulesync generate -t copilot,cursor
 
 # Clean generation (delete existing files first)
-npx rulesync generate --delete --verbose
+npx rulesync generate --targets copilot,cursor --delete --verbose
 
 # Generate for monorepo packages
-npx rulesync generate --base-dir ./packages/frontend,./packages/backend
+npx rulesync generate --targets * --base-dir ./packages/frontend,./packages/backend
 
-# Dry run to see what would be generated
-npx rulesync generate --dry-run --verbose
+# Legacy syntax (deprecated, shows warning)
+npx rulesync generate --cursor --claudecode
+
+# ❌ Invalid syntax (will show error)
+npx rulesync generate --targets *,copilot  # Error: cannot mix * with specific tools
+```
+
+**Migration Examples (v0.59.0+):**
+```bash
+# Old syntax (deprecated, shows warning)
+npx rulesync generate --all
+
+# New syntax (preferred)
+npx rulesync generate --targets *
+
+# Old syntax (deprecated, shows warning)
+npx rulesync generate --copilot --cursor --cline
+
+# New syntax (preferred)
+npx rulesync generate --targets copilot,cursor,cline
+
+# Old syntax (deprecated, shows warning)
+npx rulesync generate --claudecode --verbose
+
+# New syntax (preferred)
+npx rulesync generate --targets claudecode --verbose
+
+# Backward compatibility maintained
+# All old syntax still works but shows deprecation warnings
+# Use --targets for clean output and future compatibility
+
+# Error examples (will show helpful error messages)
+npx rulesync generate --targets invalid-tool
+npx rulesync generate --targets *,cursor
+npx rulesync generate  # Error: no tools specified
 ```
 
 **Generated Output:**

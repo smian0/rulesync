@@ -154,9 +154,6 @@ describe("generateCommand", () => {
     expect(mockLogger.error).toHaveBeenCalledWith(
       expect.stringContaining("❌ Error: At least one tool must be specified."),
     );
-    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("Available tools:"));
-    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("--copilot"));
-    expect(mockLogger.error).toHaveBeenCalledWith(expect.stringContaining("--cursor"));
   });
 
   it("should exit if .rulesync directory does not exist", async () => {
@@ -215,6 +212,35 @@ describe("generateCommand", () => {
         defaultTargets: ["copilot"],
       }),
       ["copilot"],
+      expect.any(String),
+    );
+  });
+
+  it("should handle tools specified via targets field in config", async () => {
+    const mockResolverInstance = {
+      resolve: vi.fn().mockResolvedValue({
+        value: {
+          ...mockConfig,
+          aiRulesDir: ".rulesync",
+          defaultTargets: ["copilot", "cursor"],
+          targets: ["copilot", "cursor"], // targets from config
+          watchEnabled: false,
+        },
+        source: "Configuration file",
+      }),
+    };
+    mockConfigResolver.mockImplementation(() => mockResolverInstance as any);
+
+    await generateCommand({ tools: ["copilot", "cursor"] });
+
+    expect(mockGenerateConfigurations).toHaveBeenCalledWith(
+      mockRules,
+      expect.objectContaining({
+        aiRulesDir: ".rulesync",
+        defaultTargets: ["copilot", "cursor"],
+        targets: ["copilot", "cursor"],
+      }),
+      ["copilot", "cursor"],
       expect.any(String),
     );
   });
