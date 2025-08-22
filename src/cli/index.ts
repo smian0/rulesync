@@ -48,10 +48,17 @@ program
 program
   .command("import")
   .description("Import configurations from AI tools to rulesync format")
-  .option("--all", "[DEPRECATED] Import from all available tools (use --targets * instead)")
+  .option("-t, --targets <tool>", "Tool to import from (e.g., 'copilot', 'cursor', 'cline')")
   .option(
-    "-t, --targets <tools>",
-    "Comma-separated list of tools to import from (e.g., 'copilot,cursor,cline' or '*' for all)",
+    "--features <features>",
+    `Comma-separated list of features to import (${FEATURE_TYPES.join(",")}) or '*' for all`,
+    (value) => {
+      if (value === "*") return "*";
+      return value
+        .split(",")
+        .map((f) => f.trim())
+        .filter(Boolean);
+    },
   )
   .option("--agentsmd", "[DEPRECATED] Import from AGENTS.md (use --targets agentsmd)")
   .option("--augmentcode", "[DEPRECATED] Import from AugmentCode (use --targets augmentcode)")
@@ -86,10 +93,11 @@ program
       }
 
       // Merge and deduplicate tools from all sources
-      tools = mergeAndDeduplicateTools(targetsTools, deprecatedTools, options.all === true);
+      tools = mergeAndDeduplicateTools(targetsTools, deprecatedTools, false);
 
       const importOptions: ImportOptions = {
         ...(tools.length > 0 && { targets: tools }),
+        ...(options.features && { features: options.features }),
         verbose: options.verbose,
         legacy: options.legacy,
       };
