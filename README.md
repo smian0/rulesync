@@ -1,7 +1,8 @@
 # rulesync
 
 [![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
+[![npm version](https://img.shields.io/npm/v/rulesync)](https://www.npmjs.com/package/rulesync)
+[![npm downloads](https://img.shields.io/npm/dt/rulesync)](https://www.npmjs.com/package/rulesync)
 
 A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files. Uses the recommended `.rulesync/rules/*.md` structure, with backward compatibility for legacy `.rulesync/*.md` layouts. Also imports existing AI tool configurations into the unified format.
 
