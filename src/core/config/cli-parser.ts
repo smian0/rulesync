@@ -1,3 +1,4 @@
+import { validateFeatures } from "../../utils/feature-validator.js";
 import type { CliOptions } from "./types.js";
 
 /**
@@ -15,6 +16,17 @@ export class CliParser {
     // tools (ToolTarget[])
     if (cliOptions.tools && Array.isArray(cliOptions.tools) && cliOptions.tools.length > 0) {
       parsed.tools = cliOptions.tools;
+    }
+
+    // features (FeatureType[] | '*')
+    if (cliOptions.features !== undefined) {
+      try {
+        parsed.features = validateFeatures(cliOptions.features);
+      } catch (error) {
+        throw new Error(
+          `Invalid features: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      }
     }
 
     // verbose (boolean)

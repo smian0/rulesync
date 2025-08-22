@@ -326,6 +326,9 @@ rulesync supports multiple configuration file formats:
   // Target tools to generate configurations for
   "targets": ["cursor", "claudecode", "copilot", "windsurf"],
   
+  // Features to generate (new in v0.63.0)
+  "features": ["rules", "commands", "mcp"],  // or "*" for all
+  
   // Tools to exclude from generation (overrides targets)
   "exclude": ["roo"],
   
@@ -367,6 +370,7 @@ import type { ConfigOptions } from "rulesync";
 
 const config: ConfigOptions = {
   targets: ["cursor", "claudecode", "windsurf"],
+  features: ["rules", "commands", "mcp"],  // New in v0.63.0
   exclude: ["roo"],
   outputPaths: {
     copilot: ".github/copilot-instructions.md"
@@ -393,6 +397,7 @@ export default config;
   },
   "rulesync": {
     "targets": ["cursor", "claudecode"],
+    "features": "*",
     "delete": true,
     "verbose": false
   }
@@ -409,6 +414,20 @@ Array of tools to generate configurations for.
 "targets": ["cursor", "claudecode", "windsurf"]  // Specific tools
 "targets": ["*"]                                 // All tools (default)
 ```
+
+#### `features` (New in v0.63.0)
+Array of features to generate, or `"*"` for all features.
+```jsonc
+"features": ["rules", "commands", "mcp"]  // Specific features
+"features": "*"                          // All features (default)
+"features": ["rules"]                   // Rules only (fastest)
+```
+
+**Available Features:**
+- `"rules"`: Core AI assistant rules and instructions
+- `"commands"`: Custom slash commands for supported tools
+- `"mcp"`: Model Context Protocol server configurations
+- `"ignore"`: Ignore files for controlling AI file access
 
 #### `exclude`
 Array of tools to exclude from generation (overrides `targets`).
@@ -489,6 +508,93 @@ File watching configuration for automatic regeneration.
 }
 ```
 
+## Selective Generation with Features (v0.63.0)
+
+The features system allows you to generate only specific types of files, improving performance and providing more control over what gets generated.
+
+### Feature Types
+
+| Feature | Description | Generated Files | Performance |
+|---------|-------------|-----------------|-------------|
+| `rules` | Core AI assistant rules | CLAUDE.md, .cursor/rules/, etc. | Fastest |
+| `commands` | Custom slash commands | .claude/commands/, .gemini/commands/ | Fast |
+| `mcp` | Model Context Protocol configs | .mcp.json, .cursor/mcp.json | Medium |
+| `ignore` | AI access control files | .cursorignore, .clineignore | Fast |
+
+### Configuration Examples
+
+#### Development: Rules + Commands Only
+```jsonc
+{
+  "targets": ["cursor", "claudecode"],
+  "features": ["rules", "commands"],  // Skip MCP/ignore for fast iteration
+  "verbose": true
+}
+```
+
+#### Production: All Features
+```jsonc
+{
+  "targets": ["*"],
+  "features": "*",  // Generate everything for production
+  "verbose": false
+}
+```
+
+#### Rules Only (Fastest)
+```jsonc
+{
+  "targets": ["*"],
+  "features": ["rules"],  // Only core rules, no extras
+  "watch": {
+    "enabled": true,
+    "interval": 250  // Faster polling since generation is quick
+  }
+}
+```
+
+#### MCP Setup Only
+```jsonc
+{
+  "targets": ["amazonqcli", "claudecode", "cursor"],
+  "features": ["mcp"],  // Only MCP configurations
+  "verbose": true
+}
+```
+
+### Command Line Override
+
+Configuration file features can be overridden from the command line:
+
+```bash
+# Override config to generate only rules
+npx rulesync generate --features rules
+
+# Override config to generate all features
+npx rulesync generate --features *
+
+# Use config file features (no override)
+npx rulesync generate
+```
+
+### Feature Compatibility
+
+Not all tools support all features:
+
+- **All tools**: Support `rules` generation
+- **Command-capable tools**: Claude Code, Cursor, Cline, Gemini CLI, Roo Code
+- **MCP-capable tools**: Amazon Q CLI, Claude Code, Cursor, Windsurf, etc.
+- **Ignore-capable tools**: Most tools (except permission-based tools like OpenCode)
+
+### Performance Benefits
+
+| Features | Typical Time | Use Case |
+|----------|-------------|----------|
+| `["rules"]` | ~0.5s | Quick rule updates |
+| `["rules", "commands"]` | ~0.8s | Development with commands |
+| `["rules", "mcp"]` | ~1.2s | Production setup |
+| `"*"` (all) | ~1.5s | Complete generation |
+
 ## Environment-Specific Configuration
 
 ### Development Configuration
@@ -510,6 +616,7 @@ File watching configuration for automatic regeneration.
 ```jsonc
 {
   "targets": ["*"],
+  "features": "*",         // Generate all features for production
   "exclude": [],
   "delete": false,
   "verbose": false

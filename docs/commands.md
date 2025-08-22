@@ -83,6 +83,7 @@ npx rulesync generate [options]
 
 **Options:**
 - `-t, --targets <tools>`: Comma-separated list of tools to generate for (recommended)
+- `-f, --features <features>`: Comma-separated list of features to generate (rules, commands, mcp, ignore) or `*` for all
 - `--all`: ⚠️ **[DEPRECATED]** Generate for all supported AI tools (use `--targets *` instead)
 - `--delete`: Remove existing generated files before creating new ones
 - `--verbose`, `-v`: Show detailed generation process
@@ -104,17 +105,44 @@ The `--targets` flag is now the preferred way to specify which tools to generate
 - **All tools**: `--targets *` (preferred) or `--targets all`
 - **Validation**: Cannot mix `*` with specific tools (e.g., `--targets *,copilot` is invalid)
 
+**Feature Specification (New in v0.63.0):**
+The `--features` flag allows selective generation of specific feature types:
+- **Single feature**: `--features rules`
+- **Multiple features**: `--features rules,commands,mcp`
+- **All features**: `--features *` (default when not specified)
+- **Available features**: `rules`, `commands`, `mcp`, `ignore`
+- **Validation**: Cannot mix `*` with specific features
+- **Backward compatibility**: Defaults to all features when not specified (shows warning)
+
 **Available Tools (16 total):**
 `agentsmd`, `amazonqcli`, `augmentcode`, `augmentcode-legacy`, `copilot`, `cursor`, `cline`, `claudecode`, `codexcli`, `opencode`, `qwencode`, `roo`, `geminicli`, `kiro`, `junie`, `windsurf`
+
+**Available Features (4 total):**
+- **`rules`**: Core AI assistant rules and instructions
+- **`commands`**: Custom slash commands for supported tools
+- **`mcp`**: Model Context Protocol server configurations
+- **`ignore`**: Ignore files for controlling AI file access
 
 **Special Target Values:**
 - `*` - All supported tools (preferred syntax)
 - `all` - All supported tools (alternative syntax)
 
+**Special Feature Values:**
+- `*` - All supported features (default when not specified)
+
+**Feature Compatibility:**
+- **`rules`**: All tools support rule generation
+- **`commands`**: Currently supported by Claude Code, Cursor, Cline, Gemini CLI, Roo Code
+- **`mcp`**: Supported by tools with MCP integration (Amazon Q CLI, Claude Code, Cursor, etc.)
+- **`ignore`**: Most tools support ignore files (except those using permission systems like OpenCode)
+
 **Validation Rules:**
 - Cannot combine `*` with specific tools
+- Cannot combine `*` with specific features
 - Tool names must be from the supported list above
+- Feature names must be from the supported list above
 - At least one target must be specified
+- Features default to `*` (all) when not specified (with warning)
 
 **⚠️ Deprecated Tool-Specific Flags (v0.59.0+):**
 Individual tool flags are deprecated and show warnings. Use `--targets` instead for cleaner syntax:
@@ -137,60 +165,72 @@ Individual tool flags are deprecated and show warnings. Use `--targets` instead 
 
 **Examples:**
 ```bash
-# Generate for all tools (new preferred syntax)
-npx rulesync generate --targets *
+# Generate all features for all tools (new preferred syntax)
+npx rulesync generate --targets * --features *
 
-# Generate for all tools (alternative syntax)
-npx rulesync generate --targets all
+# Generate all features for all tools (backward compatible)
+npx rulesync generate --targets *  # Shows warning about missing --features
+
+# Generate specific features for all tools
+npx rulesync generate --targets * --features rules,mcp
+npx rulesync generate --targets * --features rules  # Only rules, no MCP/ignore files
+
+# Generate specific features for specific tools (recommended)
+npx rulesync generate --targets copilot,cursor,cline --features rules,commands
+npx rulesync generate --targets claudecode --features rules,mcp
+npx rulesync generate -t copilot,cursor -f rules
+
+# Generate only rules (fastest option)
+npx rulesync generate --targets * --features rules
+
+# Generate only MCP configurations
+npx rulesync generate --targets amazonqcli,claudecode --features mcp
+
+# Clean generation with specific features
+npx rulesync generate --targets copilot,cursor --features rules,ignore --delete --verbose
+
+# Generate for monorepo packages with specific features
+npx rulesync generate --targets * --features rules,mcp --base-dir ./packages/frontend,./packages/backend
 
 # Legacy syntax (deprecated, shows warning)
 npx rulesync generate --all
-
-# Generate for specific tools (recommended syntax)
-npx rulesync generate --targets copilot,cursor,cline
-npx rulesync generate --targets claudecode
-npx rulesync generate -t copilot,cursor
-
-# Clean generation (delete existing files first)
-npx rulesync generate --targets copilot,cursor --delete --verbose
-
-# Generate for monorepo packages
-npx rulesync generate --targets * --base-dir ./packages/frontend,./packages/backend
-
-# Legacy syntax (deprecated, shows warning)
 npx rulesync generate --cursor --claudecode
 
 # ❌ Invalid syntax (will show error)
-npx rulesync generate --targets *,copilot  # Error: cannot mix * with specific tools
+npx rulesync generate --targets *,copilot    # Error: cannot mix * with specific tools
+npx rulesync generate --features *,rules     # Error: cannot mix * with specific features
+npx rulesync generate                        # Error: no tools specified
 ```
 
-**Migration Examples (v0.59.0+):**
+**Migration Examples (v0.59.0+ and v0.63.0+):**
 ```bash
 # Old syntax (deprecated, shows warning)
 npx rulesync generate --all
 
 # New syntax (preferred)
-npx rulesync generate --targets *
+npx rulesync generate --targets * --features *
 
 # Old syntax (deprecated, shows warning)
 npx rulesync generate --copilot --cursor --cline
 
 # New syntax (preferred)
-npx rulesync generate --targets copilot,cursor,cline
+npx rulesync generate --targets copilot,cursor,cline --features *
 
 # Old syntax (deprecated, shows warning)
 npx rulesync generate --claudecode --verbose
 
 # New syntax (preferred)
-npx rulesync generate --targets claudecode --verbose
+npx rulesync generate --targets claudecode --features * --verbose
 
 # Backward compatibility maintained
 # All old syntax still works but shows deprecation warnings
-# Use --targets for clean output and future compatibility
+# Use --targets and --features for clean output and future compatibility
 
 # Error examples (will show helpful error messages)
 npx rulesync generate --targets invalid-tool
 npx rulesync generate --targets *,cursor
+npx rulesync generate --features invalid-feature
+npx rulesync generate --features *,rules
 npx rulesync generate  # Error: no tools specified
 ```
 

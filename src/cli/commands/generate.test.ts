@@ -178,7 +178,12 @@ describe("generateCommand", () => {
 
     await generateCommand({ tools: ["copilot"] });
 
-    expect(mockLogger.warn).toHaveBeenCalledWith("⚠️  No configurations generated");
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      "⚠️  No rule configurations generated for /workspace",
+    );
+    expect(mockLogger.warn).toHaveBeenCalledWith(
+      "⚠️  No files generated for enabled features: rules, commands, mcp, ignore",
+    );
   });
 
   it("should handle verbose mode", async () => {

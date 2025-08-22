@@ -1,6 +1,14 @@
 import { z } from "zod/mini";
 import { ToolTargetSchema, ToolTargetsSchema } from "./tool-targets.js";
 
+// Feature types for --features option
+export const FEATURE_TYPES = ["rules", "commands", "mcp", "ignore"] as const;
+export type FeatureType = (typeof FEATURE_TYPES)[number];
+
+// Schema for features field
+export const FeatureTypeSchema = z.enum(FEATURE_TYPES);
+export const FeaturesSchema = z.union([z.array(FeatureTypeSchema), z.literal("*")]);
+
 export const OutputPathsSchema = z.object({
   agentsmd: z.optional(z.string()),
   amazonqcli: z.optional(z.string()),
@@ -28,6 +36,7 @@ export const ConfigOptionsSchema = z.object({
 
   targets: z.optional(z.array(ToolTargetSchema)),
   exclude: z.optional(z.array(ToolTargetSchema)),
+  features: z.optional(FeaturesSchema),
 
   verbose: z.optional(z.boolean()),
   delete: z.optional(z.boolean()),
@@ -65,6 +74,7 @@ const MergedConfigSchema = z.object({
 
   targets: z.optional(z.array(ToolTargetSchema)),
   exclude: z.optional(z.array(ToolTargetSchema)),
+  features: z.optional(FeaturesSchema),
   verbose: z.optional(z.boolean()),
   delete: z.optional(z.boolean()),
   baseDir: z.optional(z.union([z.string(), z.array(z.string())])),

@@ -1,3 +1,4 @@
+import type { FeatureType } from "../../types/config-options.js";
 import type { ToolTarget } from "../../types/index.js";
 
 /**
@@ -5,6 +6,7 @@ import type { ToolTarget } from "../../types/index.js";
  */
 export interface CliOptions {
   tools?: ToolTarget[];
+  features?: FeatureType[] | "*";
   verbose?: boolean;
   delete?: boolean;
   baseDirs?: string[];

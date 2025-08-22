@@ -168,6 +168,9 @@ rulesync/
 │   │   ├── utils/                      # ⭐ NEW: CLI utility functions
 │   │   │   └── targets-parser.ts       # Target specification parsing with validation
 │   │   └── index.ts                   # CLI entry point (Commander.js)
+│   ├── utils/
+│   │   ├── feature-validator.ts        # ⭐ NEW: Feature validation and normalization
+│   │   └── [other utils]               # Existing utility functions
 │   ├── core/
 │   │   ├── parser.ts                  # Parse .rulesync/*.md files
 │   │   ├── generator.ts               # Orchestrate generation (registry-aware)
@@ -228,7 +231,7 @@ rulesync/
 │   │   ├── claudecode.ts              # ⭐ NEW: Claude Code specific types
 │   │   ├── commands.ts                # ⭐ NEW: Custom command types and interfaces
 │   │   ├── tool-targets.ts            # Updated tool target definitions (11 tools)
-│   │   └── config-options.ts          # Configuration option types
+│   │   └── config-options.ts          # ⭐ NEW: Configuration option types with FeatureType support
 │   ├── test-utils/                    # ⭐ NEW: Shared testing utilities
 │   │   ├── index.ts                   # Common test helpers
 │   │   ├── mock-config.ts             # Mock configuration factory
@@ -482,10 +485,20 @@ pnpm dev generate --targets codexcli          # Test CodexCLI generation with fi
 pnpm test src/cli/utils/targets-parser        # Test target parsing logic
 pnpm test src/cli/commands/generate           # Test generate command with new syntax
 
+# Test features system
+pnpm test src/utils/feature-validator         # Feature validation and normalization
+pnpm test src/cli/commands/generate-features  # Features integration testing
+pnpm test src/types/config-options            # Feature type definitions and schemas
+
 # Test with legacy structure
 pnpm dev init --legacy                      # Test legacy initialization
 pnpm dev add typescript-rules --legacy      # Test legacy rule addition
 pnpm dev import --cursor --legacy           # Test legacy import
+
+# Test features option
+pnpm dev generate --targets * --features rules          # Test rules-only generation
+pnpm dev generate --targets cursor --features rules,mcp # Test selective features
+pnpm dev generate --targets * --features *              # Test all features explicitly
 ```
 
 #### Adding Command Support to New Tools
@@ -1008,14 +1021,22 @@ Create `src/generators/rules/newtool.ts` for advanced features:
 
 **Time to add a new tool**: Reduced from ~2-3 days to ~4-6 hours for simple tools!
 
-### CLI Interface Improvements (v0.59.0)
+### CLI Interface Improvements (v0.59.0 & v0.63.0)
 
-**Enhanced Target Specification:**
+**Enhanced Target Specification (v0.59.0):**
 - **Primary Interface**: `--targets` flag replaces individual tool flags
 - **Unified Syntax**: `--targets copilot,cursor,cline` instead of `--copilot --cursor --cline`
 - **Wildcard Support**: `--targets *` for all tools
 - **Validation**: Comprehensive input validation with helpful error messages
 - **Backward Compatibility**: All legacy flags still work with deprecation warnings
+
+**Features System (v0.63.0):**
+- **Selective Generation**: `--features` flag allows choosing which types of files to generate
+- **Feature Types**: `rules`, `commands`, `mcp`, `ignore` - each can be generated independently
+- **Wildcard Support**: `--features *` for all features (default behavior)
+- **Configuration Support**: Features can be specified in configuration files
+- **Backward Compatibility**: Defaults to all features when not specified (with warning)
+- **Performance**: Generate only what you need for faster execution
 
 **Target Parser Implementation:**
 ```typescript
@@ -1040,11 +1061,35 @@ export function getDeprecationWarning(deprecatedTools: ToolTarget[]): string {
 }
 ```
 
+**Feature Validator Implementation:**
+```typescript
+// src/utils/feature-validator.ts
+export function validateFeatures(features: string[] | "*" | undefined): FeatureType[] | "*" {
+  // Validate feature types against supported list
+  // Handle wildcard expansion
+  // Provide clear error messages for invalid features
+}
+
+export function normalizeFeatures(features: FeatureType[] | "*" | undefined): FeatureType[] {
+  // Convert wildcard to full feature array
+  // Always returns array for consistent processing
+}
+
+export function expandWildcard(): FeatureType[] {
+  // Returns all available feature types
+  // Used for wildcard expansion
+}
+```
+
 **Enhanced Error Handling:**
 - Clear validation messages for invalid tool names
+- Clear validation messages for invalid feature types
 - Prevention of conflicting target specifications
+- Prevention of mixing wildcard with specific features
 - Helpful migration guidance for deprecated syntax
+- Backward compatibility warnings for missing features
 - Improved user experience with actionable error messages
+- Configuration file validation for features field
 
 **Directory Structure Support**: All new tools automatically support both recommended (`.rulesync/rules/`) and legacy (`.rulesync/*.md`) directory structures through the registry pattern.
 

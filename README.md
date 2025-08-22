@@ -1,7 +1,8 @@
 # rulesync
 
 [![CI](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml/badge.svg)](https://github.com/dyoshikawa/rulesync/actions/workflows/ci.yml)
-[![npm version](https://badge.fury.io/js/rulesync.svg)](https://www.npmjs.com/package/rulesync)
+[![npm version](https://img.shields.io/npm/v/rulesync)](https://www.npmjs.com/package/rulesync)
+[![npm downloads](https://img.shields.io/npm/dt/rulesync)](https://www.npmjs.com/package/rulesync)
 
 A Node.js CLI tool that automatically generates configuration files for various AI development tools from unified AI rule files. Uses the recommended `.rulesync/rules/*.md` structure, with backward compatibility for legacy `.rulesync/*.md` layouts. Also imports existing AI tool configurations into the unified format.
 
@@ -34,11 +35,14 @@ yarn global add rulesync
    
 3. **Generate tool-specific configuration files:**
    ```bash
-   # Generate for all tools (preferred new syntax)
-   npx rulesync generate --targets *
+   # Generate all features for all tools (preferred new syntax)
+   npx rulesync generate --targets * --features *
    
-   # Generate for specific tools (recommended)
-   npx rulesync generate --targets copilot,cursor,cline
+   # Generate specific features for specific tools (recommended)
+   npx rulesync generate --targets copilot,cursor,cline --features rules,commands
+   
+   # Generate only rules without MCP or ignore files
+   npx rulesync generate --targets * --features rules
    
    # Legacy syntax (deprecated but still works)
    npx rulesync generate --all  # Shows deprecation warning
@@ -67,8 +71,8 @@ npx rulesync import --qwencode --legacy
 npx rulesync import --opencode --legacy
 npx rulesync import --agentsmd --legacy
 
-# Generate unified configurations
-npx rulesync generate --targets *
+# Generate unified configurations with all features
+npx rulesync generate --targets * --features *
 ```
 
 ## Supported Tools
@@ -148,11 +152,14 @@ npx rulesync import --agentsmd --legacy
 # Validate rules
 npx rulesync validate
 
-# Generate configurations (new preferred syntax)
-npx rulesync generate --targets *
+# Generate all features for all tools (new preferred syntax)
+npx rulesync generate --targets * --features *
 
-# Generate for specific tools
-npx rulesync generate --targets copilot,cursor,cline
+# Generate specific features for specific tools
+npx rulesync generate --targets copilot,cursor,cline --features rules,mcp
+
+# Generate only rules (no MCP or ignore files)
+npx rulesync generate --targets * --features rules
 
 # Watch for changes
 npx rulesync watch
@@ -188,6 +195,7 @@ npx rulesync gitignore
 - **[AgentsMd](./docs/tools/agentsmd.md)** - Standardized AI agent instructions
 
 ### ⚡ Features
+- **[Selective Generation](./docs/features/selective-generation.md)** - Generate only what you need with --features option
 - **[Custom Slash Commands](./docs/features/custom-commands.md)** - Create unified commands for Claude Code and Gemini CLI
 - **[MCP Integration](./docs/features/mcp.md)** - Model Context Protocol server configuration
 - **[Import System](./docs/features/import.md)** - Import existing AI tool configurations

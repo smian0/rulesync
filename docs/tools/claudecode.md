@@ -14,6 +14,22 @@ Claude Code supports a comprehensive memory system and custom slash commands. ru
 | **MCP Configuration** | `.mcp.json` | Model Context Protocol servers |
 | **Ignore Rules** | `.claude/settings.json` | File access permissions |
 
+## Feature Support
+
+Claude Code supports all rulesync features:
+
+- **✅ rules**: Memory system (CLAUDE.md + .claude/memories/)
+- **✅ commands**: Custom slash commands (.claude/commands/)
+- **✅ mcp**: Model Context Protocol (.mcp.json)
+- **✅ ignore**: Permission-based file access controls
+
+```bash
+# Generate specific features
+npx rulesync generate --targets claudecode --features rules,commands
+npx rulesync generate --targets claudecode --features mcp
+npx rulesync generate --targets claudecode --features rules  # Memory only
+```
+
 ## Memory System
 
 ### Hierarchical Structure
@@ -38,8 +54,14 @@ Claude Code uses a hierarchical memory system:
 rulesync generates custom slash commands from `.rulesync/commands/` directory:
 
 ```bash
-# Generate commands for Claude Code
-npx rulesync generate --claudecode
+# Generate all features for Claude Code
+npx rulesync generate --targets claudecode --features *
+
+# Generate only rules and commands (no MCP)
+npx rulesync generate --targets claudecode --features rules,commands
+
+# Generate only memory files (fastest)
+npx rulesync generate --targets claudecode --features rules
 ```
 
 ### Command Format
