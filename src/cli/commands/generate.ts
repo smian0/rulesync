@@ -4,6 +4,7 @@ import { type CliOptions, CliParser, ConfigResolver } from "../../core/config/in
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
 import { generateMcpConfigurations } from "../../core/mcp-generator.js";
 import { parseMcpConfig } from "../../core/mcp-parser.js";
+import { generateSubagents } from "../../core/subagent-generator.js";
 import type { FeatureType } from "../../types/config-options.js";
 import type { ToolTarget } from "../../types/index.js";
 import { normalizeFeatures } from "../../utils/feature-validator.js";
@@ -14,25 +15,7 @@ import {
   writeFileContent,
 } from "../../utils/index.js";
 import { logger } from "../../utils/logger.js";
-
-/**
- * Show backward compatibility warning when --features is not specified
- */
-function showBackwardCompatibilityWarning(): void {
-  const yellow = "\x1b[33m";
-  const gray = "\x1b[90m";
-  const cyan = "\x1b[36m";
-  const reset = "\x1b[0m";
-
-  logger.warn(
-    `\n${yellow}⚠️  Warning: No --features option specified.${reset}\n` +
-      `${gray}Currently generating all features for backward compatibility.${reset}\n` +
-      `${gray}In future versions, this behavior may change.${reset}\n` +
-      `${gray}Please specify --features explicitly:${reset}\n` +
-      `${cyan}  rulesync generate --features rules,commands,mcp,ignore${reset}\n` +
-      `${gray}Or use --features * to generate all features.${reset}\n`,
-  );
-}
+import { showBackwardCompatibilityWarning } from "./shared-utils.js";
 
 export interface GenerateOptions {
   tools?: ToolTarget[] | undefined;
@@ -85,7 +68,10 @@ export async function generateCommand(options: GenerateOptions = {}): Promise<vo
 
     // Show backward compatibility warning if features are not specified anywhere
     if (showWarning) {
-      showBackwardCompatibilityWarning();
+      showBackwardCompatibilityWarning(
+        "generating",
+        "rulesync generate --features rules,commands,mcp,ignore",
+      );
     }
 
     // Normalize features for processing
@@ -176,56 +162,84 @@ Available tools:
         for (const tool of targetTools) {
           switch (tool) {
             case "augmentcode":
-              deleteTasks.push(removeDirectory(join(".augment", "rules")));
-              deleteTasks.push(removeDirectory(join(".augment", "ignore")));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(join(".augment", "rules")));
+              }
+              if (normalizedFeatures.includes("ignore")) {
+                deleteTasks.push(removeDirectory(join(".augment", "ignore")));
+              }
               break;
             case "augmentcode-legacy":
               // Legacy AugmentCode files are in the root directory
-              deleteTasks.push(removeClaudeGeneratedFiles());
-              deleteTasks.push(removeDirectory(join(".augment", "ignore")));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeClaudeGeneratedFiles());
+              }
+              if (normalizedFeatures.includes("ignore")) {
+                deleteTasks.push(removeDirectory(join(".augment", "ignore")));
+              }
               break;
             case "copilot":
-              deleteTasks.push(removeDirectory(config.outputPaths.copilot));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.copilot));
+              }
               break;
             case "cursor":
-              deleteTasks.push(removeDirectory(config.outputPaths.cursor));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.cursor));
+              }
               break;
             case "cline":
-              deleteTasks.push(removeDirectory(config.outputPaths.cline));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.cline));
+              }
               break;
             case "claudecode":
-              // Use safe deletion for Claude Code files only
-              deleteTasks.push(removeClaudeGeneratedFiles());
-              // Only delete commands directory if .rulesync/commands/*.md files exist
-              if (hasCommandFiles) {
+              // Delete only the features that are being regenerated
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeClaudeGeneratedFiles());
+              }
+              if (normalizedFeatures.includes("commands") && hasCommandFiles) {
                 deleteTasks.push(removeDirectory(join(".claude", "commands")));
+              }
+              if (normalizedFeatures.includes("subagents")) {
+                deleteTasks.push(removeDirectory(join(".claude", "agents")));
               }
               break;
             case "roo":
-              deleteTasks.push(removeDirectory(config.outputPaths.roo));
-              // Only delete commands directory if .rulesync/commands/*.md files exist
-              if (hasCommandFiles) {
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.roo));
+              }
+              if (normalizedFeatures.includes("commands") && hasCommandFiles) {
                 deleteTasks.push(removeDirectory(join(".roo", "commands")));
               }
               break;
             case "geminicli":
-              deleteTasks.push(removeDirectory(config.outputPaths.geminicli));
-              // Only delete commands directory if .rulesync/commands/*.md files exist
-              if (hasCommandFiles) {
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.geminicli));
+              }
+              if (normalizedFeatures.includes("commands") && hasCommandFiles) {
                 deleteTasks.push(removeDirectory(join(".gemini", "commands")));
               }
               break;
             case "kiro":
-              deleteTasks.push(removeDirectory(config.outputPaths.kiro));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.kiro));
+              }
               break;
             case "opencode":
-              deleteTasks.push(removeDirectory(config.outputPaths.opencode));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.opencode));
+              }
               break;
             case "qwencode":
-              deleteTasks.push(removeDirectory(config.outputPaths.qwencode));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.qwencode));
+              }
               break;
             case "windsurf":
-              deleteTasks.push(removeDirectory(config.outputPaths.windsurf));
+              if (normalizedFeatures.includes("rules")) {
+                deleteTasks.push(removeDirectory(config.outputPaths.windsurf));
+              }
               break;
           }
         }
@@ -347,9 +361,41 @@ Available tools:
         logger.info("\nSkipping ignore file generation (not in --features)");
       }
 
+      // Generate subagent files (subagents feature)
+      let totalSubagentOutputs = 0;
+      if (normalizedFeatures.includes("subagents")) {
+        logger.info("\nGenerating subagent files...");
+
+        for (const baseDir of baseDirs) {
+          const subagentResults = await generateSubagents(
+            config.aiRulesDir,
+            baseDir === process.cwd() ? undefined : baseDir,
+            config.defaultTargets,
+            rules,
+          );
+
+          if (subagentResults.length === 0) {
+            logger.info(`No subagents generated for ${baseDir}`);
+            continue;
+          }
+
+          for (const result of subagentResults) {
+            await writeFileContent(result.filepath, result.content);
+            logger.success(`Generated ${result.tool} subagent: ${result.filepath}`);
+            totalSubagentOutputs++;
+          }
+        }
+      } else {
+        logger.info("\nSkipping subagent file generation (not in --features)");
+      }
+
       // Check if any features generated content
       const totalGenerated =
-        totalOutputs + totalMcpOutputs + totalCommandOutputs + totalIgnoreOutputs;
+        totalOutputs +
+        totalMcpOutputs +
+        totalCommandOutputs +
+        totalIgnoreOutputs +
+        totalSubagentOutputs;
       if (totalGenerated === 0) {
         const enabledFeatures = normalizedFeatures.join(", ");
         logger.warn(`⚠️  No files generated for enabled features: ${enabledFeatures}`);
@@ -362,6 +408,7 @@ Available tools:
         if (totalOutputs > 0) parts.push(`${totalOutputs} configurations`);
         if (totalMcpOutputs > 0) parts.push(`${totalMcpOutputs} MCP configurations`);
         if (totalCommandOutputs > 0) parts.push(`${totalCommandOutputs} commands`);
+        if (totalSubagentOutputs > 0) parts.push(`${totalSubagentOutputs} subagents`);
 
         logger.success(
           `\n🎉 All done! Generated ${totalGenerated} file(s) total (${parts.join(" + ")})`,

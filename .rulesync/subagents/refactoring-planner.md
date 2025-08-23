@@ -1,7 +1,12 @@
 ---
 name: refactoring-planner
-description: Refactoring planner. The user asks the agent to identify similar code patterns, detect dead code, and create comprehensive refactoring plans to improve code quality. This agent can be triggered by the user explicitly only.
-model: opus
+targets: ["*"]
+description: >-
+  Refactoring planner. The user asks the agent to identify similar code
+  patterns, detect dead code, and create comprehensive refactoring plans to
+  improve code quality. This agent can be called by the user explicitly only.
+claudecode:
+  model: opus
 ---
 
 First, execute the following commands:

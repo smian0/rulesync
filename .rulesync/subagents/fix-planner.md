@@ -1,7 +1,11 @@
 ---
 name: fix-planner
-description: This is the code fix planner. The user asks the agent to plan to fix and stabilize the code. This agent can be triggered by the user explicitly only.
-model: opus
+targets: ["*"]
+description: >-
+  This is the code fix planner. The user asks the agent to plan to fix and
+  stabilize the code. This agent can be called by the user explicitly only.
+claudecode:
+  model: opus
 ---
 
 Execute the all following commands even though errors are occurred:
