@@ -1,7 +1,8 @@
+import { readFile } from "node:fs/promises";
 import matter from "gray-matter";
 import { z } from "zod/mini";
-import { AiFileParams, ValidationResult } from "../types/ai-file.js";
-import { RulesyncSubagent } from "./rulesync-subagent.js";
+import { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
+import { RulesyncSubagent, RulesyncSubagentFrontmatter } from "./rulesync-subagent.js";
 import { ToolSubagent, ToolSubagentFromRulesyncSubagentParams } from "./tool-subagent.js";
 
 export const ClaudecodeSubagentFrontmatterSchema = z.object({
@@ -39,16 +40,26 @@ export class ClaudecodeSubagent extends ToolSubagent {
   }
 
   toRulesyncSubagent(): RulesyncSubagent {
+    const rulesyncFrontmatter: RulesyncSubagentFrontmatter = {
+      targets: ["claudecode"] as const,
+      name: this.frontmatter.name,
+      description: this.frontmatter.description,
+      ...(this.frontmatter.model && {
+        claudecode: {
+          model: this.frontmatter.model,
+        },
+      }),
+    };
+
+    // Generate proper file content with Rulesync specific frontmatter
+    const fileContent = matter.stringify(this.body, rulesyncFrontmatter);
+
     return new RulesyncSubagent({
-      frontmatter: {
-        targets: ["claudecode"],
-        name: this.frontmatter.name,
-        description: this.frontmatter.description,
-      },
+      frontmatter: rulesyncFrontmatter,
       body: this.body,
-      relativeDirPath: this.relativeDirPath,
+      relativeDirPath: ".rulesync/subagents",
       relativeFilePath: this.relativeFilePath,
-      fileContent: this.fileContent,
+      fileContent,
       validate: false,
     });
   }
@@ -97,5 +108,33 @@ export class ClaudecodeSubagent extends ToolSubagent {
     } else {
       return { success: false, error: result.error };
     }
+  }
+
+  static async fromFilePath({
+    baseDir = ".",
+    relativeDirPath,
+    relativeFilePath,
+    filePath,
+    validate = true,
+  }: AiFileFromFilePathParams): Promise<ClaudecodeSubagent> {
+    // Read file content
+    const fileContent = await readFile(filePath, "utf-8");
+    const { data: frontmatter, content } = matter(fileContent);
+
+    // Validate frontmatter using ClaudecodeSubagentFrontmatterSchema
+    const result = ClaudecodeSubagentFrontmatterSchema.safeParse(frontmatter);
+    if (!result.success) {
+      throw new Error(`Invalid frontmatter in ${filePath}: ${result.error.message}`);
+    }
+
+    return new ClaudecodeSubagent({
+      baseDir: baseDir,
+      relativeDirPath: relativeDirPath,
+      relativeFilePath: relativeFilePath,
+      frontmatter: result.data,
+      body: content.trim(),
+      fileContent,
+      validate,
+    });
   }
 }
