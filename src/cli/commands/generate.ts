@@ -1,6 +1,9 @@
 import { join } from "node:path";
 import { intersection } from "es-toolkit";
-import { generateCommands } from "../../core/command-generator.js";
+import {
+  CommandsProcessor,
+  type CommandsProcessorToolTarget,
+} from "../../commands/commands-processor.js";
 import { type CliOptions, CliParser, ConfigResolver } from "../../core/config/index.js";
 import { generateConfigurations, parseRulesFromDirectory } from "../../core/index.js";
 import { generateMcpConfigurations } from "../../core/mcp-generator.js";
@@ -329,22 +332,33 @@ Available tools:
       if (normalizedFeatures.includes("commands")) {
         logger.info("\nGenerating command files...");
 
+        // Check which targets support commands
+        const supportedCommandTargets: CommandsProcessorToolTarget[] = [
+          "claudecode",
+          "geminicli",
+          "roo",
+        ];
+        const commandSupportedTargets = config.defaultTargets.filter(
+          (target): target is CommandsProcessorToolTarget => {
+            return supportedCommandTargets.some((supportedTarget) => supportedTarget === target);
+          },
+        );
+
         for (const baseDir of baseDirs) {
-          const commandResults = await generateCommands(
-            process.cwd(),
-            baseDir === process.cwd() ? undefined : baseDir,
-            config.defaultTargets,
-          );
+          for (const toolTarget of intersection(
+            commandSupportedTargets,
+            CommandsProcessor.getToolTargets(),
+          )) {
+            const processor = new CommandsProcessor({
+              baseDir: baseDir,
+              toolTarget: toolTarget,
+            });
 
-          if (commandResults.length === 0) {
-            logger.info(`No commands found for ${baseDir}`);
-            continue;
-          }
-
-          for (const result of commandResults) {
-            await writeFileContent(result.filepath, result.content);
-            logger.success(`Generated ${result.tool} command: ${result.filepath}`);
-            totalCommandOutputs++;
+            const rulesyncFiles = await processor.loadRulesyncFiles();
+            const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
+            const writtenCount = await processor.writeAiFiles(toolFiles);
+            totalCommandOutputs += writtenCount;
+            logger.success(`Generated ${writtenCount} ${toolTarget} command(s) in ${baseDir}`);
           }
         }
       } else {
