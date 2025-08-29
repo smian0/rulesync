@@ -241,6 +241,10 @@
         "skipvalidation",
         "typetest",
         "üñíçødé",
-        "émøjî"
+        "émøjî",
+        "amazonqignore",
+        "dylib",
+        "webfetch",
+        "reinclusion"
     ]
 }
