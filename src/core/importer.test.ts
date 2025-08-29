@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { IgnoreProcessor } from "../ignore/ignore-processor.js";
 import * as parsers from "../parsers/index.js";
+// import { RulesProcessor } from "../rules/rules-processor.js"; // Not used in this version
 import { setupTestDirectory } from "../test-utils/index.js";
 import type { ToolTarget } from "../types/index.js";
 import { logger } from "../utils/logger.js";
@@ -21,6 +22,7 @@ vi.mock("../commands/commands-processor.js", () => {
   MockCommandsProcessor.getToolTargets = vi.fn();
   return { CommandsProcessor: MockCommandsProcessor };
 });
+// vi.mock("../rules/rules-processor"); // Not used in this version
 
 describe("importConfiguration", () => {
   let testDir: string;
@@ -68,6 +70,8 @@ describe("importConfiguration", () => {
     // Mock CommandsProcessor.getToolTargets static method
     const { CommandsProcessor } = await import("../commands/commands-processor.js");
     vi.mocked(CommandsProcessor.getToolTargets).mockReturnValue(["claudecode", "geminicli", "roo"]);
+    // Mock RulesProcessor to return null for all tools by default (not used in this version)
+    // vi.spyOn(RulesProcessor, "create").mockReturnValue(null);
   });
 
   afterEach(async () => {
@@ -687,4 +691,12 @@ describe("importConfiguration", () => {
     expect(mockIgnoreProcessor.loadToolFiles).toHaveBeenCalled();
     expect(mockIgnoreProcessor.writeAiFiles).not.toHaveBeenCalled();
   });
+
+  // it("should use RulesProcessor when available", async () => {
+  //   // RulesProcessor functionality has been replaced by CommandsProcessor and direct rule processing
+  // });
+
+  // it("should handle RulesProcessor errors gracefully", async () => {
+  //   // RulesProcessor functionality has been replaced by CommandsProcessor and direct rule processing
+  // });
 });
