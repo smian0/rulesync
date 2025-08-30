@@ -7,24 +7,11 @@ import { ToolIgnore } from "./tool-ignore.js";
 class TestToolIgnore extends ToolIgnore {
   toRulesyncIgnore(): RulesyncIgnore {
     return new RulesyncIgnore({
-      frontmatter: {
-        targets: ["claudecode"],
-        description: `Generated from test tool ignore file: ${this.relativeFilePath}`,
-        patterns: this.patterns,
-      },
-      body: this.patterns.join("\n"),
       baseDir: this.baseDir,
-      relativeDirPath: "ignore",
-      relativeFilePath: "claudecode.ignore.md",
-      fileContent: `---
-targets:
-  - claudecode
-description: Generated from test tool ignore file: ${this.relativeFilePath}
-patterns:
-${this.patterns.map((pattern) => `  - "${pattern}"`).join("\n")}
----
-
-${this.patterns.join("\n")}`,
+      relativeDirPath: ".",
+      relativeFilePath: ".rulesyncignore",
+      body: this.getPatterns().join("\n"),
+      fileContent: this.getPatterns().join("\n"),
     });
   }
 
@@ -44,8 +31,11 @@ ${this.patterns.join("\n")}`,
     relativeDirPath: string;
     rulesyncIgnore: RulesyncIgnore;
   }): TestToolIgnore {
-    const frontmatter = params.rulesyncIgnore.getFrontmatter();
-    const patterns = frontmatter.patterns || [];
+    const body = params.rulesyncIgnore.getBody();
+    const patterns = body
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0 && !line.startsWith("#"));
 
     return new TestToolIgnore({
       baseDir: params.baseDir || ".",
@@ -179,11 +169,9 @@ describe("ToolIgnore", () => {
 
       const rulesyncIgnore = toolIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getFrontmatter()).toEqual({
-        targets: ["claudecode"],
-        description: "Generated from test tool ignore file: test.ignore",
-        patterns,
-      });
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
+      expect(rulesyncIgnore.getBody()).toBe(patterns.join("\n"));
     });
   });
 
@@ -191,11 +179,6 @@ describe("ToolIgnore", () => {
     it("should create instance from RulesyncIgnore", () => {
       const patterns = ["*.tmp", "build/"];
       const rulesyncIgnore = new RulesyncIgnore({
-        frontmatter: {
-          targets: ["claudecode"],
-          description: "Test ignore patterns",
-          patterns,
-        },
         body: patterns.join("\n"),
         baseDir: testDir,
         relativeDirPath: "ignore",
@@ -232,10 +215,6 @@ ${patterns.join("\n")}`,
 
     it("should throw error for abstract fromRulesyncIgnore method", () => {
       const rulesyncIgnore = new RulesyncIgnore({
-        frontmatter: {
-          targets: ["claudecode"],
-          description: "Test",
-        },
         body: "",
         baseDir: testDir,
         relativeDirPath: "ignore",

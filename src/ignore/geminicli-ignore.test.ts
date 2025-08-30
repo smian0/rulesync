@@ -202,13 +202,11 @@ file?.txt
 
       const rulesyncIgnore = ignore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getFrontmatter()).toEqual({
-        targets: ["geminicli"],
-        description: "Generated from Gemini CLI ignore file: .aiexclude",
-      });
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
 
       const body = rulesyncIgnore.getBody();
-      expect(body).toContain("# Gemini CLI Coding Assistant Ignore File");
+      expect(body).toBe("*.log\nnode_modules/\n!important.log");
       expect(body).toContain("*.log");
       expect(body).toContain("node_modules/");
       expect(body).toContain("!important.log");
@@ -229,19 +227,11 @@ file?.txt
       const rulesyncIgnore = ignore.toRulesyncIgnore();
       const body = rulesyncIgnore.getBody();
 
-      expect(body).toContain("# Security and Secrets");
+      expect(body).toBe(patterns.join("\n"));
       expect(body).toContain("*.key");
       expect(body).toContain(".env");
-
-      expect(body).toContain("# Build Artifacts and Dependencies");
       expect(body).toContain("node_modules/");
       expect(body).toContain("dist/");
-
-      expect(body).toContain("# Data Files and Large Assets");
-      expect(body).toContain("*.csv");
-      expect(body).toContain("*.png");
-
-      expect(body).toContain("# Other Exclusions");
       expect(body).toContain("custom/path");
     });
   });
@@ -252,10 +242,6 @@ file?.txt
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "test.md",
-        frontmatter: {
-          targets: ["geminicli"],
-          description: "Test ignore file",
-        },
         body: `# Test ignore file
 *.log
 node_modules/
@@ -278,10 +264,6 @@ node_modules/
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "empty.md",
-        frontmatter: {
-          targets: ["geminicli"],
-          description: "Empty ignore file",
-        },
         body: "",
         fileContent: "",
       });
@@ -300,10 +282,6 @@ node_modules/
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "test.md",
-        frontmatter: {
-          targets: ["geminicli"],
-          description: "Test ignore file",
-        },
         body: `# This is a comment
 *.log
 

@@ -45,7 +45,7 @@ describe("CursorIgnore", () => {
   });
 
   describe("toRulesyncIgnore", () => {
-    it("should convert to RulesyncIgnore with correct frontmatter", () => {
+    it("should convert to RulesyncIgnore with correct paths", () => {
       const patterns = ["node_modules/", "*.log"];
       const cursorIgnore = new CursorIgnore({
         baseDir: testDir,
@@ -57,10 +57,8 @@ describe("CursorIgnore", () => {
 
       const rulesyncIgnore = cursorIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getFrontmatter()).toEqual({
-        targets: ["cursor"],
-        description: "Generated from Cursor ignore file: .cursorignore",
-      });
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
       expect(rulesyncIgnore.getBody()).toBe("node_modules/\n*.log");
     });
 
@@ -89,7 +87,7 @@ describe("CursorIgnore", () => {
 
       const rulesyncIgnore = cursorIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".md");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
     });
   });
 
@@ -99,10 +97,6 @@ describe("CursorIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "cursor.md",
-        frontmatter: {
-          targets: ["cursor"],
-          description: "Test cursor ignore file",
-        },
         body: "node_modules/\n*.log\n# comment\n\n.env*",
         fileContent: "",
       });
@@ -121,10 +115,6 @@ describe("CursorIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "cursor.md",
-        frontmatter: {
-          targets: ["cursor"],
-          description: "Test cursor ignore file with negations",
-        },
         body: "*.log\n!important.log\nnode_modules/\n!node_modules/important/",
         fileContent: "",
       });
@@ -148,10 +138,6 @@ describe("CursorIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "empty.md",
-        frontmatter: {
-          targets: ["cursor"],
-          description: "Empty cursor ignore file",
-        },
         body: "",
         fileContent: "",
       });
@@ -170,10 +156,6 @@ describe("CursorIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "commented.md",
-        frontmatter: {
-          targets: ["cursor"],
-          description: "File with comments",
-        },
         body: "# This is a comment\nnode_modules/\n\n*.log\n# Another comment\n.env*\n\n",
         fileContent: "",
       });

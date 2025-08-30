@@ -85,13 +85,9 @@ describe("ClineIgnore", () => {
 
       const rulesyncIgnore = clineIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getFrontmatter()).toEqual({
-        targets: ["cline"],
-        description: "Generated from Cline ignore file: .clineignore",
-      });
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
       expect(rulesyncIgnore.getBody()).toBe(patterns.join("\n"));
-      expect(rulesyncIgnore.getRelativeFilePath()).toBe("cline.md");
-      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".rulesync/ignore");
     });
 
     it("should handle empty patterns", () => {
@@ -106,7 +102,8 @@ describe("ClineIgnore", () => {
       const rulesyncIgnore = clineIgnore.toRulesyncIgnore();
 
       expect(rulesyncIgnore.getBody()).toBe("");
-      expect(rulesyncIgnore.getFrontmatter().targets).toEqual(["cline"]);
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
     });
 
     it("should include correct path information", () => {
@@ -120,9 +117,8 @@ describe("ClineIgnore", () => {
 
       const rulesyncIgnore = clineIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".rulesync/ignore");
-      expect(rulesyncIgnore.getRelativeFilePath()).toBe("cline.md");
-      expect(rulesyncIgnore.getFrontmatter().description).toContain(".clineignore");
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
     });
   });
 
@@ -134,10 +130,6 @@ describe("ClineIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "cline.md",
-        frontmatter: {
-          targets: ["cline"],
-          description: "Test ignore rules",
-        },
         body,
         fileContent: `---\ntargets: ["cline"]\ndescription: "Test ignore rules"\n---\n${body}`,
       });
@@ -160,10 +152,6 @@ describe("ClineIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "cline.md",
-        frontmatter: {
-          targets: ["cline"],
-          description: "Test ignore rules",
-        },
         body,
         fileContent: `---\ntargets: ["cline"]\ndescription: "Test ignore rules"\n---\n${body}`,
       });
@@ -182,10 +170,6 @@ describe("ClineIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "cline.md",
-        frontmatter: {
-          targets: ["cline"],
-          description: "Empty ignore rules",
-        },
         body: "",
         fileContent: `---\ntargets: ["cline"]\ndescription: "Empty ignore rules"\n---\n`,
       });

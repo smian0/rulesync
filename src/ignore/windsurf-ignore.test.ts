@@ -60,7 +60,7 @@ describe("WindsurfIgnore", () => {
   });
 
   describe("toRulesyncIgnore", () => {
-    it("should convert to RulesyncIgnore with correct frontmatter", () => {
+    it("should convert to RulesyncIgnore format", () => {
       const patterns = [".env", "*.log", "dist/"];
       const windsurfIgnore = new WindsurfIgnore({
         baseDir: testDir,
@@ -72,10 +72,8 @@ describe("WindsurfIgnore", () => {
 
       const rulesyncIgnore = windsurfIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getFrontmatter()).toEqual({
-        targets: ["windsurf"],
-        description: "Generated from Windsurf ignore file: .codeiumignore",
-      });
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
       expect(rulesyncIgnore.getBody()).toBe(patterns.join("\n"));
     });
   });
@@ -84,11 +82,6 @@ describe("WindsurfIgnore", () => {
     it("should create instance from RulesyncIgnore", () => {
       const patterns = ["*.tmp", "build/", ".env*"];
       const rulesyncIgnore = new RulesyncIgnore({
-        frontmatter: {
-          targets: ["windsurf"],
-          description: "Test windsurf ignore patterns",
-          patterns,
-        },
         body: patterns.join("\n"),
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",

@@ -63,20 +63,11 @@ describe("CodexcliIgnore", () => {
 
       const rulesyncIgnore = codexcliIgnore.toRulesyncIgnore();
 
-      expect(rulesyncIgnore.getFrontmatter()).toEqual({
-        targets: ["codexcli"],
-        description: "Generated from OpenAI Codex CLI ignore file: .codexignore",
-      });
+      expect(rulesyncIgnore.getRelativeDirPath()).toBe(".");
+      expect(rulesyncIgnore.getRelativeFilePath()).toBe(".rulesyncignore");
 
       const body = rulesyncIgnore.getBody();
-      expect(body).toContain("# OpenAI Codex CLI Ignore Patterns");
-      expect(body).toContain("# Note: Native .codexignore support is a community request");
-      expect(body).toContain("# Security and Sensitive Files");
-      expect(body).toContain("*.env");
-      expect(body).toContain("secrets/**");
-      expect(body).toContain("# Performance Optimization");
-      expect(body).toContain("node_modules/");
-      expect(body).toContain("*.log");
+      expect(body).toBe("*.env\nsecrets/**\nnode_modules/\n*.log");
     });
 
     it("should categorize patterns correctly", () => {
@@ -98,12 +89,11 @@ describe("CodexcliIgnore", () => {
       const rulesyncIgnore = codexcliIgnore.toRulesyncIgnore();
       const body = rulesyncIgnore.getBody();
 
-      expect(body).toContain("# Security and Sensitive Files");
-      expect(body).toMatch(/# Security and Sensitive Files[^#]*\*.key/s);
-      expect(body).toContain("# Performance Optimization");
-      expect(body).toMatch(/# Performance Optimization[^#]*dist\//s);
-      expect(body).toContain("# Other Exclusions");
-      expect(body).toMatch(/# Other Exclusions[^#]*custom\/\*\*/s);
+      expect(body).toBe(patterns.join("\n"));
+      expect(body).toContain("*.key");
+      expect(body).toContain("dist/");
+      expect(body).toContain("*.swp");
+      expect(body).toContain("custom/**");
     });
   });
 
@@ -113,10 +103,6 @@ describe("CodexcliIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "codex-ignore.md",
-        frontmatter: {
-          targets: ["codexcli"],
-          description: "Codex CLI ignore patterns",
-        },
         body: "*.env\nsecrets/**\nnode_modules/\n# Comment line\n\n",
         fileContent: "Test content",
       });
@@ -136,10 +122,6 @@ describe("CodexcliIgnore", () => {
         baseDir: testDir,
         relativeDirPath: ".rulesync/ignore",
         relativeFilePath: "empty.md",
-        frontmatter: {
-          targets: ["codexcli"],
-          description: "Empty ignore patterns",
-        },
         body: "# Only comments\n\n\n",
         fileContent: "",
       });

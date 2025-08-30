@@ -1,5 +1,4 @@
 import { readFile } from "node:fs/promises";
-import { basename } from "node:path";
 import type { AiFileFromFilePathParams } from "../types/ai-file.js";
 import { RulesyncIgnore } from "./rulesync-ignore.js";
 import type { ToolIgnoreFromRulesyncIgnoreParams, ToolIgnoreParams } from "./tool-ignore.js";
@@ -127,16 +126,13 @@ export class WindsurfIgnore extends ToolIgnore {
    * Convert to RulesyncIgnore format
    */
   toRulesyncIgnore(): RulesyncIgnore {
+    const patterns = this.getPatterns();
+    const body = patterns.join("\n");
     return new RulesyncIgnore({
-      baseDir: this.baseDir,
-      relativeDirPath: ".rulesync/ignore",
-      relativeFilePath: `${basename(this.relativeFilePath, ".codeiumignore")}.md`,
-      frontmatter: {
-        targets: ["windsurf"],
-        description: `Generated from Windsurf ignore file: ${this.relativeFilePath}`,
-      },
-      body: this.patterns.join("\n"),
-      fileContent: this.patterns.join("\n"),
+      relativeDirPath: ".",
+      relativeFilePath: ".rulesyncignore",
+      body,
+      fileContent: body,
     });
   }
 
@@ -149,12 +145,12 @@ export class WindsurfIgnore extends ToolIgnore {
     rulesyncIgnore,
   }: ToolIgnoreFromRulesyncIgnoreParams): WindsurfIgnore {
     const frontmatter = rulesyncIgnore.getFrontmatter();
-    const patterns =
-      frontmatter.patterns ||
-      rulesyncIgnore
-        .getBody()
-        .split("\n")
-        .filter((line) => line.trim());
+    const patterns = Array.isArray(frontmatter.patterns)
+      ? frontmatter.patterns
+      : rulesyncIgnore
+          .getBody()
+          .split("\n")
+          .filter((line) => line.trim());
 
     return new WindsurfIgnore({
       baseDir,
