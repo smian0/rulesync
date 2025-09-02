@@ -5,6 +5,7 @@ import { z } from "zod/mini";
 import { ValidationResult } from "../types/ai-file.js";
 import { RulesyncFile, RulesyncFileParams } from "../types/rulesync-file.js";
 import { RulesyncTargetsSchema } from "../types/tool-targets.js";
+import { stringifyFrontmatter } from "../utils/frontmatter.js";
 
 export const RulesyncCommandFrontmatterSchema = z.object({
   targets: RulesyncTargetsSchema,
@@ -13,16 +14,18 @@ export const RulesyncCommandFrontmatterSchema = z.object({
 
 export type RulesyncCommandFrontmatter = z.infer<typeof RulesyncCommandFrontmatterSchema>;
 
-export interface RulesyncCommandParams extends RulesyncFileParams {
+export type RulesyncCommandParams = {
   frontmatter: RulesyncCommandFrontmatter;
-}
+  body: string;
+} & RulesyncFileParams;
 
 export class RulesyncCommand extends RulesyncFile {
   private readonly frontmatter: RulesyncCommandFrontmatter;
+  private readonly body: string;
 
-  constructor({ frontmatter, ...rest }: RulesyncCommandParams) {
+  constructor({ frontmatter, body, ...rest }: RulesyncCommandParams) {
     // Validate frontmatter before calling super to avoid validation order issues
-    if (rest.validate !== false) {
+    if (rest.validate) {
       const result = RulesyncCommandFrontmatterSchema.safeParse(frontmatter);
       if (!result.success) {
         throw result.error;
@@ -31,13 +34,19 @@ export class RulesyncCommand extends RulesyncFile {
 
     super({
       ...rest,
+      fileContent: stringifyFrontmatter(body, frontmatter),
     });
 
     this.frontmatter = frontmatter;
+    this.body = body;
   }
 
   getFrontmatter(): RulesyncCommandFrontmatter {
     return this.frontmatter;
+  }
+
+  getBody(): string {
+    return this.body;
   }
 
   validate(): ValidationResult {

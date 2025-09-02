@@ -1,22 +1,42 @@
 import { readFile } from "node:fs/promises";
 import { basename } from "node:path";
 import matter from "gray-matter";
+import { z } from "zod/mini";
 import { RULESYNC_RULES_DIR } from "../constants/paths.js";
 import { type ValidationResult } from "../types/ai-file.js";
-import { type RuleFrontmatter, RuleFrontmatterSchema } from "../types/rules.js";
 import { RulesyncFile, type RulesyncFileParams } from "../types/rulesync-file.js";
+import { RulesyncTargetsSchema } from "../types/tool-targets.js";
+import { stringifyFrontmatter } from "../utils/frontmatter.js";
 
-export interface RulesyncRuleParams extends RulesyncFileParams {
-  frontmatter: RuleFrontmatter;
-}
+export const RulesyncRuleFrontmatterSchema = z.object({
+  root: z.optional(z.optional(z.boolean())),
+  targets: z.optional(RulesyncTargetsSchema),
+  description: z.optional(z.string()),
+  globs: z.optional(z.array(z.string())),
+  cursor: z.optional(
+    z.object({
+      alwaysApply: z.optional(z.boolean()),
+      description: z.optional(z.string()),
+      globs: z.optional(z.array(z.string())),
+    }),
+  ),
+});
+
+export type RulesyncRuleFrontmatter = z.infer<typeof RulesyncRuleFrontmatterSchema>;
+
+export type RulesyncRuleParams = Omit<RulesyncFileParams, "fileContent"> & {
+  frontmatter: RulesyncRuleFrontmatter;
+  body: string;
+};
 
 export class RulesyncRule extends RulesyncFile {
-  private readonly frontmatter: RuleFrontmatter;
+  private readonly frontmatter: RulesyncRuleFrontmatter;
+  private readonly body: string;
 
-  constructor({ frontmatter, ...rest }: RulesyncRuleParams) {
+  constructor({ frontmatter, body, ...rest }: RulesyncRuleParams) {
     // Validate frontmatter before calling super to avoid validation order issues
     if (rest.validate !== false) {
-      const result = RuleFrontmatterSchema.safeParse(frontmatter);
+      const result = RulesyncRuleFrontmatterSchema.safeParse(frontmatter);
       if (!result.success) {
         throw result.error;
       }
@@ -24,13 +44,14 @@ export class RulesyncRule extends RulesyncFile {
 
     super({
       ...rest,
+      fileContent: stringifyFrontmatter(body, frontmatter),
     });
 
     this.frontmatter = frontmatter;
-    this.fileContent = matter.stringify(this.body, this.frontmatter);
+    this.body = body;
   }
 
-  getFrontmatter(): RuleFrontmatter {
+  getFrontmatter(): RulesyncRuleFrontmatter {
     return this.frontmatter;
   }
 
@@ -40,7 +61,7 @@ export class RulesyncRule extends RulesyncFile {
       return { success: true, error: null };
     }
 
-    const result = RuleFrontmatterSchema.safeParse(this.frontmatter);
+    const result = RulesyncRuleFrontmatterSchema.safeParse(this.frontmatter);
 
     if (result.success) {
       return { success: true, error: null };
@@ -55,25 +76,17 @@ export class RulesyncRule extends RulesyncFile {
     const { data: frontmatter, content } = matter(fileContent);
 
     // Validate frontmatter using RuleFrontmatterSchema
-    const result = RuleFrontmatterSchema.safeParse(frontmatter);
+    const result = RulesyncRuleFrontmatterSchema.safeParse(frontmatter);
     if (!result.success) {
       throw new Error(`Invalid frontmatter in ${filePath}: ${result.error.message}`);
     }
 
-    // Convert validated data to RuleFrontmatter type
-    const validatedFrontmatter: RuleFrontmatter = {
+    const validatedFrontmatter: RulesyncRuleFrontmatter = {
       root: result.data.root ?? false,
       targets: result.data.targets ?? ["*"],
       description: result.data.description ?? "",
       globs: result.data.globs ?? [],
-      ...(result.data.cursorRuleType && { cursorRuleType: result.data.cursorRuleType }),
-      ...(result.data.windsurfActivationMode && {
-        windsurfActivationMode: result.data.windsurfActivationMode,
-      }),
-      ...(result.data.windsurfOutputFormat && {
-        windsurfOutputFormat: result.data.windsurfOutputFormat,
-      }),
-      ...(result.data.tags && { tags: result.data.tags }),
+      cursor: result.data.cursor,
     };
 
     const filename = basename(filePath);
@@ -84,7 +97,10 @@ export class RulesyncRule extends RulesyncFile {
       relativeFilePath: filename,
       frontmatter: validatedFrontmatter,
       body: content.trim(),
-      fileContent,
     });
+  }
+
+  getBody(): string {
+    return this.body;
   }
 }

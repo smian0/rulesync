@@ -3,10 +3,15 @@ import type { RulesyncCommand } from "./rulesync-command.js";
 
 export type ToolCommandFromRulesyncCommandParams = Omit<
   AiFileParams,
-  "fileContent" | "relativeFilePath"
+  "fileContent" | "relativeFilePath" | "relativeDirPath"
 > & {
   rulesyncCommand: RulesyncCommand;
 };
+
+export type ToolCommandFromFilePathParams = Omit<
+  AiFileFromFilePathParams,
+  "fileContent" | "relativeDirPath" | "relativeFilePath"
+>;
 
 /**
  * Abstract base class for AI development tool-specific command formats.
@@ -26,16 +31,6 @@ export type ToolCommandFromRulesyncCommandParams = Omit<
  */
 export abstract class ToolCommand extends AiFile {
   /**
-   * Get the command body content (without frontmatter)
-   */
-  abstract getBody(): string;
-
-  /**
-   * Get the command frontmatter as a record
-   */
-  abstract getFrontmatter(): Record<string, unknown>;
-
-  /**
    * Load a command from a tool-specific file path.
    *
    * This method should:
@@ -47,7 +42,7 @@ export abstract class ToolCommand extends AiFile {
    * @param params - Parameters including the file path to load
    * @returns Promise resolving to a concrete ToolCommand instance
    */
-  static async fromFilePath(_params: AiFileFromFilePathParams): Promise<ToolCommand> {
+  static async fromFilePath(_params: ToolCommandFromFilePathParams): Promise<ToolCommand> {
     throw new Error("Please implement this method in the subclass.");
   }
 

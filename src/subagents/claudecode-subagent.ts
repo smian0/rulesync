@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import matter from "gray-matter";
 import { z } from "zod/mini";
 import { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
+import { stringifyFrontmatter } from "../utils/frontmatter.js";
 import { RulesyncSubagent, RulesyncSubagentFrontmatter } from "./rulesync-subagent.js";
 import { ToolSubagent, ToolSubagentFromRulesyncSubagentParams } from "./tool-subagent.js";
 
@@ -13,10 +14,10 @@ export const ClaudecodeSubagentFrontmatterSchema = z.object({
 
 export type ClaudecodeSubagentFrontmatter = z.infer<typeof ClaudecodeSubagentFrontmatterSchema>;
 
-export interface ClaudecodeSubagentParams extends AiFileParams {
+export type ClaudecodeSubagentParams = {
   frontmatter: ClaudecodeSubagentFrontmatter;
   body: string;
-}
+} & AiFileParams;
 
 export class ClaudecodeSubagent extends ToolSubagent {
   private readonly frontmatter: ClaudecodeSubagentFrontmatter;
@@ -60,7 +61,7 @@ export class ClaudecodeSubagent extends ToolSubagent {
     };
 
     // Generate proper file content with Rulesync specific frontmatter
-    const fileContent = matter.stringify(this.body, rulesyncFrontmatter);
+    const fileContent = stringifyFrontmatter(this.body, rulesyncFrontmatter);
 
     return new RulesyncSubagent({
       frontmatter: rulesyncFrontmatter,
@@ -69,7 +70,7 @@ export class ClaudecodeSubagent extends ToolSubagent {
       relativeDirPath: ".rulesync/subagents",
       relativeFilePath: this.getRelativeFilePath(),
       fileContent,
-      validate: false,
+      validate: true,
     });
   }
 
@@ -88,11 +89,7 @@ export class ClaudecodeSubagent extends ToolSubagent {
 
     // Generate proper file content with Claude Code specific frontmatter
     const body = rulesyncSubagent.getBody();
-    // Remove undefined values to avoid YAML dump errors
-    const cleanFrontmatter = Object.fromEntries(
-      Object.entries(claudecodeFrontmatter).filter(([, value]) => value !== undefined),
-    );
-    const fileContent = matter.stringify(body, cleanFrontmatter);
+    const fileContent = stringifyFrontmatter(body, claudecodeFrontmatter);
 
     return new ClaudecodeSubagent({
       baseDir: baseDir,

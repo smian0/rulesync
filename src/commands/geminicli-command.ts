@@ -1,34 +1,33 @@
 import { readFile } from "node:fs/promises";
-import path from "node:path";
-import matter from "gray-matter";
+import { basename } from "node:path";
 import { parse as parseToml } from "smol-toml";
 import { z } from "zod/mini";
-import type { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
+import type { AiFileParams, ValidationResult } from "../types/ai-file.js";
 import type { ParsedCommand } from "../types/commands.js";
+import { stringifyFrontmatter } from "../utils/frontmatter.js";
 import { RulesyncCommand, RulesyncCommandFrontmatter } from "./rulesync-command.js";
-import { ToolCommand, ToolCommandFromRulesyncCommandParams } from "./tool-command.js";
+import {
+  ToolCommand,
+  ToolCommandFromFilePathParams,
+  ToolCommandFromRulesyncCommandParams,
+} from "./tool-command.js";
 
 export const GeminiCliCommandFrontmatterSchema = z.object({
   description: z.optional(z.string()),
   prompt: z.string(),
 });
 
-export interface GeminiCliCommandFrontmatter {
+export type GeminiCliCommandFrontmatter = {
   description: string;
   prompt: string;
-}
+};
 
-export interface GeminiCliCommandParams extends AiFileParams {
+export type GeminiCliCommandParams = {
   frontmatter: GeminiCliCommandFrontmatter;
   body: string;
-}
+} & AiFileParams;
 
 export class GeminiCliCommand extends ToolCommand {
-  protected readonly toolName = "geminicli" as const;
-  protected readonly commandsDirectoryName = "commands";
-  protected readonly supportsNamespacing = true;
-  protected readonly fileExtension = ".toml";
-
   private readonly frontmatter: GeminiCliCommandFrontmatter;
   private readonly body: string;
 
@@ -37,14 +36,6 @@ export class GeminiCliCommand extends ToolCommand {
     const parsed = this.parseTomlContent(this.fileContent);
     this.frontmatter = parsed;
     this.body = parsed.prompt;
-  }
-
-  protected getGlobalCommandsDirectory(): string {
-    return path.join(process.env.HOME || "~", ".gemini", "commands");
-  }
-
-  protected getProjectCommandsDirectory(): string {
-    return path.join(process.cwd(), ".gemini", "commands");
   }
 
   private parseTomlContent(content: string): GeminiCliCommandFrontmatter {
@@ -90,7 +81,7 @@ export class GeminiCliCommand extends ToolCommand {
     };
 
     // Generate proper file content with Rulesync specific frontmatter
-    const fileContent = matter.stringify(this.body, rulesyncFrontmatter);
+    const fileContent = stringifyFrontmatter(this.body, rulesyncFrontmatter);
 
     return new RulesyncCommand({
       baseDir: this.baseDir,
@@ -99,14 +90,13 @@ export class GeminiCliCommand extends ToolCommand {
       relativeDirPath: ".rulesync/commands",
       relativeFilePath: this.relativeFilePath,
       fileContent,
-      validate: false,
+      validate: true,
     });
   }
 
   static fromRulesyncCommand({
     baseDir = ".",
     rulesyncCommand,
-    relativeDirPath,
     validate = true,
   }: ToolCommandFromRulesyncCommandParams): GeminiCliCommand {
     const rulesyncFrontmatter = rulesyncCommand.getFrontmatter();
@@ -124,7 +114,7 @@ ${geminiFrontmatter.prompt}
 
     return new GeminiCliCommand({
       baseDir: baseDir,
-      relativeDirPath,
+      relativeDirPath: ".gemini/commands",
       relativeFilePath: rulesyncCommand.getRelativeFilePath().replace(".md", ".toml"),
       fileContent: tomlContent,
       validate,
@@ -133,18 +123,16 @@ ${geminiFrontmatter.prompt}
 
   static async fromFilePath({
     baseDir = ".",
-    relativeDirPath,
-    relativeFilePath,
     filePath,
     validate = true,
-  }: AiFileFromFilePathParams): Promise<GeminiCliCommand> {
+  }: ToolCommandFromFilePathParams): Promise<GeminiCliCommand> {
     // Read file content
     const fileContent = await readFile(filePath, "utf-8");
 
     return new GeminiCliCommand({
       baseDir: baseDir,
-      relativeDirPath: relativeDirPath,
-      relativeFilePath: relativeFilePath,
+      relativeDirPath: ".gemini/commands",
+      relativeFilePath: basename(filePath),
       fileContent,
       validate,
     });
@@ -159,7 +147,7 @@ ${geminiFrontmatter.prompt}
     }
   }
 
-  protected async processContent(content: string, args?: string): Promise<string> {
+  private async processContent(content: string, args?: string): Promise<string> {
     let processedContent = content;
 
     // Process {{args}} placeholder
@@ -171,7 +159,7 @@ ${geminiFrontmatter.prompt}
     return processedContent;
   }
 
-  protected processArgumentPlaceholder(content: string, args?: string): string {
+  private processArgumentPlaceholder(content: string, args?: string): string {
     if (content.includes("{{args}}")) {
       // If {{args}} placeholder exists, replace it with arguments
       return content.replace(/\{\{args\}\}/g, args || "");

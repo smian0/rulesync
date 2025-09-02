@@ -1,6 +1,7 @@
 {
   "mcpServers": {
     "serena": {
+      "type": "stdio",
       "command": "uvx",
       "args": [
         "--from",
@@ -17,6 +18,7 @@
       "env": {}
     },
     "context7": {
+      "type": "stdio",
       "command": "npx",
       "args": [
         "-y",
@@ -25,6 +27,7 @@
       "env": {}
     },
     "cipher": {
+      "type": "stdio",
       "command": "cipher",
       "args": ["--mode", "mcp"],
       "env": {}

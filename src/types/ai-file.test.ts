@@ -170,7 +170,7 @@ describe("AiFile", () => {
         relativeDirPath: ".claude",
         relativeFilePath: "test.md",
         fileContent: "valid content",
-        validate: false,
+        validate: true,
       });
 
       const result = aiFile.validate();

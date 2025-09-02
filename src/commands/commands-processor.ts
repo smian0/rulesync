@@ -39,19 +39,16 @@ export class CommandsProcessor extends FeatureProcessor {
         case "claudecode":
           return ClaudecodeCommand.fromRulesyncCommand({
             baseDir: this.baseDir,
-            relativeDirPath: ".claude/commands",
             rulesyncCommand: rulesyncCommand,
           });
         case "geminicli":
           return GeminiCliCommand.fromRulesyncCommand({
             baseDir: this.baseDir,
-            relativeDirPath: ".gemini/commands",
             rulesyncCommand: rulesyncCommand,
           });
         case "roo":
           return RooCommand.fromRulesyncCommand({
             baseDir: this.baseDir,
-            relativeDirPath: ".roo/commands",
             rulesyncCommand: rulesyncCommand,
           });
         default:
@@ -176,8 +173,6 @@ export class CommandsProcessor extends FeatureProcessor {
       try {
         const claudecodeCommand = await ClaudecodeCommand.fromFilePath({
           baseDir: this.baseDir,
-          relativeDirPath: ".claude/commands",
-          relativeFilePath: mdFile,
           filePath: filepath,
         });
 
@@ -225,8 +220,6 @@ export class CommandsProcessor extends FeatureProcessor {
       try {
         const geminiCliCommand = await GeminiCliCommand.fromFilePath({
           baseDir: this.baseDir,
-          relativeDirPath: ".gemini/commands",
-          relativeFilePath: tomlFile,
           filePath: filepath,
         });
 
@@ -274,8 +267,6 @@ export class CommandsProcessor extends FeatureProcessor {
       try {
         const rooCommand = await RooCommand.fromFilePath({
           baseDir: this.baseDir,
-          relativeDirPath: ".roo/commands",
-          relativeFilePath: mdFile,
           filePath: filepath,
         });
 

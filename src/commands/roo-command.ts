@@ -1,9 +1,15 @@
 import { readFile } from "node:fs/promises";
+import { basename } from "node:path";
 import matter from "gray-matter";
 import { optional, z } from "zod/mini";
-import { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
+import { AiFileParams, ValidationResult } from "../types/ai-file.js";
+import { stringifyFrontmatter } from "../utils/frontmatter.js";
 import { RulesyncCommand, RulesyncCommandFrontmatter } from "./rulesync-command.js";
-import { ToolCommand, ToolCommandFromRulesyncCommandParams } from "./tool-command.js";
+import {
+  ToolCommand,
+  ToolCommandFromFilePathParams,
+  ToolCommandFromRulesyncCommandParams,
+} from "./tool-command.js";
 
 export const RooCommandFrontmatterSchema = z.object({
   description: z.string(),
@@ -12,10 +18,10 @@ export const RooCommandFrontmatterSchema = z.object({
 
 export type RooCommandFrontmatter = z.infer<typeof RooCommandFrontmatterSchema>;
 
-export interface RooCommandParams extends AiFileParams {
+export type RooCommandParams = {
   frontmatter: RooCommandFrontmatter;
   body: string;
-}
+} & AiFileParams;
 
 export class RooCommand extends ToolCommand {
   private readonly frontmatter: RooCommandFrontmatter;
@@ -23,7 +29,7 @@ export class RooCommand extends ToolCommand {
 
   constructor({ frontmatter, body, ...rest }: RooCommandParams) {
     // Validate frontmatter before calling super to avoid validation order issues
-    if (rest.validate !== false) {
+    if (rest.validate) {
       const result = RooCommandFrontmatterSchema.safeParse(frontmatter);
       if (!result.success) {
         throw result.error;
@@ -32,6 +38,7 @@ export class RooCommand extends ToolCommand {
 
     super({
       ...rest,
+      fileContent: stringifyFrontmatter(body, frontmatter),
     });
 
     this.frontmatter = frontmatter;
@@ -53,7 +60,7 @@ export class RooCommand extends ToolCommand {
     };
 
     // Generate proper file content with Rulesync specific frontmatter
-    const fileContent = matter.stringify(this.body, rulesyncFrontmatter);
+    const fileContent = stringifyFrontmatter(this.body, rulesyncFrontmatter);
 
     return new RulesyncCommand({
       baseDir: this.baseDir,
@@ -62,14 +69,13 @@ export class RooCommand extends ToolCommand {
       relativeDirPath: ".rulesync/commands",
       relativeFilePath: this.relativeFilePath,
       fileContent,
-      validate: false,
+      validate: true,
     });
   }
 
   static fromRulesyncCommand({
     baseDir = ".",
     rulesyncCommand,
-    relativeDirPath,
     validate = true,
   }: ToolCommandFromRulesyncCommandParams): RooCommand {
     const rulesyncFrontmatter = rulesyncCommand.getFrontmatter();
@@ -80,19 +86,15 @@ export class RooCommand extends ToolCommand {
 
     // Generate proper file content with Roo Code specific frontmatter
     const body = rulesyncCommand.getBody();
-    // Remove undefined values to avoid YAML dump errors
-    const cleanFrontmatter = Object.fromEntries(
-      Object.entries(rooFrontmatter).filter(([, value]) => value !== undefined),
-    );
-    const fileContent = matter.stringify(body, cleanFrontmatter);
+    const fileContent = stringifyFrontmatter(body, rooFrontmatter);
 
     return new RooCommand({
       baseDir: baseDir,
       frontmatter: rooFrontmatter,
       body,
-      relativeDirPath,
+      relativeDirPath: ".roo/commands",
       relativeFilePath: rulesyncCommand.getRelativeFilePath(),
-      fileContent,
+      fileContent: fileContent,
       validate,
     });
   }
@@ -113,11 +115,9 @@ export class RooCommand extends ToolCommand {
 
   static async fromFilePath({
     baseDir = ".",
-    relativeDirPath,
-    relativeFilePath,
     filePath,
     validate = true,
-  }: AiFileFromFilePathParams): Promise<RooCommand> {
+  }: ToolCommandFromFilePathParams): Promise<RooCommand> {
     // Read file content
     const fileContent = await readFile(filePath, "utf-8");
     const { data: frontmatter, content } = matter(fileContent);
@@ -130,8 +130,8 @@ export class RooCommand extends ToolCommand {
 
     return new RooCommand({
       baseDir: baseDir,
-      relativeDirPath: relativeDirPath,
-      relativeFilePath: relativeFilePath,
+      relativeDirPath: ".roo/commands",
+      relativeFilePath: basename(filePath),
       frontmatter: result.data,
       body: content.trim(),
       fileContent,
