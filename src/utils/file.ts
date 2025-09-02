@@ -1,4 +1,4 @@
-import { mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { logger } from "./logger.js";
 
@@ -80,6 +80,8 @@ export async function readFileContent(filepath: string): Promise<string> {
 }
 
 export async function writeFileContent(filepath: string, content: string): Promise<void> {
+  logger.debug(`Writing file: ${filepath}`);
+
   await ensureDir(dirname(filepath));
   await writeFile(filepath, content, "utf-8");
 }
@@ -90,6 +92,14 @@ export async function fileExists(filepath: string): Promise<boolean> {
     return true;
   } catch {
     return false;
+  }
+}
+
+export async function listDirectoryFiles(dir: string): Promise<string[]> {
+  try {
+    return await readdir(dir);
+  } catch {
+    return [];
   }
 }
 
@@ -154,16 +164,6 @@ export async function removeFile(filepath: string): Promise<void> {
   }
 }
 
-export async function removeClaudeGeneratedFiles(): Promise<void> {
-  const filesToRemove = ["CLAUDE.md", ".claude/memories"];
-
-  for (const fileOrDir of filesToRemove) {
-    if (fileOrDir.endsWith("/memories")) {
-      // Remove the entire memories directory
-      await removeDirectory(fileOrDir);
-    } else {
-      // Remove individual file
-      await removeFile(fileOrDir);
-    }
-  }
+export async function createTempDirectory(prefix: string): Promise<string> {
+  return await mkdtemp(prefix);
 }

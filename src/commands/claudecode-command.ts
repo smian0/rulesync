@@ -1,9 +1,8 @@
-import { readFile } from "node:fs/promises";
 import { basename, join } from "node:path";
-import matter from "gray-matter";
 import { z } from "zod/mini";
 import { AiFileParams, ValidationResult } from "../types/ai-file.js";
-import { stringifyFrontmatter } from "../utils/frontmatter.js";
+import { readFileContent } from "../utils/file.js";
+import { parseFrontmatter, stringifyFrontmatter } from "../utils/frontmatter.js";
 import { RulesyncCommand, RulesyncCommandFrontmatter } from "./rulesync-command.js";
 import {
   ToolCommand,
@@ -116,8 +115,8 @@ export class ClaudecodeCommand extends ToolCommand {
     validate = true,
   }: ToolCommandFromFilePathParams): Promise<ClaudecodeCommand> {
     // Read file content
-    const fileContent = await readFile(filePath, "utf-8");
-    const { data: frontmatter, content } = matter(fileContent);
+    const fileContent = await readFileContent(filePath);
+    const { frontmatter, body: content } = parseFrontmatter(fileContent);
 
     // Validate frontmatter using ClaudecodeCommandFrontmatterSchema
     const result = ClaudecodeCommandFrontmatterSchema.safeParse(frontmatter);

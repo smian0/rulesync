@@ -1,6 +1,6 @@
-import { readFile } from "node:fs/promises";
-import matter from "gray-matter";
 import { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
+import { readFileContent } from "../utils/file.js";
+import { parseFrontmatter } from "../utils/frontmatter.js";
 import { RulesyncRule } from "./rulesync-rule.js";
 import { ToolRule, ToolRuleFromRulesyncRuleParams } from "./tool-rule.js";
 
@@ -33,8 +33,8 @@ export class AugmentcodeRule extends ToolRule {
     filePath,
     validate = true,
   }: AiFileFromFilePathParams): Promise<AugmentcodeRule> {
-    const fileContent = await readFile(filePath, "utf-8");
-    const { content } = matter(fileContent);
+    const fileContent = await readFileContent(filePath);
+    const { body: content } = parseFrontmatter(fileContent);
 
     return new AugmentcodeRule({
       baseDir: baseDir,

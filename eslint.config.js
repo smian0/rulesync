@@ -1,7 +1,9 @@
 import eslint from "@eslint/js";
 import { defineConfig } from "eslint/config";
+import importPlugin from "eslint-plugin-import";
 import noTypeAssertion from "eslint-plugin-no-type-assertion";
 import oxlint from "eslint-plugin-oxlint";
+import strictDependencies from "eslint-plugin-strict-dependencies";
 import zodImport from "eslint-plugin-zod-import";
 import tseslint from "typescript-eslint";
 
@@ -38,8 +40,29 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    plugins: {
+      "strict-dependencies": strictDependencies,
+      import: importPlugin,
+    },
     rules: {
       "@typescript-eslint/consistent-type-definitions": ["error", "type"],
+      "@typescript-eslint/no-floating-promises": "error",
+      "import/no-restricted-paths": "error",
+      "strict-dependencies/strict-dependencies": [
+        "error",
+        [
+          {
+            module: "node:fs",
+            allowReferenceFrom: ["src/utils/file.ts", "src/utils/file.test.ts"],
+            allowSameModule: false,
+          },
+          {
+            module: "gray-matter",
+            allowReferenceFrom: ["src/utils/frontmatter.ts"],
+            allowSameModule: false,
+          },
+        ],
+      ],
     },
   },
 

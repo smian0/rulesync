@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileExists, readFileContent, writeFileContent } from "../../utils/file.js";
 import { logger } from "../../utils/logger.js";
 
 export const gitignoreCommand = async (): Promise<void> => {
@@ -54,8 +54,8 @@ export const gitignoreCommand = async (): Promise<void> => {
 
   let gitignoreContent = "";
 
-  if (existsSync(gitignorePath)) {
-    gitignoreContent = readFileSync(gitignorePath, "utf-8");
+  if (await fileExists(gitignorePath)) {
+    gitignoreContent = await readFileContent(gitignorePath);
   }
 
   const linesToAdd: string[] = [];
@@ -75,7 +75,7 @@ export const gitignoreCommand = async (): Promise<void> => {
     ? `${gitignoreContent.trimEnd()}\n\n${linesToAdd.join("")}\n`
     : `${linesToAdd.join("")}\n`;
 
-  writeFileSync(gitignorePath, newContent);
+  await writeFileContent(gitignorePath, newContent);
 
   logger.success(`Added ${linesToAdd.length} rules to .gitignore:`);
   for (const line of linesToAdd) {

@@ -1,8 +1,7 @@
-import { readFile } from "node:fs/promises";
-import matter from "gray-matter";
 import { z } from "zod/mini";
 import { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
-import { stringifyFrontmatter } from "../utils/frontmatter.js";
+import { readFileContent } from "../utils/file.js";
+import { parseFrontmatter, stringifyFrontmatter } from "../utils/frontmatter.js";
 import { RulesyncSubagent, RulesyncSubagentFrontmatter } from "./rulesync-subagent.js";
 import { ToolSubagent, ToolSubagentFromRulesyncSubagentParams } from "./tool-subagent.js";
 
@@ -124,8 +123,8 @@ export class ClaudecodeSubagent extends ToolSubagent {
     validate = true,
   }: AiFileFromFilePathParams): Promise<ClaudecodeSubagent> {
     // Read file content
-    const fileContent = await readFile(filePath, "utf-8");
-    const { data: frontmatter, content } = matter(fileContent);
+    const fileContent = await readFileContent(filePath);
+    const { frontmatter, body: content } = parseFrontmatter(fileContent);
 
     // Validate frontmatter using ClaudecodeSubagentFrontmatterSchema
     const result = ClaudecodeSubagentFrontmatterSchema.safeParse(frontmatter);
