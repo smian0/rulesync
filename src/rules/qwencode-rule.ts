@@ -1,7 +1,13 @@
-import { AiFileFromFilePathParams, ValidationResult } from "../types/ai-file.js";
+import { join } from "node:path";
+import { ValidationResult } from "../types/ai-file.js";
 import { readFileContent } from "../utils/file.js";
 import { RulesyncRule } from "./rulesync-rule.js";
-import { ToolRule, ToolRuleFromRulesyncRuleParams, ToolRuleParams } from "./tool-rule.js";
+import {
+  ToolRule,
+  ToolRuleFromFileParams,
+  ToolRuleFromRulesyncRuleParams,
+  ToolRuleParams,
+} from "./tool-rule.js";
 
 export type QwencodeRuleParams = ToolRuleParams;
 
@@ -12,16 +18,22 @@ export type QwencodeRuleParams = ToolRuleParams;
  * Supports the Qwen Code context management system with hierarchical discovery.
  */
 export class QwencodeRule extends ToolRule {
-  static async fromFilePath(params: AiFileFromFilePathParams): Promise<QwencodeRule> {
-    const fileContent = await readFileContent(params.filePath);
+  static async fromFile({
+    baseDir = ".",
+    relativeFilePath,
+    validate = true,
+  }: ToolRuleFromFileParams): Promise<QwencodeRule> {
+    const isRoot = relativeFilePath === "QWEN.md";
+    const relativePath = isRoot ? "QWEN.md" : join(".qwencode/memories", relativeFilePath);
+    const fileContent = await readFileContent(join(baseDir, relativePath));
 
     return new QwencodeRule({
-      baseDir: params.baseDir || process.cwd(),
-      relativeDirPath: params.relativeDirPath,
-      relativeFilePath: params.relativeFilePath,
+      baseDir,
+      relativeDirPath: isRoot ? "." : ".qwencode/memories",
+      relativeFilePath: isRoot ? "QWEN.md" : relativeFilePath,
       fileContent,
-      validate: params.validate ?? true,
-      root: params.relativeFilePath === "QWEN.md",
+      validate,
+      root: isRoot,
     });
   }
 

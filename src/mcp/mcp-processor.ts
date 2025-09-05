@@ -1,4 +1,3 @@
-import { join } from "node:path";
 import { z } from "zod/mini";
 import { FeatureProcessor } from "../types/feature-processor.js";
 import { RulesyncFile } from "../types/rulesync-file.js";
@@ -44,9 +43,7 @@ export class McpProcessor extends FeatureProcessor {
    */
   async loadRulesyncFiles(): Promise<RulesyncFile[]> {
     try {
-      return [
-        await RulesyncMcp.fromFilePath({ filePath: join(this.baseDir, ".rulesync", ".mcp.json") }),
-      ];
+      return [await RulesyncMcp.fromFile({})];
     } catch (error) {
       logger.debug(`No MCP files found for tool target: ${this.toolTarget}`, error);
       return [];
@@ -59,42 +56,62 @@ export class McpProcessor extends FeatureProcessor {
    */
   async loadToolFiles(): Promise<ToolFile[]> {
     try {
-      switch (this.toolTarget) {
-        case "amazonqcli": {
-          return [
-            await AmazonqcliMcp.fromFilePath({
-              filePath: join(this.baseDir, ".amazonq", "mcp.json"),
-            }),
-          ];
+      const toolMcps = await (async () => {
+        switch (this.toolTarget) {
+          case "amazonqcli": {
+            return [
+              await AmazonqcliMcp.fromFile({
+                baseDir: this.baseDir,
+                validate: true,
+              }),
+            ];
+          }
+          case "claudecode": {
+            return [
+              await ClaudecodeMcp.fromFile({
+                baseDir: this.baseDir,
+                validate: true,
+              }),
+            ];
+          }
+          case "cline": {
+            return [
+              await ClineMcp.fromFile({
+                baseDir: this.baseDir,
+                validate: true,
+              }),
+            ];
+          }
+          case "copilot": {
+            return [
+              await CopilotMcp.fromFile({
+                baseDir: this.baseDir,
+                validate: true,
+              }),
+            ];
+          }
+          case "cursor": {
+            return [
+              await CursorMcp.fromFile({
+                baseDir: this.baseDir,
+                validate: true,
+              }),
+            ];
+          }
+          case "roo": {
+            return [
+              await RooMcp.fromFile({
+                baseDir: this.baseDir,
+                validate: true,
+              }),
+            ];
+          }
+          default:
+            throw new Error(`Unsupported tool target: ${this.toolTarget}`);
         }
-        case "claudecode": {
-          return [
-            await ClaudecodeMcp.fromFilePath({
-              filePath: join(this.baseDir, ".mcp.json"),
-            }),
-          ];
-        }
-        case "cline": {
-          return [
-            await ClineMcp.fromFilePath({ filePath: join(this.baseDir, ".cline", "mcp.json") }),
-          ];
-        }
-        case "copilot": {
-          return [
-            await CopilotMcp.fromFilePath({ filePath: join(this.baseDir, ".vscode", "mcp.json") }),
-          ];
-        }
-        case "cursor": {
-          return [
-            await CursorMcp.fromFilePath({ filePath: join(this.baseDir, ".cursor", "mcp.json") }),
-          ];
-        }
-        case "roo": {
-          return [await RooMcp.fromFilePath({ filePath: join(this.baseDir, ".roo", "mcp.json") })];
-        }
-        default:
-          throw new Error(`Unsupported tool target: ${this.toolTarget}`);
-      }
+      })();
+      logger.info(`Successfully loaded ${toolMcps.length} ${this.toolTarget} MCP files`);
+      return toolMcps;
     } catch (error) {
       logger.debug(`No MCP files found for tool target: ${this.toolTarget}`, error);
       return [];

@@ -1,17 +1,12 @@
 import { basename, join } from "node:path";
 import { XMLBuilder } from "fast-xml-parser";
 import { z } from "zod/mini";
-import { RULESYNC_RULES_DIR_LEGACY } from "../constants/paths.js";
+import { RULESYNC_RULES_DIR, RULESYNC_RULES_DIR_LEGACY } from "../constants/paths.js";
 import { FeatureProcessor } from "../types/feature-processor.js";
 import { RulesyncFile } from "../types/rulesync-file.js";
 import { ToolFile } from "../types/tool-file.js";
 import { ToolTarget } from "../types/tool-targets.js";
-import {
-  directoryExists,
-  fileExists,
-  findFilesByGlobs,
-  listDirectoryFiles,
-} from "../utils/file.js";
+import { findFilesByGlobs } from "../utils/file.js";
 import { logger } from "../utils/logger.js";
 import { AgentsMdRule } from "./agentsmd-rule.js";
 import { AmazonQCliRule } from "./amazonqcli-rule.js";
@@ -29,7 +24,7 @@ import { OpenCodeRule } from "./opencode-rule.js";
 import { QwencodeRule } from "./qwencode-rule.js";
 import { RooRule } from "./roo-rule.js";
 import { RulesyncRule } from "./rulesync-rule.js";
-import { ToolRule } from "./tool-rule.js";
+import { ToolRule, ToolRuleFromFileParams } from "./tool-rule.js";
 import { WarpRule } from "./warp-rule.js";
 import { WindsurfRule } from "./windsurf-rule.js";
 
@@ -277,71 +272,19 @@ export class RulesProcessor extends FeatureProcessor {
    * Load and parse rulesync rule files from .rulesync/rules/ directory
    */
   async loadRulesyncFiles(): Promise<RulesyncFile[]> {
-    try {
-      const rulesDir = join(this.baseDir, ".rulesync", "rules");
-
-      // Check if directory exists
-      const dirExists = await directoryExists(rulesDir);
-      if (!dirExists) {
-        logger.debug(`Rulesync rules directory not found: ${rulesDir}`);
-        return [];
-      }
-
-      // Read all markdown files from the directory
-      const entries = await listDirectoryFiles(rulesDir);
-      const mdFiles = entries.filter((file) => file.endsWith(".md"));
-
-      if (mdFiles.length === 0) {
-        logger.debug(`No markdown files found in rulesync rules directory: ${rulesDir}`);
-        return [];
-      }
-
-      logger.info(`Found ${mdFiles.length} rule files in ${rulesDir}`);
-
-      // Parse all files and create RulesyncRule instances using fromFilePath
-      const rulesyncRules: RulesyncRule[] = [];
-
-      for (const mdFile of mdFiles) {
-        const filepath = join(rulesDir, mdFile);
-
-        try {
-          const rulesyncRule = await RulesyncRule.fromFilePath({
-            filePath: filepath,
-          });
-
-          rulesyncRules.push(rulesyncRule);
-          logger.debug(`Successfully loaded rule: ${mdFile}`);
-        } catch (error) {
-          logger.warn(`Failed to load rule file ${filepath}:`, error);
-          continue;
-        }
-      }
-
-      if (rulesyncRules.length === 0) {
-        logger.debug(`No valid rules found in ${rulesDir}`);
-        return [];
-      }
-
-      logger.info(`Successfully loaded ${rulesyncRules.length} rulesync rules`);
-      return rulesyncRules;
-    } catch (error) {
-      logger.debug(`No rulesync files found`, error);
-      return [];
-    }
+    const files = await findFilesByGlobs(join(RULESYNC_RULES_DIR, "*.md"));
+    logger.debug(`Found ${files.length} rulesync files`);
+    return Promise.all(
+      files.map((file) => RulesyncRule.fromFile({ relativeFilePath: basename(file) })),
+    );
   }
 
-  async loadLegacyRulesyncFiles(): Promise<RulesyncFile[]> {
-    try {
-      const legacyFiles = await findFilesByGlobs(join(RULESYNC_RULES_DIR_LEGACY, "*.md"));
-      return Promise.all(
-        legacyFiles.map((file) =>
-          RulesyncRule.fromLegacyFile({ relativeFilePath: basename(file) }),
-        ),
-      );
-    } catch (error) {
-      logger.debug(`No legacy rulesync files found`, error);
-      return [];
-    }
+  async loadRulesyncFilesLegacy(): Promise<RulesyncFile[]> {
+    const legacyFiles = await findFilesByGlobs(join(RULESYNC_RULES_DIR_LEGACY, "*.md"));
+    logger.debug(`Found ${legacyFiles.length} legacy rulesync files`);
+    return Promise.all(
+      legacyFiles.map((file) => RulesyncRule.fromFileLegacy({ relativeFilePath: basename(file) })),
+    );
   }
 
   /**
@@ -394,622 +337,328 @@ export class RulesProcessor extends FeatureProcessor {
     }
   }
 
+  private async loadToolRulesDefault({
+    root,
+    nonRoot,
+  }: {
+    root?: {
+      relativeDirPath: string;
+      relativeFilePath: string;
+      fromFile: (params: ToolRuleFromFileParams) => Promise<ToolRule>;
+    };
+    nonRoot?: {
+      relativeFilePath: string;
+      fromFile: (params: ToolRuleFromFileParams) => Promise<ToolRule>;
+      extension: "md" | "mdc";
+    };
+  }) {
+    const rootToolRules = await (async () => {
+      if (!root) {
+        return [];
+      }
+
+      const rootFilePaths = await findFilesByGlobs(
+        join(this.baseDir, root.relativeDirPath ?? ".", root.relativeFilePath),
+      );
+      return await Promise.all(
+        rootFilePaths.map((filePath) =>
+          root.fromFile({
+            baseDir: this.baseDir,
+            relativeFilePath: basename(filePath),
+          }),
+        ),
+      );
+    })();
+    logger.debug(`Found ${rootToolRules.length} root tool rule files`);
+
+    const nonRootToolRules = await (async () => {
+      if (!nonRoot) {
+        return [];
+      }
+
+      const nonRootFilePaths = await findFilesByGlobs(
+        join(this.baseDir, nonRoot.relativeFilePath, `*.${nonRoot.extension}`),
+      );
+      return await Promise.all(
+        nonRootFilePaths.map((filePath) =>
+          nonRoot.fromFile({
+            baseDir: this.baseDir,
+            relativeFilePath: basename(filePath),
+          }),
+        ),
+      );
+    })();
+    logger.debug(`Found ${nonRootToolRules.length} non-root tool rule files`);
+
+    return [...rootToolRules, ...nonRootToolRules];
+  }
+
   /**
    * Load AGENTS.md rule configuration
    */
   private async loadAgentsmdRules(): Promise<ToolRule[]> {
-    const agentsFile = join(this.baseDir, "AGENTS.md");
-
-    if (!(await fileExists(agentsFile))) {
-      logger.warn(`AGENTS.md file not found: ${agentsFile}`);
-      return [];
-    }
-
-    try {
-      const agentsmdRule = await AgentsMdRule.fromFilePath({
-        baseDir: this.baseDir,
+    return await this.loadToolRulesDefault({
+      root: {
         relativeDirPath: ".",
         relativeFilePath: "AGENTS.md",
-        filePath: agentsFile,
-        validate: true,
-      });
-
-      logger.info(`Successfully loaded AGENTS.md rule`);
-      return [agentsmdRule];
-    } catch (error) {
-      logger.warn(`Failed to load AGENTS.md file ${agentsFile}:`, error);
-      return [];
-    }
+        fromFile: (params) => AgentsMdRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".agents/memories",
+        fromFile: (params) => AgentsMdRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   private async loadWarpRules(): Promise<ToolRule[]> {
-    const rootFilePaths = await findFilesByGlobs(join(this.baseDir, "WARP.md"));
-    const nonRootFilePaths = await findFilesByGlobs(join(this.baseDir, ".warp/memories/*.md"));
-
-    const rootFiles = await Promise.all(
-      rootFilePaths.map((filePath) =>
-        WarpRule.fromFilePath({
-          filePath,
-          validate: true,
-          relativeDirPath: ".",
-          relativeFilePath: "WARP.md",
-        }),
-      ),
-    );
-    const nonRootFiles = await Promise.all(
-      nonRootFilePaths.map((filePath) =>
-        WarpRule.fromFilePath({
-          filePath,
-          validate: true,
-          relativeDirPath: ".warp/memories",
-          relativeFilePath: basename(filePath),
-        }),
-      ),
-    );
-    return [...rootFiles, ...nonRootFiles];
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: "WARP.md",
+        fromFile: (params) => WarpRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".warp/memories",
+        fromFile: (params) => WarpRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Amazon Q Developer CLI rule configurations from .amazonq/rules/ directory
    */
   private async loadAmazonqcliRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".amazonq", "rules"),
-      (filePath, relativeFilePath) =>
-        AmazonQCliRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".amazonq/rules",
-          relativeFilePath,
-          filePath,
-          validate: true,
-        }),
-      "Amazon Q Developer CLI",
-    );
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".amazonq/rules",
+        fromFile: (params) => AmazonQCliRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load AugmentCode rule configurations from .augment/rules/ directory
    */
   private async loadAugmentcodeRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".augment", "rules"),
-      (filePath, relativeFilePath) =>
-        AugmentcodeRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".augment/rules",
-          relativeFilePath,
-          filePath,
-          validate: true,
-        }),
-      "AugmentCode",
-    );
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".augment/rules",
+        fromFile: (params) => AugmentcodeRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load AugmentCode legacy rule configuration from .augment-guidelines file and .augment/rules/ directory
    */
   private async loadAugmentcodeLegacyRules(): Promise<ToolRule[]> {
-    const toolRules: ToolRule[] = [];
-
-    // Check for root file
-    const guidelinesFile = join(this.baseDir, ".augment-guidelines");
-    if (await fileExists(guidelinesFile)) {
-      try {
-        const augmentcodeLegacyRule = await AugmentcodeLegacyRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".",
-          relativeFilePath: ".augment-guidelines",
-          filePath: guidelinesFile,
-          validate: true,
-        });
-        toolRules.push(augmentcodeLegacyRule);
-        logger.info(`Successfully loaded AugmentCode legacy guidelines`);
-      } catch (error) {
-        logger.warn(`Failed to load AugmentCode legacy guidelines file ${guidelinesFile}:`, error);
-      }
-    }
-
-    // Check for non-root files in .augment/rules/
-    const rulesDir = join(this.baseDir, ".augment", "rules");
-    if (await directoryExists(rulesDir)) {
-      const dirRules = await this.loadToolRulesFromDirectory(
-        rulesDir,
-        (filePath, relativeFilePath) =>
-          AugmentcodeLegacyRule.fromFilePath({
-            baseDir: this.baseDir,
-            relativeDirPath: join(".augment", "rules"),
-            relativeFilePath,
-            filePath,
-            validate: true,
-          }),
-        "AugmentCode Legacy",
-      );
-      toolRules.push(...dirRules);
-    }
-
-    return toolRules;
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: ".augment-guidelines",
+        fromFile: (params) => AugmentcodeLegacyRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".augment/rules",
+        fromFile: (params) => AugmentcodeLegacyRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Claude Code rule configuration from CLAUDE.md file
    */
   private async loadClaudecodeRules(): Promise<ToolRule[]> {
-    const claudeMemoriesDir = join(this.baseDir, ".claude", "memories");
-
-    // Check if the memories directory exists
-    if (!(await directoryExists(claudeMemoriesDir))) {
-      logger.debug(`Claude Code memories directory not found: ${claudeMemoriesDir}`);
-
-      // Fall back to check for legacy CLAUDE.md file
-      const claudeFile = join(this.baseDir, "CLAUDE.md");
-      if (!(await fileExists(claudeFile))) {
-        logger.debug(`Claude Code memory file not found: ${claudeFile}`);
-        return [];
-      }
-
-      try {
-        const claudecodeRule = await ClaudecodeRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".",
-          relativeFilePath: "CLAUDE.md",
-          filePath: claudeFile,
-          validate: true,
-        });
-
-        logger.info(`Successfully loaded Claude Code memory file`);
-        return [claudecodeRule];
-      } catch (error) {
-        logger.warn(`Failed to load Claude Code memory file ${claudeFile}:`, error);
-        return [];
-      }
-    }
-
-    // Load from .claude/memories directory
-    const entries = await listDirectoryFiles(claudeMemoriesDir);
-    const mdFiles = entries.filter((file) => file.endsWith(".md"));
-
-    if (mdFiles.length === 0) {
-      logger.debug(
-        `No markdown files found in Claude Code memories directory: ${claudeMemoriesDir}`,
-      );
-      return [];
-    }
-
-    logger.info(`Found ${mdFiles.length} Claude Code memory files in ${claudeMemoriesDir}`);
-
-    const toolRules: ToolRule[] = [];
-
-    for (const mdFile of mdFiles) {
-      const filePath = join(claudeMemoriesDir, mdFile);
-
-      try {
-        const claudecodeRule = await ClaudecodeRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: join(".claude", "memories"),
-          relativeFilePath: mdFile,
-          filePath: filePath,
-          validate: true,
-        });
-
-        toolRules.push(claudecodeRule);
-        logger.debug(`Successfully loaded Claude Code memory file: ${mdFile}`);
-      } catch (error) {
-        logger.warn(`Failed to load Claude Code memory file ${filePath}:`, error);
-        continue;
-      }
-    }
-
-    logger.info(`Successfully loaded ${toolRules.length} Claude Code memory files`);
-    return toolRules;
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: "CLAUDE.md",
+        fromFile: (params) => ClaudecodeRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".claude/memories",
+        fromFile: (params) => ClaudecodeRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Cline rule configurations from .clinerules/ directory
    */
   private async loadClineRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".clinerules"),
-      (filePath, relativeFilePath) =>
-        ClineRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".clinerules",
-          relativeFilePath,
-          filePath,
-          validate: true,
-        }),
-      "Cline",
-    );
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".clinerules",
+        fromFile: (params) => ClineRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load OpenAI Codex CLI rule configuration from AGENTS.md and .codex/memories/*.md files
    */
   private async loadCodexcliRules(): Promise<ToolRule[]> {
-    const rules: ToolRule[] = [];
-
-    // Load root file (AGENTS.md)
-    const agentsFile = join(this.baseDir, "AGENTS.md");
-    if (await fileExists(agentsFile)) {
-      try {
-        const codexcliRule = await CodexcliRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".",
-          relativeFilePath: "AGENTS.md",
-          filePath: agentsFile,
-          validate: true,
-        });
-        rules.push(codexcliRule);
-        logger.info(`Successfully loaded OpenAI Codex CLI agents file`);
-      } catch (error) {
-        logger.warn(`Failed to load OpenAI Codex CLI agents file ${agentsFile}:`, error);
-      }
-    }
-
-    // Load non-root files from .codex/memories/
-    const memoriesDir = join(this.baseDir, ".codex", "memories");
-    if (await directoryExists(memoriesDir)) {
-      try {
-        const entries = await listDirectoryFiles(memoriesDir);
-        const mdFiles = entries.filter((file) => file.endsWith(".md"));
-
-        for (const mdFile of mdFiles) {
-          const filePath = join(memoriesDir, mdFile);
-          try {
-            const codexcliRule = await CodexcliRule.fromFilePath({
-              baseDir: this.baseDir,
-              relativeDirPath: join(".codex", "memories"),
-              relativeFilePath: mdFile,
-              filePath,
-              validate: true,
-            });
-            rules.push(codexcliRule);
-          } catch (error) {
-            logger.warn(`Failed to load Codex CLI memories file ${filePath}:`, error);
-          }
-        }
-
-        if (mdFiles.length > 0) {
-          logger.info(`Successfully loaded ${mdFiles.length} OpenAI Codex CLI memory files`);
-        }
-      } catch (error) {
-        logger.warn(`Failed to read OpenAI Codex CLI memories directory ${memoriesDir}:`, error);
-      }
-    }
-
-    if (rules.length === 0) {
-      logger.warn(`No OpenAI Codex CLI rule files found`);
-    }
-
-    return rules;
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: "AGENTS.md",
+        fromFile: (params) => CodexcliRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".codex/memories",
+        fromFile: (params) => CodexcliRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load GitHub Copilot rule configuration from .github/copilot-instructions.md file
    */
   private async loadCopilotRules(): Promise<ToolRule[]> {
-    const copilotFile = join(this.baseDir, ".github", "copilot-instructions.md");
-
-    if (!(await fileExists(copilotFile))) {
-      logger.warn(`GitHub Copilot instructions file not found: ${copilotFile}`);
-      return [];
-    }
-
-    try {
-      const copilotRule = await CopilotRule.fromFilePath({
-        baseDir: this.baseDir,
-        relativeDirPath: ".github",
-        relativeFilePath: "copilot-instructions.md",
-        filePath: copilotFile,
-        validate: true,
-      });
-
-      logger.info(`Successfully loaded GitHub Copilot instructions file`);
-      return [copilotRule];
-    } catch (error) {
-      logger.warn(`Failed to load GitHub Copilot instructions file ${copilotFile}:`, error);
-      return [];
-    }
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: ".github/copilot-instructions.md",
+        fromFile: (params) => CopilotRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".github/instructions",
+        fromFile: (params) => CopilotRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Cursor rule configurations from .cursor/rules/ directory
    */
   private async loadCursorRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".cursor", "rules"),
-      (filePath) =>
-        CursorRule.fromFilePath({
-          filePath,
-          validate: true,
-        }),
-      "Cursor",
-    );
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".cursor/rules",
+        fromFile: (params) => CursorRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Gemini CLI rule configuration from GEMINI.md file
    */
   private async loadGeminicliRules(): Promise<ToolRule[]> {
-    const geminiFile = join(this.baseDir, "GEMINI.md");
-
-    if (!(await fileExists(geminiFile))) {
-      logger.warn(`Gemini CLI memory file not found: ${geminiFile}`);
-      return [];
-    }
-
-    try {
-      const geminicliRule = await GeminiCliRule.fromFilePath({
-        baseDir: this.baseDir,
+    return await this.loadToolRulesDefault({
+      root: {
         relativeDirPath: ".",
         relativeFilePath: "GEMINI.md",
-        filePath: geminiFile,
-        validate: true,
-      });
-
-      logger.info(`Successfully loaded Gemini CLI memory file`);
-      return [geminicliRule];
-    } catch (error) {
-      logger.warn(`Failed to load Gemini CLI memory file ${geminiFile}:`, error);
-      return [];
-    }
+        fromFile: (params) => GeminiCliRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".gemini/memories",
+        fromFile: (params) => GeminiCliRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load JetBrains Junie rule configuration from .junie/guidelines.md file
    */
   private async loadJunieRules(): Promise<ToolRule[]> {
-    const guidelinesFile = join(this.baseDir, ".junie", "guidelines.md");
-
-    if (!(await fileExists(guidelinesFile))) {
-      return [];
-    }
-
-    const junieRule = await JunieRule.fromFilePath({
-      baseDir: this.baseDir,
-      relativeDirPath: ".junie",
-      relativeFilePath: "guidelines.md",
-      filePath: guidelinesFile,
-      validate: true,
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: ".junie/guidelines.md",
+        fromFile: (params) => JunieRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".junie/memories",
+        fromFile: (params) => JunieRule.fromFile(params),
+        extension: "md",
+      },
     });
-
-    logger.info(`Successfully loaded JetBrains Junie guidelines file`);
-    return [junieRule];
   }
 
   /**
    * Load Kiro rule configurations from .kiro/steering/ directory
    */
   private async loadKiroRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".kiro", "steering"),
-      (filePath, relativeFilePath) =>
-        KiroRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".kiro/steering",
-          relativeFilePath,
-          filePath,
-          validate: true,
-        }),
-      "Kiro",
-    );
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".kiro/steering",
+        fromFile: (params) => KiroRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load OpenCode rule configuration from AGENTS.md file and .opencode/memories/*.md files
    */
   private async loadOpencodeRules(): Promise<ToolRule[]> {
-    const rules: ToolRule[] = [];
-
-    // Load root file (AGENTS.md)
-    const agentsFile = join(this.baseDir, "AGENTS.md");
-    if (await fileExists(agentsFile)) {
-      try {
-        const opencodeRule = await OpenCodeRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".",
-          relativeFilePath: "AGENTS.md",
-          filePath: agentsFile,
-          validate: true,
-        });
-        rules.push(opencodeRule);
-        logger.info(`Successfully loaded OpenCode agents file`);
-      } catch (error) {
-        logger.warn(`Failed to load OpenCode agents file ${agentsFile}:`, error);
-      }
-    }
-
-    // Load non-root files from .opencode/memories/
-    const memoriesDir = join(this.baseDir, ".opencode", "memories");
-    if (await directoryExists(memoriesDir)) {
-      try {
-        const entries = await listDirectoryFiles(memoriesDir);
-        const mdFiles = entries.filter((file) => file.endsWith(".md"));
-
-        for (const mdFile of mdFiles) {
-          const filePath = join(memoriesDir, mdFile);
-          try {
-            const opencodeRule = await OpenCodeRule.fromFilePath({
-              baseDir: this.baseDir,
-              relativeDirPath: join(".opencode", "memories"),
-              relativeFilePath: mdFile,
-              filePath,
-              validate: true,
-            });
-            rules.push(opencodeRule);
-          } catch (error) {
-            logger.warn(`Failed to load OpenCode memories file ${filePath}:`, error);
-          }
-        }
-
-        if (mdFiles.length > 0) {
-          logger.info(`Successfully loaded ${mdFiles.length} OpenCode memory files`);
-        }
-      } catch (error) {
-        logger.warn(`Failed to read OpenCode memories directory ${memoriesDir}:`, error);
-      }
-    }
-
-    if (rules.length === 0) {
-      logger.warn(`No OpenCode rule files found`);
-    }
-
-    return rules;
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: "AGENTS.md",
+        fromFile: (params) => OpenCodeRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".opencode/memories",
+        fromFile: (params) => OpenCodeRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Qwen Code rule configuration from QWEN.md file and .qwen/memories/*.md files
    */
   private async loadQwencodeRules(): Promise<ToolRule[]> {
-    const rules: ToolRule[] = [];
-
-    // Load root file (QWEN.md)
-    const qwenFile = join(this.baseDir, "QWEN.md");
-    if (await fileExists(qwenFile)) {
-      try {
-        const qwencodeRule = await QwencodeRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".",
-          relativeFilePath: "QWEN.md",
-          filePath: qwenFile,
-          validate: true,
-        });
-        rules.push(qwencodeRule);
-        logger.info(`Successfully loaded Qwen Code memory file`);
-      } catch (error) {
-        logger.warn(`Failed to load Qwen Code memory file ${qwenFile}:`, error);
-      }
-    }
-
-    // Load non-root files from .qwen/memories/
-    const memoriesDir = join(this.baseDir, ".qwen", "memories");
-    if (await directoryExists(memoriesDir)) {
-      try {
-        const entries = await listDirectoryFiles(memoriesDir);
-        const mdFiles = entries.filter((file) => file.endsWith(".md"));
-
-        for (const mdFile of mdFiles) {
-          const filePath = join(memoriesDir, mdFile);
-          try {
-            const qwencodeRule = await QwencodeRule.fromFilePath({
-              baseDir: this.baseDir,
-              relativeDirPath: join(".qwen", "memories"),
-              relativeFilePath: mdFile,
-              filePath,
-              validate: true,
-            });
-            rules.push(qwencodeRule);
-          } catch (error) {
-            logger.warn(`Failed to load Qwen Code memories file ${filePath}:`, error);
-          }
-        }
-
-        if (mdFiles.length > 0) {
-          logger.info(`Successfully loaded ${mdFiles.length} Qwen Code memory files`);
-        }
-      } catch (error) {
-        logger.warn(`Failed to read Qwen Code memories directory ${memoriesDir}:`, error);
-      }
-    }
-
-    if (rules.length === 0) {
-      logger.warn(`No Qwen Code rule files found`);
-    }
-
-    return rules;
+    return await this.loadToolRulesDefault({
+      root: {
+        relativeDirPath: ".",
+        relativeFilePath: "QWEN.md",
+        fromFile: (params) => QwencodeRule.fromFile(params),
+      },
+      nonRoot: {
+        relativeFilePath: ".qwen/memories",
+        fromFile: (params) => QwencodeRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Roo Code rule configurations from .roo/rules/ directory
    */
   private async loadRooRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".roo", "rules"),
-      (filePath, relativeFilePath) =>
-        RooRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".roo/rules",
-          relativeFilePath,
-          filePath,
-          validate: true,
-        }),
-      "Roo Code",
-    );
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".roo/rules",
+        fromFile: (params) => RooRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
    * Load Windsurf rule configurations from .windsurf/rules/ directory
    */
   private async loadWindsurfRules(): Promise<ToolRule[]> {
-    return this.loadToolRulesFromDirectory(
-      join(this.baseDir, ".windsurf", "rules"),
-      (filePath, relativeFilePath) =>
-        WindsurfRule.fromFilePath({
-          baseDir: this.baseDir,
-          relativeDirPath: ".windsurf/rules",
-          relativeFilePath,
-          filePath,
-          validate: true,
-        }),
-      "Windsurf",
-    );
-  }
-
-  /**
-   * Common helper method to load tool rules from a directory with parallel processing
-   */
-  private async loadToolRulesFromDirectory(
-    dirPath: string,
-    ruleFactory: (filePath: string, relativeFilePath: string) => Promise<ToolRule>,
-    toolName: string,
-  ): Promise<ToolRule[]> {
-    if (!(await directoryExists(dirPath))) {
-      logger.warn(`${toolName} rules directory not found: ${dirPath}`);
-      return [];
-    }
-
-    const entries = await listDirectoryFiles(dirPath);
-    const mdFiles = entries.filter((file) => file.endsWith(".md") || file.endsWith(".mdc"));
-
-    if (mdFiles.length === 0) {
-      logger.info(`No rule files found in ${dirPath}`);
-      return [];
-    }
-
-    logger.info(`Found ${mdFiles.length} ${toolName} rule files in ${dirPath}`);
-
-    // Use Promise.allSettled for parallel processing with better error handling
-    const results = await Promise.allSettled(
-      mdFiles.map(async (mdFile) => {
-        const filepath = join(dirPath, mdFile);
-        return {
-          rule: await ruleFactory(filepath, mdFile),
-          filename: mdFile,
-        };
-      }),
-    );
-
-    const toolRules: ToolRule[] = [];
-    for (const [index, result] of results.entries()) {
-      if (result.status === "fulfilled") {
-        toolRules.push(result.value.rule);
-        logger.debug(`Successfully loaded ${toolName} rule: ${result.value.filename}`);
-      } else {
-        logger.warn(`Failed to load ${toolName} rule file ${mdFiles[index]}:`, result.reason);
-      }
-    }
-
-    logger.info(`Successfully loaded ${toolRules.length} ${toolName} rules`);
-    return toolRules;
-  }
-
-  async writeToolRulesFromRulesyncRules(rulesyncRules: RulesyncRule[]): Promise<void> {
-    const toolRules = await this.convertRulesyncFilesToToolFiles(rulesyncRules);
-    await this.writeAiFiles(toolRules);
-  }
-
-  async writeRulesyncRulesFromToolRules(toolRules: ToolRule[]): Promise<void> {
-    const rulesyncRules = await this.convertToolFilesToRulesyncFiles(toolRules);
-    await this.writeAiFiles(rulesyncRules);
+    return await this.loadToolRulesDefault({
+      nonRoot: {
+        relativeFilePath: ".windsurf/rules",
+        fromFile: (params) => WindsurfRule.fromFile(params),
+        extension: "md",
+      },
+    });
   }
 
   /**
@@ -1020,33 +669,7 @@ export class RulesProcessor extends FeatureProcessor {
     return rulesProcessorToolTargets;
   }
 
-  /**
-   * Get all supported tools
-   */
-  static getSupportedTools(): ToolTarget[] {
-    const allTools: ToolTarget[] = [
-      "agentsmd",
-      "amazonqcli",
-      "augmentcode",
-      "augmentcode-legacy",
-      "claudecode",
-      "cline",
-      "codexcli",
-      "copilot",
-      "cursor",
-      "geminicli",
-      "junie",
-      "kiro",
-      "opencode",
-      "qwencode",
-      "roo",
-      "windsurf",
-    ];
-
-    return allTools;
-  }
-
-  public generateXmlReferencesSection(toolRules: ToolRule[]): string {
+  private generateXmlReferencesSection(toolRules: ToolRule[]): string {
     const toolRulesWithoutRoot = toolRules.filter((rule) => !rule.isRoot());
 
     if (toolRulesWithoutRoot.length === 0) {
@@ -1096,7 +719,7 @@ export class RulesProcessor extends FeatureProcessor {
     return lines.join("\n") + "\n";
   }
 
-  public generateReferencesSection(toolRules: ToolRule[]): string {
+  private generateReferencesSection(toolRules: ToolRule[]): string {
     const toolRulesWithoutRoot = toolRules.filter((rule) => !rule.isRoot());
 
     if (toolRulesWithoutRoot.length === 0) {

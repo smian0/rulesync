@@ -1,5 +1,10 @@
+import { join } from "node:path";
+import { readFileContent } from "../utils/file.js";
 import { RulesyncIgnore } from "./rulesync-ignore.js";
-import type { ToolIgnoreFromRulesyncIgnoreParams } from "./tool-ignore.js";
+import type {
+  ToolIgnoreFromFileParams,
+  ToolIgnoreFromRulesyncIgnoreParams,
+} from "./tool-ignore.js";
 import { ToolIgnore } from "./tool-ignore.js";
 
 /**
@@ -21,6 +26,21 @@ export class WindsurfIgnore extends ToolIgnore {
       relativeDirPath: ".",
       relativeFilePath: ".codeiumignore",
       fileContent: rulesyncIgnore.getFileContent(),
+    });
+  }
+
+  static async fromFile({
+    baseDir = ".",
+    validate = true,
+  }: ToolIgnoreFromFileParams): Promise<WindsurfIgnore> {
+    const fileContent = await readFileContent(join(baseDir, ".codeiumignore"));
+
+    return new WindsurfIgnore({
+      baseDir,
+      relativeDirPath: ".",
+      relativeFilePath: ".codeiumignore",
+      fileContent,
+      validate,
     });
   }
 }

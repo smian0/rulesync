@@ -1,7 +1,8 @@
-import { AiFileFromFilePathParams, AiFileParams, ValidationResult } from "../types/ai-file.js";
+import { join } from "node:path";
+import { AiFileParams, ValidationResult } from "../types/ai-file.js";
 import { readFileContent } from "../utils/file.js";
 import { RulesyncRule } from "./rulesync-rule.js";
-import { ToolRule, ToolRuleFromRulesyncRuleParams } from "./tool-rule.js";
+import { ToolRule, ToolRuleFromFileParams, ToolRuleFromRulesyncRuleParams } from "./tool-rule.js";
 
 export type JunieRuleParams = AiFileParams;
 
@@ -12,15 +13,21 @@ export type JunieRuleParams = AiFileParams;
  * Junie uses plain markdown format without frontmatter requirements.
  */
 export class JunieRule extends ToolRule {
-  static async fromFilePath(params: AiFileFromFilePathParams): Promise<JunieRule> {
-    const fileContent = await readFileContent(params.filePath);
+  static async fromFile({
+    baseDir = ".",
+    relativeFilePath,
+    validate = true,
+  }: ToolRuleFromFileParams): Promise<JunieRule> {
+    const isRoot = relativeFilePath === "guidelines.md";
+    const relativePath = isRoot ? "guidelines.md" : join(".junie/memories", relativeFilePath);
+    const fileContent = await readFileContent(join(baseDir, relativePath));
 
     return new JunieRule({
-      baseDir: params.baseDir || ".",
-      relativeDirPath: params.relativeDirPath,
-      relativeFilePath: params.relativeFilePath,
+      baseDir,
+      relativeDirPath: isRoot ? ".junie" : ".junie/memories",
+      relativeFilePath: isRoot ? "guidelines.md" : relativeFilePath,
       fileContent,
-      validate: params.validate ?? true,
+      validate,
     });
   }
 
@@ -34,8 +41,8 @@ export class JunieRule extends ToolRule {
         baseDir,
         rulesyncRule,
         validate,
-        rootPath: { relativeDirPath: ".", relativeFilePath: "guidelines.md" },
-        nonRootPath: { relativeDirPath: ".junie/guidelines" },
+        rootPath: { relativeDirPath: ".junie", relativeFilePath: "guidelines.md" },
+        nonRootPath: { relativeDirPath: ".junie/memories" },
       }),
     );
   }
