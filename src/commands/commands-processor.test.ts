@@ -15,12 +15,52 @@ vi.mock("../utils/logger.js", () => ({
     info: vi.fn(),
   },
 }));
+// Mock RulesyncCommand after importing it
 vi.mock("./rulesync-command.js");
-vi.mock("./claudecode-command.js");
-vi.mock("./geminicli-command.js");
-vi.mock("./roo-command.js");
+vi.mock("./claudecode-command.js", () => ({
+  ClaudecodeCommand: vi.fn().mockImplementation((config) => config),
+}));
+vi.mock("./geminicli-command.js", () => ({
+  GeminiCliCommand: vi.fn().mockImplementation((config) => config),
+}));
+vi.mock("./roo-command.js", () => ({
+  RooCommand: vi.fn().mockImplementation((config) => config),
+}));
 
 const mockFindFilesByGlobs = findFilesByGlobs as MockedFunction<typeof findFilesByGlobs>;
+
+// Set up RulesyncCommand mock
+vi.mocked(RulesyncCommand).mockImplementation((config: any) => {
+  const instance = Object.create(RulesyncCommand.prototype);
+  return Object.assign(instance, config);
+});
+
+// Set up static methods after mocking
+vi.mocked(RulesyncCommand).fromFile = vi.fn();
+vi.mocked(RulesyncCommand).getSettablePaths = vi
+  .fn()
+  .mockReturnValue({ relativeDirPath: ".rulesync/commands" });
+
+// Set up static methods after mocking
+vi.mocked(ClaudecodeCommand).fromFile = vi.fn();
+vi.mocked(ClaudecodeCommand).fromRulesyncCommand = vi.fn();
+vi.mocked(ClaudecodeCommand).getSettablePaths = vi
+  .fn()
+  .mockReturnValue({ relativeDirPath: ".claude/commands" });
+
+// Set up static methods after mocking
+vi.mocked(GeminiCliCommand).fromFile = vi.fn();
+vi.mocked(GeminiCliCommand).fromRulesyncCommand = vi.fn();
+vi.mocked(GeminiCliCommand).getSettablePaths = vi
+  .fn()
+  .mockReturnValue({ relativeDirPath: ".gemini/commands" });
+
+// Set up static methods after mocking
+vi.mocked(RooCommand).fromFile = vi.fn();
+vi.mocked(RooCommand).fromRulesyncCommand = vi.fn();
+vi.mocked(RooCommand).getSettablePaths = vi
+  .fn()
+  .mockReturnValue({ relativeDirPath: ".roo/commands" });
 
 describe("CommandsProcessor", () => {
   let testDir: string;
@@ -39,7 +79,7 @@ describe("CommandsProcessor", () => {
   describe("constructor", () => {
     it("should create instance with valid tool target", () => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "claudecode",
       });
       expect(processor).toBeInstanceOf(CommandsProcessor);
@@ -48,7 +88,7 @@ describe("CommandsProcessor", () => {
     it("should throw error for invalid tool target", () => {
       expect(() => {
         processor = new CommandsProcessor({
-          baseDir: expect.any(String),
+          baseDir: testDir,
           toolTarget: "invalid" as CommandsProcessorToolTarget,
         });
       }).toThrow();
@@ -65,14 +105,14 @@ describe("CommandsProcessor", () => {
   describe("convertRulesyncFilesToToolFiles", () => {
     beforeEach(() => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "claudecode",
       });
     });
 
     it("should convert rulesync commands to claudecode commands", async () => {
       const mockRulesyncCommand = new RulesyncCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".rulesync/commands",
         relativeFilePath: "test.md",
         fileContent: "test content",
@@ -84,7 +124,7 @@ describe("CommandsProcessor", () => {
       });
 
       const mockClaudecodeCommand = new ClaudecodeCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".claude/commands",
         relativeFilePath: "test.md",
         frontmatter: {
@@ -106,12 +146,12 @@ describe("CommandsProcessor", () => {
 
     it("should convert rulesync commands to geminicli commands", async () => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "geminicli",
       });
 
       const mockRulesyncCommand = new RulesyncCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".rulesync/commands",
         relativeFilePath: "test.md",
         fileContent: "test content",
@@ -123,7 +163,7 @@ describe("CommandsProcessor", () => {
       });
 
       const mockGeminiCliCommand = new GeminiCliCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".gemini/commands",
         relativeFilePath: "test.md",
         fileContent: `description = "test description"\nprompt = """\nconverted content\n"""`,
@@ -142,12 +182,12 @@ describe("CommandsProcessor", () => {
 
     it("should convert rulesync commands to roo commands", async () => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "roo",
       });
 
       const mockRulesyncCommand = new RulesyncCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".rulesync/commands",
         relativeFilePath: "test.md",
         fileContent: "test content",
@@ -159,7 +199,7 @@ describe("CommandsProcessor", () => {
       });
 
       const mockRooCommand = new RooCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".roo/commands",
         relativeFilePath: "test.md",
         fileContent: "converted content",
@@ -182,7 +222,7 @@ describe("CommandsProcessor", () => {
 
     it("should filter out non-rulesync command files", async () => {
       const mockRulesyncCommand = new RulesyncCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".rulesync/commands",
         relativeFilePath: "test.md",
         fileContent: "test content",
@@ -192,6 +232,18 @@ describe("CommandsProcessor", () => {
         },
         body: "test content",
       });
+
+      const mockClaudecodeCommand = new ClaudecodeCommand({
+        baseDir: testDir,
+        relativeDirPath: ".claude/commands",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          description: "test description",
+        },
+        body: "converted content",
+      });
+
+      vi.mocked(ClaudecodeCommand.fromRulesyncCommand).mockReturnValue(mockClaudecodeCommand);
 
       const mockOtherFile = { type: "other" };
 
@@ -206,7 +258,7 @@ describe("CommandsProcessor", () => {
     it("should throw error for unsupported tool target", async () => {
       // Create processor with valid target first, then modify internal target for testing
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "claudecode",
       });
 
@@ -214,7 +266,7 @@ describe("CommandsProcessor", () => {
       (processor as any).toolTarget = "unsupported";
 
       const mockRulesyncCommand = new RulesyncCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".rulesync/commands",
         relativeFilePath: "test.md",
         fileContent: "test content",
@@ -234,7 +286,7 @@ describe("CommandsProcessor", () => {
   describe("convertToolFilesToRulesyncFiles", () => {
     beforeEach(() => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "claudecode",
       });
     });
@@ -300,7 +352,7 @@ describe("CommandsProcessor", () => {
   describe("loadRulesyncFiles", () => {
     beforeEach(() => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "claudecode",
       });
     });
@@ -309,7 +361,7 @@ describe("CommandsProcessor", () => {
       const mockPaths = ["test1.md", "test2.md"];
       const mockRulesyncCommands = [
         new RulesyncCommand({
-          baseDir: expect.any(String),
+          baseDir: testDir,
           relativeDirPath: ".rulesync/commands",
           relativeFilePath: "test1.md",
           fileContent: "content1",
@@ -320,7 +372,7 @@ describe("CommandsProcessor", () => {
           body: "content1",
         }),
         new RulesyncCommand({
-          baseDir: expect.any(String),
+          baseDir: testDir,
           relativeDirPath: ".rulesync/commands",
           relativeFilePath: "test2.md",
           fileContent: "content2",
@@ -350,7 +402,7 @@ describe("CommandsProcessor", () => {
     it("should handle failed file loading gracefully", async () => {
       const mockPaths = ["test1.md", "test2.md"];
       const mockRulesyncCommand = new RulesyncCommand({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         relativeDirPath: ".rulesync/commands",
         relativeFilePath: "test1.md",
         fileContent: "content1",
@@ -461,7 +513,7 @@ describe("CommandsProcessor", () => {
 
     it("should throw error for unsupported tool target", async () => {
       processor = new CommandsProcessor({
-        baseDir: expect.any(String),
+        baseDir: testDir,
         toolTarget: "claudecode",
       });
 
