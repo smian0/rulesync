@@ -1,8 +1,5 @@
 import { intersection } from "es-toolkit";
-import {
-  CommandsProcessor,
-  type CommandsProcessorToolTarget,
-} from "../../commands/commands-processor.js";
+import { CommandsProcessor } from "../../commands/commands-processor.js";
 import { ConfigResolver, type ConfigResolverResolveParams } from "../../config/config-resolver.js";
 import { IgnoreProcessor } from "../../ignore/ignore-processor.js";
 import { McpProcessor, type McpProcessorToolTarget } from "../../mcp/mcp-processor.js";
@@ -109,22 +106,12 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
   if (config.getFeatures().includes("commands")) {
     logger.info("Generating command files...");
 
-    // Check which targets support commands
-    const supportedCommandTargets: CommandsProcessorToolTarget[] = [
-      "claudecode",
-      "geminicli",
-      "roo",
-    ];
-    const commandSupportedTargets = config
-      .getTargets()
-      .filter((target): target is CommandsProcessorToolTarget => {
-        return supportedCommandTargets.some((supportedTarget) => supportedTarget === target);
-      });
-
     for (const baseDir of config.getBaseDirs()) {
       for (const toolTarget of intersection(
-        commandSupportedTargets,
-        CommandsProcessor.getToolTargets(),
+        config.getTargets(),
+        CommandsProcessor.getToolTargets({
+          includeSimulated: config.getExperimentalSimulateCommands(),
+        }),
       )) {
         const processor = new CommandsProcessor({
           baseDir: baseDir,
@@ -190,7 +177,9 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
     for (const baseDir of config.getBaseDirs()) {
       for (const toolTarget of intersection(
         config.getTargets(),
-        SubagentsProcessor.getToolTargets(),
+        SubagentsProcessor.getToolTargets({
+          includeSimulated: config.getExperimentalSimulateSubagents(),
+        }),
       )) {
         const processor = new SubagentsProcessor({
           baseDir: baseDir,
