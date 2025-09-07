@@ -7,13 +7,25 @@ import { ToolTarget } from "../types/tool-targets.js";
 import { findFilesByGlobs } from "../utils/file.js";
 import { logger } from "../utils/logger.js";
 import { ClaudecodeCommand } from "./claudecode-command.js";
+import { CodexCliCommand } from "./codexcli-command.js";
+import { CopilotCommand } from "./copilot-command.js";
+import { CursorCommand } from "./cursor-command.js";
 import { GeminiCliCommand } from "./geminicli-command.js";
 import { RooCommand } from "./roo-command.js";
 import { RulesyncCommand } from "./rulesync-command.js";
 import { ToolCommand } from "./tool-command.js";
 
-const commandsProcessorToolTargets: ToolTarget[] = ["claudecode", "geminicli", "roo"];
+const commandsProcessorToolTargets: ToolTarget[] = [
+  "claudecode",
+  "geminicli",
+  "roo",
+  "copilot",
+  "cursor",
+  "codexcli",
+];
 export const CommandsProcessorToolTargetSchema = z.enum(commandsProcessorToolTargets);
+
+const commandsProcessorToolTargetsSimulated: ToolTarget[] = ["copilot", "cursor", "codexcli"];
 
 export type CommandsProcessorToolTarget = z.infer<typeof CommandsProcessorToolTargetSchema>;
 
@@ -47,6 +59,21 @@ export class CommandsProcessor extends FeatureProcessor {
           });
         case "roo":
           return RooCommand.fromRulesyncCommand({
+            baseDir: this.baseDir,
+            rulesyncCommand: rulesyncCommand,
+          });
+        case "copilot":
+          return CopilotCommand.fromRulesyncCommand({
+            baseDir: this.baseDir,
+            rulesyncCommand: rulesyncCommand,
+          });
+        case "cursor":
+          return CursorCommand.fromRulesyncCommand({
+            baseDir: this.baseDir,
+            rulesyncCommand: rulesyncCommand,
+          });
+        case "codexcli":
+          return CodexCliCommand.fromRulesyncCommand({
             baseDir: this.baseDir,
             rulesyncCommand: rulesyncCommand,
           });
@@ -184,7 +211,17 @@ export class CommandsProcessor extends FeatureProcessor {
    * Implementation of abstract method from FeatureProcessor
    * Return the tool targets that this processor supports
    */
-  static getToolTargets(): ToolTarget[] {
+  static getToolTargets({
+    excludeSimulated = false,
+  }: {
+    excludeSimulated?: boolean;
+  } = {}): ToolTarget[] {
+    if (excludeSimulated) {
+      return commandsProcessorToolTargets.filter(
+        (target) => !commandsProcessorToolTargetsSimulated.includes(target),
+      );
+    }
+
     return commandsProcessorToolTargets;
   }
 }

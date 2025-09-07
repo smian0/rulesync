@@ -32,6 +32,8 @@ async function initConfig(): Promise<void> {
         baseDirs: ["."],
         delete: true,
         verbose: false,
+        experimentalSimulateCommands: false,
+        experimentalSimulateSubagents: false,
       } satisfies ConfigParams,
       null,
       2,

@@ -7,6 +7,8 @@ export type ConfigParams = {
   features: RulesyncFeatures;
   verbose: boolean;
   delete: boolean;
+  experimentalSimulateCommands: boolean;
+  experimentalSimulateSubagents: boolean;
 };
 
 export class Config {
@@ -15,13 +17,25 @@ export class Config {
   private readonly features: RulesyncFeatures;
   private readonly verbose: boolean;
   private readonly delete: boolean;
+  private readonly experimentalSimulateCommands: boolean;
+  private readonly experimentalSimulateSubagents: boolean;
 
-  constructor({ baseDirs, targets, features, verbose, delete: isDelete }: ConfigParams) {
+  constructor({
+    baseDirs,
+    targets,
+    features,
+    verbose,
+    delete: isDelete,
+    experimentalSimulateCommands,
+    experimentalSimulateSubagents,
+  }: ConfigParams) {
     this.baseDirs = baseDirs;
     this.targets = targets;
     this.features = features;
     this.verbose = verbose;
     this.delete = isDelete;
+    this.experimentalSimulateCommands = experimentalSimulateCommands;
+    this.experimentalSimulateSubagents = experimentalSimulateSubagents;
   }
 
   public getBaseDirs(): string[] {
@@ -50,5 +64,13 @@ export class Config {
 
   public getDelete(): boolean {
     return this.delete;
+  }
+
+  public getExperimentalSimulateCommands(): boolean {
+    return this.experimentalSimulateCommands;
+  }
+
+  public getExperimentalSimulateSubagents(): boolean {
+    return this.experimentalSimulateSubagents;
   }
 }
