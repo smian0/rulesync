@@ -1,7 +1,13 @@
 import { basename, join } from "node:path";
 import { XMLBuilder } from "fast-xml-parser";
 import { z } from "zod/mini";
+import { CodexCliCommand } from "../commands/codexcli-command.js";
+import { CopilotCommand } from "../commands/copilot-command.js";
+import { CursorCommand } from "../commands/cursor-command.js";
 import { RULESYNC_RULES_DIR, RULESYNC_RULES_DIR_LEGACY } from "../constants/paths.js";
+import { CodexCliSubagent } from "../subagents/codexcli-subagent.js";
+import { CopilotSubagent } from "../subagents/copilot-subagent.js";
+import { CursorSubagent } from "../subagents/cursor-subagent.js";
 import { FeatureProcessor } from "../types/feature-processor.js";
 import { RulesyncFile } from "../types/rulesync-file.js";
 import { ToolFile } from "../types/tool-file.js";
@@ -53,13 +59,24 @@ export type RulesProcessorToolTarget = z.infer<typeof RulesProcessorToolTargetSc
 
 export class RulesProcessor extends FeatureProcessor {
   private readonly toolTarget: RulesProcessorToolTarget;
+  private readonly simulateCommands: boolean;
+  private readonly simulateSubagents: boolean;
 
   constructor({
     baseDir = process.cwd(),
     toolTarget,
-  }: { baseDir?: string; toolTarget: RulesProcessorToolTarget }) {
+    simulateCommands = false,
+    simulateSubagents = false,
+  }: {
+    baseDir?: string;
+    toolTarget: RulesProcessorToolTarget;
+    simulateCommands?: boolean;
+    simulateSubagents?: boolean;
+  }) {
     super({ baseDir });
     this.toolTarget = RulesProcessorToolTargetSchema.parse(toolTarget);
+    this.simulateCommands = simulateCommands;
+    this.simulateSubagents = simulateSubagents;
   }
 
   async convertRulesyncFilesToToolFiles(rulesyncFiles: RulesyncFile[]): Promise<ToolFile[]> {
@@ -176,6 +193,27 @@ export class RulesProcessor extends FeatureProcessor {
       }
     });
 
+    // For enabling simulated commands and subagents in Cursor, an additional convention rule is needed.
+    if (this.toolTarget === "cursor" && (this.simulateCommands || this.simulateSubagents)) {
+      toolRules.push(
+        new CursorRule({
+          baseDir: this.baseDir,
+          frontmatter: {
+            alwaysApply: true,
+          },
+          body: this.generateAdditionalConventionsSection({
+            commands: { relativeDirPath: CursorCommand.getSettablePaths().relativeDirPath },
+            subagents: {
+              relativeDirPath: CursorSubagent.getSettablePaths().relativeDirPath,
+            },
+          }),
+          relativeDirPath: CursorRule.getSettablePaths().nonRoot.relativeDirPath,
+          relativeFilePath: "additional-conventions.mdc",
+          validate: true,
+        }),
+      );
+    }
+
     const rootRuleIndex = toolRules.findIndex((rule) => rule.isRoot());
     if (rootRuleIndex === -1) {
       return toolRules;
@@ -206,14 +244,28 @@ export class RulesProcessor extends FeatureProcessor {
       case "codexcli": {
         const rootRule = toolRules[rootRuleIndex];
         rootRule?.setFileContent(
-          this.generateXmlReferencesSection(toolRules) + rootRule.getFileContent(),
+          this.generateXmlReferencesSection(toolRules) +
+            this.generateAdditionalConventionsSection({
+              commands: { relativeDirPath: CodexCliCommand.getSettablePaths().relativeDirPath },
+              subagents: {
+                relativeDirPath: CodexCliSubagent.getSettablePaths().relativeDirPath,
+              },
+            }) +
+            rootRule.getFileContent(),
         );
         return toolRules;
       }
       case "copilot": {
         const rootRule = toolRules[rootRuleIndex];
         rootRule?.setFileContent(
-          this.generateXmlReferencesSection(toolRules) + rootRule.getFileContent(),
+          this.generateXmlReferencesSection(toolRules) +
+            this.generateAdditionalConventionsSection({
+              commands: { relativeDirPath: CopilotCommand.getSettablePaths().relativeDirPath },
+              subagents: {
+                relativeDirPath: CopilotSubagent.getSettablePaths().relativeDirPath,
+              },
+            }) +
+            rootRule.getFileContent(),
         );
         return toolRules;
       }
@@ -762,5 +814,52 @@ export class RulesProcessor extends FeatureProcessor {
     }
 
     return lines.join("\n") + "\n";
+  }
+
+  private generateAdditionalConventionsSection({
+    commands,
+    subagents,
+  }: {
+    commands: {
+      relativeDirPath: string;
+    };
+    subagents: {
+      relativeDirPath: string;
+    };
+  }): string {
+    return `# Additional Conventions Beyond the Built-in Functions
+
+As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.
+
+${
+  this.simulateCommands
+    ? `## Simulated Custom Slash Commands
+
+Custom slash commands allow you to define frequently-used prompts as Markdown files that you can execute.
+
+### Syntax
+
+Users can use following syntax to invoke a custom command.
+
+\`\`\`txt
+s/<command> [arguments]
+\`\`\`
+
+This syntax employs a double slash (\`s/\`) to prevent conflicts with built-in slash commands.  
+The \`s\` in \`s/\` stands for *simulate*. Because custom slash commands are not built-in, this syntax provides a pseudo way to invoke them.
+
+When users call a custom slash command, you have to look for the markdown file, \`${join(commands.relativeDirPath, "{command}.md")}\`, then execute the contents of that file as the block of operations.`
+    : ""
+}
+
+${
+  this.simulateSubagents
+    ? `## Simulated Subagents
+
+Simulated subagents are specialized AI assistants that can be invoked to handle specific types of tasks. In this case, it can be appear something like simulated custom slash commands simply. Simulated subagents can be called by simulated custom slash commands.
+
+When users call a simulated subagent, it will look for the corresponding markdown file, \`${join(subagents.relativeDirPath, "{subagent}.md")}\`, and execute its contents as the block of operations.`
+    : ""
+}`.trim();
   }
 }
