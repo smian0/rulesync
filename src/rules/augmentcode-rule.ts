@@ -68,4 +68,11 @@ export class AugmentcodeRule extends ToolRule {
   validate(): ValidationResult {
     return { success: true, error: null };
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "augmentcode",
+    });
+  }
 }
