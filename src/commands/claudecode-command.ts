@@ -116,6 +116,13 @@ export class ClaudecodeCommand extends ToolCommand {
     }
   }
 
+  static isTargetedByRulesyncCommand(rulesyncCommand: RulesyncCommand): boolean {
+    return this.isTargetedByRulesyncCommandDefault({
+      rulesyncCommand,
+      toolTarget: "claudecode",
+    });
+  }
+
   static async fromFile({
     baseDir = ".",
     relativeFilePath,
