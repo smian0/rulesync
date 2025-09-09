@@ -167,4 +167,21 @@ export class RulesyncRule extends RulesyncFile {
   getBody(): string {
     return this.body;
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    const targets = rulesyncRule.getFrontmatter().targets;
+    if (!targets) {
+      return true;
+    }
+
+    if (targets.includes("*")) {
+      return true;
+    }
+
+    if (targets.includes("rulesync")) {
+      return true;
+    }
+
+    return false;
+  }
 }
