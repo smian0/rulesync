@@ -122,6 +122,13 @@ export class RooCommand extends ToolCommand {
     }
   }
 
+  static isTargetedByRulesyncCommand(rulesyncCommand: RulesyncCommand): boolean {
+    return this.isTargetedByRulesyncCommandDefault({
+      rulesyncCommand,
+      toolTarget: "roo",
+    });
+  }
+
   static async fromFile({
     baseDir = ".",
     relativeFilePath,
