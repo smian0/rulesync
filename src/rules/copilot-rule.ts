@@ -209,4 +209,11 @@ export class CopilotRule extends ToolRule {
   getBody(): string {
     return this.body;
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "copilot",
+    });
+  }
 }

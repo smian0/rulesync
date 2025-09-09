@@ -690,4 +690,88 @@ description: "Test trimming"
       expect(loadedRule.getFilePath()).toBe(originalRule.getFilePath());
     });
   });
+
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting copilot", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: "rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(CopilotRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: "rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(CopilotRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting copilot", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: "rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "agentsmd"],
+        },
+        body: "Test content",
+      });
+
+      expect(CopilotRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: "rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(CopilotRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including copilot", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: "rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot", "agentsmd"],
+        },
+        body: "Test content",
+      });
+
+      expect(CopilotRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: "rules",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(CopilotRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
 });
