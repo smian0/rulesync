@@ -1,7 +1,7 @@
 ---
 description: 'Command: update-docs'
 targets:
-  - claudecode
+  - '*'
 ---
 
 1. Call the diff-analyzer subagent to detect the changes in current branch.

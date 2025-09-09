@@ -44,6 +44,7 @@ vi.mocked(RulesyncCommand).getSettablePaths = vi
 // Set up static methods after mocking
 vi.mocked(ClaudecodeCommand).fromFile = vi.fn();
 vi.mocked(ClaudecodeCommand).fromRulesyncCommand = vi.fn();
+vi.mocked(ClaudecodeCommand).isTargetedByRulesyncCommand = vi.fn().mockReturnValue(true);
 vi.mocked(ClaudecodeCommand).getSettablePaths = vi
   .fn()
   .mockReturnValue({ relativeDirPath: ".claude/commands" });
@@ -51,6 +52,7 @@ vi.mocked(ClaudecodeCommand).getSettablePaths = vi
 // Set up static methods after mocking
 vi.mocked(GeminiCliCommand).fromFile = vi.fn();
 vi.mocked(GeminiCliCommand).fromRulesyncCommand = vi.fn();
+vi.mocked(GeminiCliCommand).isTargetedByRulesyncCommand = vi.fn().mockReturnValue(true);
 vi.mocked(GeminiCliCommand).getSettablePaths = vi
   .fn()
   .mockReturnValue({ relativeDirPath: ".gemini/commands" });
@@ -58,6 +60,7 @@ vi.mocked(GeminiCliCommand).getSettablePaths = vi
 // Set up static methods after mocking
 vi.mocked(RooCommand).fromFile = vi.fn();
 vi.mocked(RooCommand).fromRulesyncCommand = vi.fn();
+vi.mocked(RooCommand).isTargetedByRulesyncCommand = vi.fn().mockReturnValue(true);
 vi.mocked(RooCommand).getSettablePaths = vi
   .fn()
   .mockReturnValue({ relativeDirPath: ".roo/commands" });

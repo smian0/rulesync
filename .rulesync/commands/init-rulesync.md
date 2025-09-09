@@ -1,7 +1,7 @@
 ---
 description: 'Command: init-rulesync'
 targets:
-  - claudecode
+  - '*'
 ---
 
 Analyze this project's codebase and update .rulesync/rules/overview.md files as needed. Especially you should read `README.md` and `CONTRIBUTING.md`.

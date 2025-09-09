@@ -1,7 +1,7 @@
 ---
 description: 'Judge PR'
 targets:
-  - claudecode
+  - '*'
 ---
 
 target_pr = $ARGUMENTS

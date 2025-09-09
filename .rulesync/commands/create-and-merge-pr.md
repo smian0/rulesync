@@ -1,7 +1,7 @@
 ---
 description: 'create and merge PR'
 targets:
-  - claudecode
+  - '*'
 ---
 
 1. Call the pr-handler subagent to create or update a PR.

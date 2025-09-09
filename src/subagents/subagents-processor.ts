@@ -46,36 +46,50 @@ export class SubagentsProcessor extends FeatureProcessor {
       (file): file is RulesyncSubagent => file instanceof RulesyncSubagent,
     );
 
-    const toolSubagents = rulesyncSubagents.map((rulesyncSubagent) => {
-      switch (this.toolTarget) {
-        case "claudecode":
-          return ClaudecodeSubagent.fromRulesyncSubagent({
-            baseDir: this.baseDir,
-            relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
-            rulesyncSubagent: rulesyncSubagent,
-          });
-        case "copilot":
-          return CopilotSubagent.fromRulesyncSubagent({
-            baseDir: this.baseDir,
-            relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
-            rulesyncSubagent: rulesyncSubagent,
-          });
-        case "cursor":
-          return CursorSubagent.fromRulesyncSubagent({
-            baseDir: this.baseDir,
-            relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
-            rulesyncSubagent: rulesyncSubagent,
-          });
-        case "codexcli":
-          return CodexCliSubagent.fromRulesyncSubagent({
-            baseDir: this.baseDir,
-            relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
-            rulesyncSubagent: rulesyncSubagent,
-          });
-        default:
-          throw new Error(`Unsupported tool target: ${this.toolTarget}`);
-      }
-    });
+    const toolSubagents = rulesyncSubagents
+      .map((rulesyncSubagent) => {
+        switch (this.toolTarget) {
+          case "claudecode":
+            if (!ClaudecodeSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)) {
+              return null;
+            }
+            return ClaudecodeSubagent.fromRulesyncSubagent({
+              baseDir: this.baseDir,
+              relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
+              rulesyncSubagent: rulesyncSubagent,
+            });
+          case "copilot":
+            if (!CopilotSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)) {
+              return null;
+            }
+            return CopilotSubagent.fromRulesyncSubagent({
+              baseDir: this.baseDir,
+              relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
+              rulesyncSubagent: rulesyncSubagent,
+            });
+          case "cursor":
+            if (!CursorSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)) {
+              return null;
+            }
+            return CursorSubagent.fromRulesyncSubagent({
+              baseDir: this.baseDir,
+              relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
+              rulesyncSubagent: rulesyncSubagent,
+            });
+          case "codexcli":
+            if (!CodexCliSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)) {
+              return null;
+            }
+            return CodexCliSubagent.fromRulesyncSubagent({
+              baseDir: this.baseDir,
+              relativeDirPath: RulesyncSubagent.getSettablePaths().relativeDirPath,
+              rulesyncSubagent: rulesyncSubagent,
+            });
+          default:
+            throw new Error(`Unsupported tool target: ${this.toolTarget}`);
+        }
+      })
+      .filter((subagent): subagent is ToolSubagent => subagent !== null);
 
     return toolSubagents;
   }

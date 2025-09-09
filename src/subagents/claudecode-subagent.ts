@@ -126,6 +126,13 @@ export class ClaudecodeSubagent extends ToolSubagent {
     }
   }
 
+  static isTargetedByRulesyncSubagent(rulesyncSubagent: RulesyncSubagent): boolean {
+    return this.isTargetedByRulesyncSubagentDefault({
+      rulesyncSubagent,
+      toolTarget: "claudecode",
+    });
+  }
+
   static async fromFile({
     baseDir = ".",
     relativeFilePath,

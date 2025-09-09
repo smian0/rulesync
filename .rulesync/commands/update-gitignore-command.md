@@ -1,7 +1,7 @@
 ---
 description: 'Command: update-gitignore-command'
 targets:
-  - claudecode
+  - '*'
 ---
 
 tool_name_in_rulesync, remarks = $ARGUMENTS

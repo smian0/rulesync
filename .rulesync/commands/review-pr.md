@@ -1,7 +1,7 @@
 ---
 description: 'Command: review-pr'
 targets:
-  - claudecode
+  - '*'
 ---
 
 target_pr = $ARGUMENTS

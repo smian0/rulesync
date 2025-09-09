@@ -458,6 +458,78 @@ describe("ClaudecodeSubagent", () => {
     });
   });
 
+  describe("isTargetedByRulesyncSubagent", () => {
+    it("should return true for rulesync subagent with wildcard target", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["*"], name: "Test", description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = ClaudecodeSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync subagent with claudecode target", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["claudecode"], name: "Test", description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = ClaudecodeSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync subagent with claudecode and other targets", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "claudecode", "cline"],
+          name: "Test",
+          description: "Test",
+        },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = ClaudecodeSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+
+    it("should return false for rulesync subagent with different target", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["cursor"], name: "Test", description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = ClaudecodeSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(false);
+    });
+
+    it("should return true for rulesync subagent with no targets specified", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: undefined, name: "Test", description: "Test" } as any,
+        body: "Body",
+        fileContent: "",
+        validate: false,
+      });
+
+      const result = ClaudecodeSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+  });
+
   describe("fromFile", () => {
     it("should load subagent from file", async () => {
       const frontmatter: ClaudecodeSubagentFrontmatter = {

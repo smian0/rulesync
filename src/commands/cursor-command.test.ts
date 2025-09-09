@@ -526,4 +526,71 @@ Body content`;
       expect(command).toBeInstanceOf(CursorCommand);
     });
   });
+
+  describe("isTargetedByRulesyncCommand", () => {
+    it("should return true for rulesync command with wildcard target", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["*"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CursorCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync command with cursor target", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["cursor"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CursorCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync command with cursor and other targets", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["claudecode", "cursor", "cline"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CursorCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+
+    it("should return false for rulesync command with different target", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["claudecode"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CursorCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(false);
+    });
+
+    it("should return false for rulesync command with empty targets", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: [], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CursorCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(false);
+    });
+  });
 });

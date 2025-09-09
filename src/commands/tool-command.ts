@@ -1,4 +1,5 @@
 import { AiFile, AiFileFromFileParams, AiFileParams } from "../types/ai-file.js";
+import type { ToolTarget } from "../types/tool-targets.js";
 import type { RulesyncCommand } from "./rulesync-command.js";
 
 export type ToolCommandFromRulesyncCommandParams = Omit<
@@ -78,4 +79,45 @@ export abstract class ToolCommand extends AiFile {
    * @returns A RulesyncCommand instance
    */
   abstract toRulesyncCommand(): RulesyncCommand;
+
+  /**
+   * Check if this tool is targeted by a RulesyncCommand based on its targets field.
+   * Subclasses should override this to provide specific targeting logic.
+   *
+   * @param rulesyncCommand - The RulesyncCommand to check
+   * @returns True if this tool is targeted by the command
+   */
+  static isTargetedByRulesyncCommand(_rulesyncCommand: RulesyncCommand): boolean {
+    throw new Error("Please implement this method in the subclass.");
+  }
+
+  /**
+   * Default implementation for checking if a tool is targeted by a RulesyncCommand.
+   * Checks if the command's targets include the tool target or a wildcard.
+   *
+   * @param params - Parameters including the RulesyncCommand and tool target
+   * @returns True if the tool target is included in the command's targets
+   */
+  protected static isTargetedByRulesyncCommandDefault({
+    rulesyncCommand,
+    toolTarget,
+  }: {
+    rulesyncCommand: RulesyncCommand;
+    toolTarget: ToolTarget;
+  }): boolean {
+    const targets = rulesyncCommand.getFrontmatter().targets;
+    if (!targets) {
+      return true;
+    }
+
+    if (targets.includes("*")) {
+      return true;
+    }
+
+    if (targets.includes(toolTarget)) {
+      return true;
+    }
+
+    return false;
+  }
 }
