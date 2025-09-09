@@ -220,7 +220,7 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
     const parts = [];
     if (totalRulesOutputs > 0) parts.push(`${totalRulesOutputs} rules`);
     if (totalIgnoreOutputs > 0) parts.push(`${totalIgnoreOutputs} ignore files`);
-    if (totalMcpOutputs > 0) parts.push(`${totalMcpOutputs} MCPs`);
+    if (totalMcpOutputs > 0) parts.push(`${totalMcpOutputs} MCP files`);
     if (totalCommandOutputs > 0) parts.push(`${totalCommandOutputs} commands`);
     if (totalSubagentOutputs > 0) parts.push(`${totalSubagentOutputs} subagents`);
 

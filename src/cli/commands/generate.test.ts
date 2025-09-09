@@ -440,7 +440,7 @@ describe("generateCommand", () => {
       await generateCommand(options);
 
       expect(logger.success).toHaveBeenCalledWith(
-        "🎉 All done! Generated 6 file(s) total (2 rules + 3 MCPs + 1 commands)",
+        "🎉 All done! Generated 6 file(s) total (2 rules + 3 MCP files + 1 commands)",
       );
     });
 
@@ -455,7 +455,7 @@ describe("generateCommand", () => {
       await generateCommand(options);
 
       expect(logger.success).toHaveBeenCalledWith(
-        "🎉 All done! Generated 5 file(s) total (1 rules + 1 ignore files + 1 MCPs + 1 commands + 1 subagents)",
+        "🎉 All done! Generated 5 file(s) total (1 rules + 1 ignore files + 1 MCP files + 1 commands + 1 subagents)",
       );
     });
 
