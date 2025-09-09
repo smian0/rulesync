@@ -145,4 +145,11 @@ ${geminiFrontmatter.prompt}
       return { success: false, error: error instanceof Error ? error : new Error(String(error)) };
     }
   }
+
+  static isTargetedByRulesyncCommand(rulesyncCommand: RulesyncCommand): boolean {
+    return this.isTargetedByRulesyncCommandDefault({
+      rulesyncCommand,
+      toolTarget: "geminicli",
+    });
+  }
 }
