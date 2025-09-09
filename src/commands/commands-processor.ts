@@ -45,42 +45,72 @@ export class CommandsProcessor extends FeatureProcessor {
       (file): file is RulesyncCommand => file instanceof RulesyncCommand,
     );
 
-    const toolCommands = rulesyncCommands.map((rulesyncCommand) => {
-      switch (this.toolTarget) {
-        case "claudecode":
-          return ClaudecodeCommand.fromRulesyncCommand({
-            baseDir: this.baseDir,
-            rulesyncCommand: rulesyncCommand,
-          });
-        case "geminicli":
-          return GeminiCliCommand.fromRulesyncCommand({
-            baseDir: this.baseDir,
-            rulesyncCommand: rulesyncCommand,
-          });
-        case "roo":
-          return RooCommand.fromRulesyncCommand({
-            baseDir: this.baseDir,
-            rulesyncCommand: rulesyncCommand,
-          });
-        case "copilot":
-          return CopilotCommand.fromRulesyncCommand({
-            baseDir: this.baseDir,
-            rulesyncCommand: rulesyncCommand,
-          });
-        case "cursor":
-          return CursorCommand.fromRulesyncCommand({
-            baseDir: this.baseDir,
-            rulesyncCommand: rulesyncCommand,
-          });
-        case "codexcli":
-          return CodexCliCommand.fromRulesyncCommand({
-            baseDir: this.baseDir,
-            rulesyncCommand: rulesyncCommand,
-          });
-        default:
-          throw new Error(`Unsupported tool target: ${this.toolTarget}`);
-      }
-    });
+    const toolCommands = rulesyncCommands
+      .map((rulesyncCommand) => {
+        switch (this.toolTarget) {
+          case "claudecode":
+            if (!ClaudecodeCommand.isTargetedByRulesyncCommand(rulesyncCommand)) {
+              return null;
+            }
+            return ClaudecodeCommand.fromRulesyncCommand({
+              baseDir: this.baseDir,
+              rulesyncCommand: rulesyncCommand,
+            });
+          case "geminicli":
+            if (!GeminiCliCommand.isTargetedByRulesyncCommand(rulesyncCommand)) {
+              return null;
+            }
+            return GeminiCliCommand.fromRulesyncCommand({
+              baseDir: this.baseDir,
+              rulesyncCommand: rulesyncCommand,
+            });
+          case "roo":
+            if (!RooCommand.isTargetedByRulesyncCommand(rulesyncCommand)) {
+              return null;
+            }
+            return RooCommand.fromRulesyncCommand({
+              baseDir: this.baseDir,
+              rulesyncCommand: rulesyncCommand,
+            });
+          case "copilot":
+            if (!CopilotCommand.isTargetedByRulesyncCommand(rulesyncCommand)) {
+              return null;
+            }
+            return CopilotCommand.fromRulesyncCommand({
+              baseDir: this.baseDir,
+              rulesyncCommand: rulesyncCommand,
+            });
+          case "cursor":
+            if (!CursorCommand.isTargetedByRulesyncCommand(rulesyncCommand)) {
+              return null;
+            }
+            return CursorCommand.fromRulesyncCommand({
+              baseDir: this.baseDir,
+              rulesyncCommand: rulesyncCommand,
+            });
+          case "codexcli":
+            if (!CodexCliCommand.isTargetedByRulesyncCommand(rulesyncCommand)) {
+              return null;
+            }
+            return CodexCliCommand.fromRulesyncCommand({
+              baseDir: this.baseDir,
+              rulesyncCommand: rulesyncCommand,
+            });
+          default:
+            throw new Error(`Unsupported tool target: ${this.toolTarget}`);
+        }
+      })
+      .filter(
+        (
+          command,
+        ): command is
+          | ClaudecodeCommand
+          | GeminiCliCommand
+          | RooCommand
+          | CopilotCommand
+          | CursorCommand
+          | CodexCliCommand => command !== null,
+      );
 
     return toolCommands;
   }
