@@ -290,6 +290,115 @@ describe("AgentsMdRule", () => {
     });
   });
 
+  describe("getSettablePaths", () => {
+    it("should return correct paths for root and nonRoot", () => {
+      const paths = AgentsMdRule.getSettablePaths();
+
+      expect(paths.root).toEqual({
+        relativeDirPath: ".",
+        relativeFilePath: "AGENTS.md",
+      });
+
+      expect(paths.nonRoot).toEqual({
+        relativeDirPath: ".agents/memories",
+      });
+    });
+
+    it("should have consistent paths structure", () => {
+      const paths = AgentsMdRule.getSettablePaths();
+
+      expect(paths).toHaveProperty("root");
+      expect(paths).toHaveProperty("nonRoot");
+      expect(paths.root).toHaveProperty("relativeDirPath");
+      expect(paths.root).toHaveProperty("relativeFilePath");
+      expect(paths.nonRoot).toHaveProperty("relativeDirPath");
+    });
+  });
+
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting agentsmd", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["agentsmd"],
+        },
+        body: "Test content",
+      });
+
+      expect(AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting agentsmd", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including agentsmd", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "agentsmd", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
+
   describe("edge cases", () => {
     it("should handle empty file content", async () => {
       const memoriesDir = join(testDir, ".agents", "memories");

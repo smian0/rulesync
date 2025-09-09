@@ -92,4 +92,11 @@ export class AgentsMdRule extends ToolRule {
     // This follows the same pattern as other rule validation methods
     return { success: true, error: null };
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "agentsmd",
+    });
+  }
 }
