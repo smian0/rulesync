@@ -1,7 +1,7 @@
 ---
 description: 'Reviewprompt'
 targets:
-  - claudecode
+  - '*'
 ---
 
 pr_url = $ARGUMENTS

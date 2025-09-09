@@ -1,7 +1,7 @@
 ---
 description: 'Instruct for multiple AI coding tools.'
 targets:
-  - claudecode
+  - '*'
 ---
 
 $ARGUMENTS is required.

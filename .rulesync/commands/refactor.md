@@ -1,7 +1,7 @@
 ---
 description: 'Refactor'
 targets:
-  - claudecode
+  - '*'
 ---
 
 1. Call refactoring-planner subagent to plan refactoring tasks.

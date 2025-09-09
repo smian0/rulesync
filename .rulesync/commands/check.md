@@ -1,7 +1,7 @@
 ---
 description: 'Command: check'
 targets:
-  - claudecode
+  - '*'
 ---
 
 Do the following actions and fix any failures if exists. Until all pass successfully, do the following actions again.

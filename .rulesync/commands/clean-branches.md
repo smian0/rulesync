@@ -1,7 +1,7 @@
 ---
 description: 'Clean branches'
 targets:
-  - claudecode
+  - '*'
 ---
 
 1. Delete all local branches except for current branch and main branch.

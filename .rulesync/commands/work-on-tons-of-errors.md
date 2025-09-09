@@ -1,7 +1,7 @@
 ---
 description: 'Command: work-on-tons-of-errors'
 targets:
-  - claudecode
+  - '*'
 ---
 
 work_guidelines = $ARGUMENTS
