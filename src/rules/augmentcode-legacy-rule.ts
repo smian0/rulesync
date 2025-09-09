@@ -74,6 +74,13 @@ export class AugmentcodeLegacyRule extends ToolRule {
     return { success: true, error: null };
   }
 
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "augmentcode-legacy",
+    });
+  }
+
   static async fromFile({
     baseDir = ".",
     relativeFilePath,
