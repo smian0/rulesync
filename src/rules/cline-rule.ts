@@ -50,6 +50,13 @@ export class ClineRule extends ToolRule {
     return { success: true, error: null };
   }
 
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "cline",
+    });
+  }
+
   static async fromFile({
     baseDir = ".",
     relativeFilePath,

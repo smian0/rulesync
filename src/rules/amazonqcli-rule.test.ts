@@ -362,4 +362,105 @@ describe("AmazonQCliRule", () => {
       expect(finalRulesync.getRelativeFilePath()).toBe("roundtrip.md");
     });
   });
+
+  describe("getSettablePaths", () => {
+    it("should return correct paths for nonRoot", () => {
+      const paths = AmazonQCliRule.getSettablePaths();
+
+      expect(paths.nonRoot).toEqual({
+        relativeDirPath: ".amazonq/rules",
+      });
+    });
+
+    it("should have consistent paths structure", () => {
+      const paths = AmazonQCliRule.getSettablePaths();
+
+      expect(paths).toHaveProperty("nonRoot");
+      expect(paths.nonRoot).toHaveProperty("relativeDirPath");
+    });
+  });
+
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting amazonqcli", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["amazonqcli"],
+        },
+        body: "Test content",
+      });
+
+      expect(AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting amazonqcli", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including amazonqcli", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "amazonqcli", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
 });

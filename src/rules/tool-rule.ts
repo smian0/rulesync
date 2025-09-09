@@ -1,6 +1,7 @@
 import { RULESYNC_RULES_DIR } from "../constants/paths.js";
 import { AiFileFromFileParams, AiFileParams } from "../types/ai-file.js";
 import { ToolFile } from "../types/tool-file.js";
+import { ToolTarget } from "../types/tool-targets.js";
 import { RulesyncRule } from "./rulesync-rule.js";
 
 export type ToolRuleParams = AiFileParams & {
@@ -94,5 +95,32 @@ export abstract class ToolRule extends ToolFile {
 
   isRoot(): boolean {
     return this.root;
+  }
+
+  static isTargetedByRulesyncRule(_rulesyncRule: RulesyncRule): boolean {
+    throw new Error("Please implement this method in the subclass.");
+  }
+
+  protected static isTargetedByRulesyncRuleDefault({
+    rulesyncRule,
+    toolTarget,
+  }: {
+    rulesyncRule: RulesyncRule;
+    toolTarget: ToolTarget;
+  }): boolean {
+    const targets = rulesyncRule.getFrontmatter().targets;
+    if (!targets) {
+      return true;
+    }
+
+    if (targets.includes("*")) {
+      return true;
+    }
+
+    if (targets.includes(toolTarget)) {
+      return true;
+    }
+
+    return false;
   }
 }

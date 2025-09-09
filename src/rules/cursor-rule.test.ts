@@ -542,6 +542,90 @@ This is the rule content
     });
   });
 
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting cursor", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor"],
+        },
+        body: "Test content",
+      });
+
+      expect(CursorRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(CursorRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting cursor", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cline", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(CursorRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(CursorRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including cursor", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cline", "cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(CursorRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(CursorRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
+
   describe("edge cases", () => {
     it("should handle globs with only whitespace", () => {
       const cursorRule = new CursorRule({

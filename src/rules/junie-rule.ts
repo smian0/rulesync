@@ -85,4 +85,11 @@ export class JunieRule extends ToolRule {
     // Junie rules are always valid since they don't require frontmatter
     return { success: true, error: null };
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "junie",
+    });
+  }
 }

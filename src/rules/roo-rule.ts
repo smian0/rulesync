@@ -98,4 +98,11 @@ export class RooRule extends ToolRule {
   validate(): ValidationResult {
     return { success: true, error: null };
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "roo",
+    });
+  }
 }

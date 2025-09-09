@@ -374,4 +374,105 @@ describe("AugmentcodeRule", () => {
       expect(augmentcodeRule.getFileContent()).toBe("# Inheritance Test");
     });
   });
+
+  describe("getSettablePaths", () => {
+    it("should return correct paths for nonRoot", () => {
+      const paths = AugmentcodeRule.getSettablePaths();
+
+      expect(paths.nonRoot).toEqual({
+        relativeDirPath: ".augment/rules",
+      });
+    });
+
+    it("should have consistent paths structure", () => {
+      const paths = AugmentcodeRule.getSettablePaths();
+
+      expect(paths).toHaveProperty("nonRoot");
+      expect(paths.nonRoot).toHaveProperty("relativeDirPath");
+    });
+  });
+
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting augmentcode", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".augment/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["augmentcode"],
+        },
+        body: "Test content",
+      });
+
+      expect(AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".augment/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting augmentcode", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".augment/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".augment/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including augmentcode", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".augment/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "augmentcode", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".augment/rules",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
 });
