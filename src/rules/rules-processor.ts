@@ -84,114 +84,167 @@ export class RulesProcessor extends FeatureProcessor {
       (file): file is RulesyncRule => file instanceof RulesyncRule,
     );
 
-    const toolRules = rulesyncRules.map((rulesyncRule) => {
-      switch (this.toolTarget) {
-        case "agentsmd":
-          return AgentsMdRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "amazonqcli":
-          return AmazonQCliRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "augmentcode":
-          return AugmentcodeRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "augmentcode-legacy":
-          return AugmentcodeLegacyRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "claudecode":
-          return ClaudecodeRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "cline":
-          return ClineRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "codexcli":
-          return CodexcliRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "copilot":
-          return CopilotRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "cursor":
-          return CursorRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "geminicli":
-          return GeminiCliRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "junie":
-          return JunieRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "kiro":
-          return KiroRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "opencode":
-          return OpenCodeRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "qwencode":
-          return QwencodeRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "roo":
-          return RooRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "warp":
-          return WarpRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        case "windsurf":
-          return WindsurfRule.fromRulesyncRule({
-            baseDir: this.baseDir,
-            rulesyncRule: rulesyncRule,
-            validate: true,
-          });
-        default:
-          throw new Error(`Unsupported tool target: ${this.toolTarget}`);
-      }
-    });
+    const toolRules = rulesyncRules
+      .map((rulesyncRule) => {
+        switch (this.toolTarget) {
+          case "agentsmd":
+            if (!AgentsMdRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return AgentsMdRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "amazonqcli":
+            if (!AmazonQCliRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return AmazonQCliRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "augmentcode":
+            if (!AugmentcodeRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return AugmentcodeRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "augmentcode-legacy":
+            if (!AugmentcodeLegacyRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return AugmentcodeLegacyRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "claudecode":
+            if (!ClaudecodeRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return ClaudecodeRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "cline":
+            if (!ClineRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return ClineRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "codexcli":
+            if (!CodexcliRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return CodexcliRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "copilot":
+            if (!CopilotRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return CopilotRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "cursor":
+            if (!CursorRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return CursorRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "geminicli":
+            if (!GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return GeminiCliRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "junie":
+            if (!JunieRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return JunieRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "kiro":
+            if (!KiroRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return KiroRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "opencode":
+            if (!OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return OpenCodeRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "qwencode":
+            if (!QwencodeRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return QwencodeRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "roo":
+            if (!RooRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return RooRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "warp":
+            if (!WarpRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return WarpRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          case "windsurf":
+            if (!WindsurfRule.isTargetedByRulesyncRule(rulesyncRule)) {
+              return null;
+            }
+            return WindsurfRule.fromRulesyncRule({
+              baseDir: this.baseDir,
+              rulesyncRule: rulesyncRule,
+              validate: true,
+            });
+          default:
+            throw new Error(`Unsupported tool target: ${this.toolTarget}`);
+        }
+      })
+      .filter((rule): rule is ToolRule => rule !== null);
 
     // For enabling simulated commands and subagents in Cursor, an additional convention rule is needed.
     if (this.toolTarget === "cursor" && (this.simulateCommands || this.simulateSubagents)) {
