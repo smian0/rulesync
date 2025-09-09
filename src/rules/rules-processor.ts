@@ -791,23 +791,6 @@ export class RulesProcessor extends FeatureProcessor {
     return rulesProcessorToolTargets;
   }
 
-  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
-    const targets = rulesyncRule.getFrontmatter().targets;
-    if (!targets) {
-      return true;
-    }
-
-    if (targets.includes("*")) {
-      return true;
-    }
-
-    if (targets.includes("rulesync")) {
-      return true;
-    }
-
-    return false;
-  }
-
   private generateXmlReferencesSection(toolRules: ToolRule[]): string {
     const toolRulesWithoutRoot = toolRules.filter((rule) => !rule.isRoot());
 
