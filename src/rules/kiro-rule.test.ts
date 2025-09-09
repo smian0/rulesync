@@ -651,6 +651,90 @@ describe("KiroRule", () => {
     });
   });
 
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting kiro", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["kiro"],
+        },
+        body: "Test content",
+      });
+
+      expect(KiroRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(KiroRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting kiro", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(KiroRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(KiroRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including kiro", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "kiro", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(KiroRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(KiroRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
+
   describe("edge cases", () => {
     it("should handle files with special characters in names", () => {
       const kiroRule = new KiroRule({
