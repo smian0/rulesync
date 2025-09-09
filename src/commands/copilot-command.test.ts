@@ -526,4 +526,71 @@ Body content`;
       expect(command).toBeInstanceOf(CopilotCommand);
     });
   });
+
+  describe("isTargetedByRulesyncCommand", () => {
+    it("should return true for rulesync command with wildcard target", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["*"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync command with copilot target", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["copilot"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync command with copilot and other targets", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["cursor", "copilot", "cline"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+
+    it("should return false for rulesync command with different target", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["cursor"], description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(false);
+    });
+
+    it("should return true for rulesync command with no targets specified", () => {
+      const rulesyncCommand = new RulesyncCommand({
+        relativeDirPath: ".rulesync/commands",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: undefined, description: "Test" } as any,
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotCommand.isTargetedByRulesyncCommand(rulesyncCommand);
+      expect(result).toBe(true);
+    });
+  });
 });
