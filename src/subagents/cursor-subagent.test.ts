@@ -552,4 +552,96 @@ Body content`;
       );
     });
   });
+
+  describe("isTargetedByRulesyncSubagent", () => {
+    it("should return true when targets includes cursor", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test-agent.md",
+        frontmatter: {
+          targets: ["cursor"],
+          name: "Test Agent",
+          description: "Test description",
+        },
+        body: "Test content",
+        fileContent: "",
+        validate: true,
+      });
+
+      expect(CursorSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)).toBe(true);
+    });
+
+    it("should return true when targets includes asterisk", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test-agent.md",
+        frontmatter: {
+          targets: ["*"],
+          name: "Test Agent",
+          description: "Test description",
+        },
+        body: "Test content",
+        fileContent: "",
+        validate: true,
+      });
+
+      expect(CursorSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)).toBe(true);
+    });
+
+    it("should return false when targets array is empty", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test-agent.md",
+        frontmatter: {
+          targets: [],
+          name: "Test Agent",
+          description: "Test description",
+        },
+        body: "Test content",
+        fileContent: "",
+        validate: false, // Skip validation to allow empty targets array
+      });
+
+      expect(CursorSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)).toBe(false);
+    });
+
+    it("should return false when targets does not include cursor", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test-agent.md",
+        frontmatter: {
+          targets: ["copilot", "cline"],
+          name: "Test Agent",
+          description: "Test description",
+        },
+        body: "Test content",
+        fileContent: "",
+        validate: true,
+      });
+
+      expect(CursorSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)).toBe(false);
+    });
+
+    it("should return true when targets includes cursor among other targets", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test-agent.md",
+        frontmatter: {
+          targets: ["copilot", "cursor", "cline"],
+          name: "Test Agent",
+          description: "Test description",
+        },
+        body: "Test content",
+        fileContent: "",
+        validate: true,
+      });
+
+      expect(CursorSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent)).toBe(true);
+    });
+  });
 });
