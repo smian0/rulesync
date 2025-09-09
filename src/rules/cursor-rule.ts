@@ -252,4 +252,11 @@ export class CursorRule extends ToolRule {
   getBody(): string {
     return this.body;
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "cursor",
+    });
+  }
 }
