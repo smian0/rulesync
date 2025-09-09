@@ -33,7 +33,7 @@ const getVersion = async (): Promise<string> => {
     return packageJson.version;
   } catch {
     // Fallback to a hardcoded version if reading fails
-    return "0.74.0";
+    return "0.75.0";
   }
 };
 
