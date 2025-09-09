@@ -597,4 +597,88 @@ describe("OpenCodeRule", () => {
       expect(opencodeRule.validate().success).toBe(true);
     });
   });
+
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting opencode", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["opencode"],
+        },
+        body: "Test content",
+      });
+
+      expect(OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting opencode", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including opencode", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "opencode", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".rulesync",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(OpenCodeRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
 });

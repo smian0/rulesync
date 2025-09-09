@@ -76,4 +76,11 @@ export class OpenCodeRule extends ToolRule {
     // Similar to AgentsMdRule, no complex frontmatter validation needed
     return { success: true, error: null };
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "opencode",
+    });
+  }
 }
