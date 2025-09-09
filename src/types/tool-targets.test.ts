@@ -23,7 +23,6 @@ describe("tool targets", () => {
         "opencode",
         "qwencode",
         "roo",
-        "rulesync",
         "geminicli",
         "kiro",
         "junie",

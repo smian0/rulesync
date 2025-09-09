@@ -13,7 +13,6 @@ export const ALL_TOOL_TARGETS = [
   "opencode",
   "qwencode",
   "roo",
-  "rulesync",
   "geminicli",
   "kiro",
   "junie",
