@@ -1,3 +1,4 @@
+import { RulesyncSubagent } from "./rulesync-subagent.js";
 import { SimulatedSubagent } from "./simulated-subagent.js";
 import {
   ToolSubagent,
@@ -21,5 +22,12 @@ export class CodexCliSubagent extends SimulatedSubagent {
   static fromRulesyncSubagent(params: ToolSubagentFromRulesyncSubagentParams): ToolSubagent {
     const baseParams = this.fromRulesyncSubagentDefault(params);
     return new CodexCliSubagent(baseParams);
+  }
+
+  static isTargetedByRulesyncSubagent(rulesyncSubagent: RulesyncSubagent): boolean {
+    return this.isTargetedByRulesyncSubagentDefault({
+      rulesyncSubagent,
+      toolTarget: "codexcli",
+    });
   }
 }
