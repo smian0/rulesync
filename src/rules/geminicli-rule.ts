@@ -81,4 +81,11 @@ export class GeminiCliRule extends ToolRule {
     // Validation always succeeds
     return { success: true as const, error: null };
   }
+
+  static isTargetedByRulesyncRule(rulesyncRule: RulesyncRule): boolean {
+    return this.isTargetedByRulesyncRuleDefault({
+      rulesyncRule,
+      toolTarget: "geminicli",
+    });
+  }
 }

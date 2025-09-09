@@ -365,6 +365,115 @@ describe("GeminiCliRule", () => {
     });
   });
 
+  describe("getSettablePaths", () => {
+    it("should return correct paths for root and nonRoot", () => {
+      const paths = GeminiCliRule.getSettablePaths();
+
+      expect(paths.root).toEqual({
+        relativeDirPath: ".",
+        relativeFilePath: "GEMINI.md",
+      });
+
+      expect(paths.nonRoot).toEqual({
+        relativeDirPath: ".gemini/memories",
+      });
+    });
+
+    it("should have consistent paths structure", () => {
+      const paths = GeminiCliRule.getSettablePaths();
+
+      expect(paths).toHaveProperty("root");
+      expect(paths).toHaveProperty("nonRoot");
+      expect(paths.root).toHaveProperty("relativeDirPath");
+      expect(paths.root).toHaveProperty("relativeFilePath");
+      expect(paths.nonRoot).toHaveProperty("relativeDirPath");
+    });
+  });
+
+  describe("isTargetedByRulesyncRule", () => {
+    it("should return true for rules targeting geminicli", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["geminicli"],
+        },
+        body: "Test content",
+      });
+
+      expect(GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return true for rules targeting all tools (*)", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["*"],
+        },
+        body: "Test content",
+      });
+
+      expect(GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should return false for rules not targeting geminicli", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should return false for empty targets", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: [],
+        },
+        body: "Test content",
+      });
+
+      expect(GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(false);
+    });
+
+    it("should handle mixed targets including geminicli", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "geminicli", "copilot"],
+        },
+        body: "Test content",
+      });
+
+      expect(GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+
+    it("should handle undefined targets in frontmatter", () => {
+      const rulesyncRule = new RulesyncRule({
+        baseDir: testDir,
+        relativeDirPath: ".agents/memories",
+        relativeFilePath: "test.md",
+        frontmatter: {},
+        body: "Test content",
+      });
+
+      expect(GeminiCliRule.isTargetedByRulesyncRule(rulesyncRule)).toBe(true);
+    });
+  });
+
   describe("integration tests", () => {
     it("should handle complete workflow from file to rulesync rule", async () => {
       // Create original file
