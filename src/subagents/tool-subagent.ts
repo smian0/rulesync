@@ -1,5 +1,6 @@
 import { AiFileFromFileParams, AiFileParams } from "../types/ai-file.js";
 import { ToolFile } from "../types/tool-file.js";
+import { ToolTarget } from "../types/tool-targets.js";
 import { RulesyncSubagent } from "./rulesync-subagent.js";
 
 export type ToolSubagentFromRulesyncSubagentParams = Omit<
@@ -28,4 +29,31 @@ export abstract class ToolSubagent extends ToolFile {
   }
 
   abstract toRulesyncSubagent(): RulesyncSubagent;
+
+  static isTargetedByRulesyncSubagent(_rulesyncSubagent: RulesyncSubagent): boolean {
+    throw new Error("Please implement this method in the subclass.");
+  }
+
+  protected static isTargetedByRulesyncSubagentDefault({
+    rulesyncSubagent,
+    toolTarget,
+  }: {
+    rulesyncSubagent: RulesyncSubagent;
+    toolTarget: ToolTarget;
+  }): boolean {
+    const targets = rulesyncSubagent.getFrontmatter().targets;
+    if (!targets) {
+      return true;
+    }
+
+    if (targets.includes("*")) {
+      return true;
+    }
+
+    if (targets.includes(toolTarget)) {
+      return true;
+    }
+
+    return false;
+  }
 }
