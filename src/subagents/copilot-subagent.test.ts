@@ -531,6 +531,78 @@ Body content`;
     });
   });
 
+  describe("isTargetedByRulesyncSubagent", () => {
+    it("should return true for rulesync subagent with wildcard target", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["*"], name: "Test", description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync subagent with copilot target", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["copilot"], name: "Test", description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+
+    it("should return true for rulesync subagent with copilot and other targets", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: {
+          targets: ["cursor", "copilot", "cline"],
+          name: "Test",
+          description: "Test",
+        },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+
+    it("should return false for rulesync subagent with different target", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: ["cursor"], name: "Test", description: "Test" },
+        body: "Body",
+        fileContent: "",
+      });
+
+      const result = CopilotSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(false);
+    });
+
+    it("should return true for rulesync subagent with no targets specified", () => {
+      const rulesyncSubagent = new RulesyncSubagent({
+        relativeDirPath: ".rulesync/subagents",
+        relativeFilePath: "test.md",
+        frontmatter: { targets: undefined, name: "Test", description: "Test" } as any,
+        body: "Body",
+        fileContent: "",
+        validate: false,
+      });
+
+      const result = CopilotSubagent.isTargetedByRulesyncSubagent(rulesyncSubagent);
+      expect(result).toBe(true);
+    });
+  });
+
   describe("integration with base classes", () => {
     it("should properly inherit from SimulatedSubagent", () => {
       const subagent = new CopilotSubagent({
