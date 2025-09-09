@@ -1,6 +1,7 @@
 import { basename, join } from "node:path";
 import { readFileContent } from "../utils/file.js";
 import { parseFrontmatter } from "../utils/frontmatter.js";
+import { RulesyncCommand } from "./rulesync-command.js";
 import { SimulatedCommand, SimulatedCommandFrontmatterSchema } from "./simulated-command.js";
 import {
   ToolCommandFromFileParams,
@@ -50,6 +51,13 @@ export class CursorCommand extends SimulatedCommand {
       frontmatter: result.data,
       body: content.trim(),
       validate,
+    });
+  }
+
+  static isTargetedByRulesyncCommand(rulesyncCommand: RulesyncCommand): boolean {
+    return this.isTargetedByRulesyncCommandDefault({
+      rulesyncCommand,
+      toolTarget: "cursor",
     });
   }
 }
