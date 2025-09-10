@@ -44,7 +44,7 @@ Body content`;
     it("should return correct paths for copilot commands", () => {
       const paths = CopilotCommand.getSettablePaths();
       expect(paths).toEqual({
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
       });
     });
   });
@@ -53,7 +53,7 @@ Body content`;
     it("should create instance with valid markdown content", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test-command.md",
         frontmatter: {
           description: "Test copilot command description",
@@ -74,7 +74,7 @@ Body content`;
     it("should create instance with empty description", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test-command.md",
         frontmatter: {
           description: "",
@@ -92,7 +92,7 @@ Body content`;
     it("should create instance without validation when validate is false", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test-command.md",
         frontmatter: {
           description: "Test description",
@@ -109,7 +109,7 @@ Body content`;
         () =>
           new CopilotCommand({
             baseDir: testDir,
-            relativeDirPath: ".copilot/commands",
+            relativeDirPath: ".github/commands",
             relativeFilePath: "invalid-command.md",
             frontmatter: {
               // Missing required description field
@@ -125,7 +125,7 @@ Body content`;
     it("should return the body content", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test-command.md",
         frontmatter: {
           description: "Test description",
@@ -142,7 +142,7 @@ Body content`;
     it("should return frontmatter with description", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test-command.md",
         frontmatter: {
           description: "Test copilot command",
@@ -162,7 +162,7 @@ Body content`;
     it("should throw error as it is a simulated file", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test-command.md",
         frontmatter: {
           description: "Test description",
@@ -204,7 +204,7 @@ Body content`;
         description: "Test description from rulesync",
       });
       expect(copilotCommand.getRelativeFilePath()).toBe("test-command.md");
-      expect(copilotCommand.getRelativeDirPath()).toBe(".copilot/commands");
+      expect(copilotCommand.getRelativeDirPath()).toBe(".github/commands");
     });
 
     it("should handle RulesyncCommand with different file extensions", () => {
@@ -258,7 +258,7 @@ Body content`;
 
   describe("fromFile", () => {
     it("should load CopilotCommand from file", async () => {
-      const commandsDir = join(testDir, ".copilot", "commands");
+      const commandsDir = join(testDir, ".github", "commands");
       const filePath = join(commandsDir, "test-file-command.md");
 
       await writeFileContent(filePath, validMarkdownContent);
@@ -280,7 +280,7 @@ Body content`;
     });
 
     it("should handle file path with subdirectories", async () => {
-      const commandsDir = join(testDir, ".copilot", "commands", "subdir");
+      const commandsDir = join(testDir, ".github", "commands", "subdir");
       const filePath = join(commandsDir, "nested-command.md");
 
       await writeFileContent(filePath, validMarkdownContent);
@@ -305,7 +305,7 @@ Body content`;
     });
 
     it("should throw error when file contains invalid frontmatter", async () => {
-      const commandsDir = join(testDir, ".copilot", "commands");
+      const commandsDir = join(testDir, ".github", "commands");
       const filePath = join(commandsDir, "invalid-command.md");
 
       await writeFileContent(filePath, invalidMarkdownContent);
@@ -320,7 +320,7 @@ Body content`;
     });
 
     it("should handle file without frontmatter", async () => {
-      const commandsDir = join(testDir, ".copilot", "commands");
+      const commandsDir = join(testDir, ".github", "commands");
       const filePath = join(commandsDir, "no-frontmatter.md");
 
       await writeFileContent(filePath, markdownWithoutFrontmatter);
@@ -339,7 +339,7 @@ Body content`;
     it("should return success for valid frontmatter", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "valid-command.md",
         frontmatter: {
           description: "Valid description",
@@ -356,7 +356,7 @@ Body content`;
     it("should handle frontmatter with additional properties", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "command-with-extras.md",
         frontmatter: {
           description: "Command with extra properties",
@@ -402,7 +402,7 @@ Body content`;
     it("should handle empty body content", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "empty-body.md",
         frontmatter: {
           description: "Command with empty body",
@@ -423,7 +423,7 @@ Body content`;
 
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "special-char.md",
         frontmatter: {
           description: "Special characters test",
@@ -443,7 +443,7 @@ Body content`;
 
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "long-content.md",
         frontmatter: {
           description: "Long content test",
@@ -459,7 +459,7 @@ Body content`;
     it("should handle multi-line description", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "multiline-desc.md",
         frontmatter: {
           description: "This is a multi-line\ndescription with\nmultiple lines",
@@ -478,7 +478,7 @@ Body content`;
 
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "windows-lines.md",
         frontmatter: {
           description: "Windows line endings test",
@@ -495,7 +495,7 @@ Body content`;
     it("should properly inherit from SimulatedCommand", () => {
       const command = new CopilotCommand({
         baseDir: testDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test.md",
         frontmatter: {
           description: "Test",
@@ -506,7 +506,7 @@ Body content`;
 
       // Check that it's an instance of parent classes
       expect(command).toBeInstanceOf(CopilotCommand);
-      expect(command.getRelativeDirPath()).toBe(".copilot/commands");
+      expect(command.getRelativeDirPath()).toBe(".github/commands");
       expect(command.getRelativeFilePath()).toBe("test.md");
     });
 
@@ -514,7 +514,7 @@ Body content`;
       const customBaseDir = "/custom/base/dir";
       const command = new CopilotCommand({
         baseDir: customBaseDir,
-        relativeDirPath: ".copilot/commands",
+        relativeDirPath: ".github/commands",
         relativeFilePath: "test.md",
         frontmatter: {
           description: "Test",

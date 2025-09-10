@@ -2,12 +2,18 @@ import { basename, join } from "node:path";
 import { XMLBuilder } from "fast-xml-parser";
 import { z } from "zod/mini";
 import { CodexCliCommand } from "../commands/codexcli-command.js";
+import { CommandsProcessor } from "../commands/commands-processor.js";
 import { CopilotCommand } from "../commands/copilot-command.js";
 import { CursorCommand } from "../commands/cursor-command.js";
+import { GeminiCliCommand } from "../commands/geminicli-command.js";
+import { RooCommand } from "../commands/roo-command.js";
 import { RULESYNC_RULES_DIR, RULESYNC_RULES_DIR_LEGACY } from "../constants/paths.js";
 import { CodexCliSubagent } from "../subagents/codexcli-subagent.js";
 import { CopilotSubagent } from "../subagents/copilot-subagent.js";
 import { CursorSubagent } from "../subagents/cursor-subagent.js";
+import { GeminiCliSubagent } from "../subagents/geminicli-subagent.js";
+import { RooSubagent } from "../subagents/roo-subagent.js";
+import { SubagentsProcessor } from "../subagents/subagents-processor.js";
 import { FeatureProcessor } from "../types/feature-processor.js";
 import { RulesyncFile } from "../types/rulesync-file.js";
 import { ToolFile } from "../types/tool-file.js";
@@ -246,8 +252,10 @@ export class RulesProcessor extends FeatureProcessor {
       })
       .filter((rule): rule is ToolRule => rule !== null);
 
+    const isSimulated = this.simulateCommands || this.simulateSubagents;
+
     // For enabling simulated commands and subagents in Cursor, an additional convention rule is needed.
-    if (this.toolTarget === "cursor" && (this.simulateCommands || this.simulateSubagents)) {
+    if (isSimulated && this.toolTarget === "cursor") {
       toolRules.push(
         new CursorRule({
           baseDir: this.baseDir,
@@ -262,6 +270,23 @@ export class RulesProcessor extends FeatureProcessor {
           }),
           relativeDirPath: CursorRule.getSettablePaths().nonRoot.relativeDirPath,
           relativeFilePath: "additional-conventions.mdc",
+          validate: true,
+        }),
+      );
+    }
+
+    if (isSimulated && this.toolTarget === "roo") {
+      toolRules.push(
+        new RooRule({
+          baseDir: this.baseDir,
+          relativeDirPath: RooRule.getSettablePaths().nonRoot.relativeDirPath,
+          relativeFilePath: "additional-conventions.md",
+          fileContent: this.generateAdditionalConventionsSection({
+            commands: { relativeDirPath: RooCommand.getSettablePaths().relativeDirPath },
+            subagents: {
+              relativeDirPath: RooSubagent.getSettablePaths().relativeDirPath,
+            },
+          }),
           validate: true,
         }),
       );
@@ -325,7 +350,14 @@ export class RulesProcessor extends FeatureProcessor {
       case "geminicli": {
         const rootRule = toolRules[rootRuleIndex];
         rootRule?.setFileContent(
-          this.generateXmlReferencesSection(toolRules) + rootRule.getFileContent(),
+          this.generateXmlReferencesSection(toolRules) +
+            this.generateAdditionalConventionsSection({
+              commands: { relativeDirPath: GeminiCliCommand.getSettablePaths().relativeDirPath },
+              subagents: {
+                relativeDirPath: GeminiCliSubagent.getSettablePaths().relativeDirPath,
+              },
+            }) +
+            rootRule.getFileContent(),
         );
         return toolRules;
       }
@@ -880,13 +912,11 @@ export class RulesProcessor extends FeatureProcessor {
       relativeDirPath: string;
     };
   }): string {
-    return `# Additional Conventions Beyond the Built-in Functions
+    const overview = `# Additional Conventions Beyond the Built-in Functions
 
-As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.
+As this project's AI coding tool, you must follow the additional conventions below, in addition to the built-in functions.`;
 
-${
-  this.simulateCommands
-    ? `## Simulated Custom Slash Commands
+    const commandsSection = `## Simulated Custom Slash Commands
 
 Custom slash commands allow you to define frequently-used prompts as Markdown files that you can execute.
 
@@ -901,18 +931,27 @@ s/<command> [arguments]
 This syntax employs a double slash (\`s/\`) to prevent conflicts with built-in slash commands.  
 The \`s\` in \`s/\` stands for *simulate*. Because custom slash commands are not built-in, this syntax provides a pseudo way to invoke them.
 
-When users call a custom slash command, you have to look for the markdown file, \`${join(commands.relativeDirPath, "{command}.md")}\`, then execute the contents of that file as the block of operations.`
-    : ""
-}
+When users call a custom slash command, you have to look for the markdown file, \`${join(commands.relativeDirPath, "{command}.md")}\`, then execute the contents of that file as the block of operations.`;
 
-${
-  this.simulateSubagents
-    ? `## Simulated Subagents
+    const subagentsSection = `## Simulated Subagents
 
-Simulated subagents are specialized AI assistants that can be invoked to handle specific types of tasks. In this case, it can be appear something like simulated custom slash commands simply. Simulated subagents can be called by simulated custom slash commands.
+Simulated subagents are specialized AI assistants that can be invoked to handle specific types of tasks. In this case, it can be appear something like custom slash commands simply. Simulated subagents can be called by custom slash commands.
 
-When users call a simulated subagent, it will look for the corresponding markdown file, \`${join(subagents.relativeDirPath, "{subagent}.md")}\`, and execute its contents as the block of operations.`
-    : ""
-}`.trim();
+When users call a simulated subagent, it will look for the corresponding markdown file, \`${join(subagents.relativeDirPath, "{subagent}.md")}\`, and execute its contents as the block of operations.
+
+For example, if the user instructs \`Call planner subagent to plan the refactoring\`, you have to look for the markdown file, \`${join(subagents.relativeDirPath, "planner.md")}\`, and execute its contents as the block of operations.`;
+
+    const result = [
+      overview,
+      ...(this.simulateCommands &&
+      CommandsProcessor.getToolTargetsSimulated().includes(this.toolTarget)
+        ? [commandsSection]
+        : []),
+      ...(this.simulateSubagents &&
+      SubagentsProcessor.getToolTargetsSimulated().includes(this.toolTarget)
+        ? [subagentsSection]
+        : []),
+    ].join("\n\n");
+    return result;
   }
 }

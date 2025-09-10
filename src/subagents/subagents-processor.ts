@@ -228,7 +228,7 @@ export class SubagentsProcessor extends FeatureProcessor {
   }
 
   /**
-   * Load Copilot subagent configurations from .copilot/subagents/ directory
+   * Load Copilot subagent configurations from .github/subagents/ directory
    */
   private async loadCopilotSubagents(): Promise<ToolSubagent[]> {
     return await this.loadToolSubagentsDefault({
@@ -311,5 +311,9 @@ export class SubagentsProcessor extends FeatureProcessor {
     }
 
     return subagentsProcessorToolTargets;
+  }
+
+  static getToolTargetsSimulated(): ToolTarget[] {
+    return subagentsProcessorToolTargetsSimulated;
   }
 }
