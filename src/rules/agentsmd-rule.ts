@@ -72,7 +72,7 @@ export class AgentsMdRule extends ToolRule {
     validate = true,
   }: ToolRuleFromRulesyncRuleParams): AgentsMdRule {
     return new AgentsMdRule(
-      this.buildToolRuleParamsDefault({
+      this.buildToolRuleParamsAgentsmd({
         baseDir,
         rulesyncRule,
         validate,

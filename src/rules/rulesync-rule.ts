@@ -15,6 +15,12 @@ export const RulesyncRuleFrontmatterSchema = z.object({
   targets: z.optional(RulesyncTargetsSchema),
   description: z.optional(z.string()),
   globs: z.optional(z.array(z.string())),
+  agentsmd: z.optional(
+    z.object({
+      // @example "path/to/subproject"
+      subprojectPath: z.optional(z.string()),
+    }),
+  ),
   cursor: z.optional(
     z.object({
       alwaysApply: z.optional(z.boolean()),
@@ -113,6 +119,7 @@ export class RulesyncRule extends RulesyncFile {
       targets: result.data.targets ?? ["*"],
       description: result.data.description ?? "",
       globs: result.data.globs ?? [],
+      agentsmd: result.data.agentsmd,
       cursor: result.data.cursor,
     };
 
@@ -149,6 +156,7 @@ export class RulesyncRule extends RulesyncFile {
       targets: result.data.targets ?? ["*"],
       description: result.data.description ?? "",
       globs: result.data.globs ?? [],
+      agentsmd: result.data.agentsmd,
       cursor: result.data.cursor,
     };
 
