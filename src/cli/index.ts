@@ -81,11 +81,26 @@ const main = async () => {
       },
     )
     .option("-V, --verbose", "Verbose output")
+    .option("--scan-all", "Auto-discover and import all Claude Code content types")
+    .option("--all-content", "Import all content types (context, epics, prds, technical-design, additional-rules)")
     .action(async (options) => {
       try {
+        // Process convenience flags
+        let features = options.features;
+        
+        if (options.scanAll) {
+          // Auto-discover and enable all available content types
+          features = ["*"];
+        } else if (options.allContent) {
+          // Enable all content-related features
+          const contentFeatures = ["context", "epics", "prds", "technical-design", "additional-rules"];
+          const existingFeatures = features || [];
+          features = [...new Set([...existingFeatures, ...contentFeatures])];
+        }
+
         await importCommand({
           targets: options.targets,
-          features: options.features,
+          features: features,
           verbose: options.verbose,
           configPath: options.config,
         });
@@ -128,11 +143,22 @@ const main = async () => {
       "--experimental-simulate-subagents",
       "Generate simulated subagents (experimental feature). This feature is only available for copilot, cursor and codexcli.",
     )
+    .option("--all-content", "Generate all content types (context, epics, prds, technical-design, additional-rules)")
     .action(async (options) => {
       try {
+        // Process convenience flags
+        let features = options.features;
+        
+        if (options.allContent) {
+          // Enable all content-related features
+          const contentFeatures = ["context", "epics", "prds", "technical-design", "additional-rules"];
+          const existingFeatures = features || [];
+          features = [...new Set([...existingFeatures, ...contentFeatures])];
+        }
+
         await generateCommand({
           targets: options.targets,
-          features: options.features,
+          features: features,
           verbose: options.verbose,
           delete: options.delete,
           baseDirs: options.baseDirs,

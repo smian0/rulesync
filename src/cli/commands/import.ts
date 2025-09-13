@@ -4,6 +4,11 @@ import { IgnoreProcessor } from "../../ignore/ignore-processor.js";
 import { McpProcessor } from "../../mcp/mcp-processor.js";
 import { RulesProcessor } from "../../rules/rules-processor.js";
 import { SubagentsProcessor } from "../../subagents/subagents-processor.js";
+import { ContextProcessor } from "../../content/context-processor.js";
+import { EpicsProcessor } from "../../content/epics-processor.js";
+import { PRDsProcessor } from "../../content/prds-processor.js";
+import { TechnicalDesignProcessor } from "../../content/technical-design-processor.js";
+import { AdditionalRulesProcessor } from "../../content/additional-rules-processor.js";
 import { logger } from "../../utils/logger.js";
 
 export type ImportOptions = Omit<ConfigResolverResolveParams, "delete" | "baseDirs">;
@@ -143,6 +148,116 @@ export async function importCommand(options: ImportOptions): Promise<void> {
 
     if (config.getVerbose() && commandsCreated > 0) {
       logger.success(`Created ${commandsCreated} command files`);
+    }
+  }
+
+  // Create context files if context feature is enabled
+  let contextCreated = 0;
+  if (config.getFeatures().includes("context")) {
+    if (ContextProcessor.getToolTargets().includes(tool)) {
+      const contextProcessor = new ContextProcessor({
+        baseDir: ".",
+        toolTarget: tool,
+      });
+
+      const toolFiles = await contextProcessor.loadToolFiles();
+      if (toolFiles.length > 0) {
+        const rulesyncFiles = await contextProcessor.convertToolFilesToRulesyncFiles(toolFiles);
+        const writtenCount = await contextProcessor.writeAiFiles(rulesyncFiles);
+        contextCreated = writtenCount;
+      }
+    }
+
+    if (config.getVerbose() && contextCreated > 0) {
+      logger.success(`Created ${contextCreated} context files`);
+    }
+  }
+
+  // Create epics files if epics feature is enabled
+  let epicsCreated = 0;
+  if (config.getFeatures().includes("epics")) {
+    if (EpicsProcessor.getToolTargets().includes(tool)) {
+      const epicsProcessor = new EpicsProcessor({
+        baseDir: ".",
+        toolTarget: tool,
+      });
+
+      const toolFiles = await epicsProcessor.loadToolFiles();
+      if (toolFiles.length > 0) {
+        const rulesyncFiles = await epicsProcessor.convertToolFilesToRulesyncFiles(toolFiles);
+        const writtenCount = await epicsProcessor.writeAiFiles(rulesyncFiles);
+        epicsCreated = writtenCount;
+      }
+    }
+
+    if (config.getVerbose() && epicsCreated > 0) {
+      logger.success(`Created ${epicsCreated} epics files`);
+    }
+  }
+
+  // Create PRDs files if prds feature is enabled
+  let prdsCreated = 0;
+  if (config.getFeatures().includes("prds")) {
+    if (PRDsProcessor.getToolTargets().includes(tool)) {
+      const prdsProcessor = new PRDsProcessor({
+        baseDir: ".",
+        toolTarget: tool,
+      });
+
+      const toolFiles = await prdsProcessor.loadToolFiles();
+      if (toolFiles.length > 0) {
+        const rulesyncFiles = await prdsProcessor.convertToolFilesToRulesyncFiles(toolFiles);
+        const writtenCount = await prdsProcessor.writeAiFiles(rulesyncFiles);
+        prdsCreated = writtenCount;
+      }
+    }
+
+    if (config.getVerbose() && prdsCreated > 0) {
+      logger.success(`Created ${prdsCreated} PRDs files`);
+    }
+  }
+
+  // Create technical-design files if technical-design feature is enabled
+  let technicalDesignCreated = 0;
+  if (config.getFeatures().includes("technical-design")) {
+    if (TechnicalDesignProcessor.getToolTargets().includes(tool)) {
+      const technicalDesignProcessor = new TechnicalDesignProcessor({
+        baseDir: ".",
+        toolTarget: tool,
+      });
+
+      const toolFiles = await technicalDesignProcessor.loadToolFiles();
+      if (toolFiles.length > 0) {
+        const rulesyncFiles = await technicalDesignProcessor.convertToolFilesToRulesyncFiles(toolFiles);
+        const writtenCount = await technicalDesignProcessor.writeAiFiles(rulesyncFiles);
+        technicalDesignCreated = writtenCount;
+      }
+    }
+
+    if (config.getVerbose() && technicalDesignCreated > 0) {
+      logger.success(`Created ${technicalDesignCreated} technical-design files`);
+    }
+  }
+
+  // Create additional-rules files if additional-rules feature is enabled
+  let additionalRulesCreated = 0;
+  if (config.getFeatures().includes("additional-rules")) {
+    if (AdditionalRulesProcessor.getToolTargets().includes(tool)) {
+      const additionalRulesProcessor = new AdditionalRulesProcessor({
+        baseDir: ".",
+        toolTarget: tool,
+      });
+
+      const toolFiles = await additionalRulesProcessor.loadToolFiles();
+      if (toolFiles.length > 0) {
+        const rulesyncFiles = await additionalRulesProcessor.convertToolFilesToRulesyncFiles(toolFiles);
+        const writtenCount = await additionalRulesProcessor.writeAiFiles(rulesyncFiles);
+        additionalRulesCreated = writtenCount;
+      }
+    }
+
+    if (config.getVerbose() && additionalRulesCreated > 0) {
+      logger.success(`Created ${additionalRulesCreated} additional-rules files`);
     }
   }
 }
