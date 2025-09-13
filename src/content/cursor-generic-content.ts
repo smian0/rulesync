@@ -19,7 +19,7 @@ export class CursorGenericContent extends ToolFile {
 
   constructor({ fileName, fileContent, contentType, relativePath }: CursorGenericContentOptions) {
     const baseName = fileName.replace(/\.[^/.]+$/, ""); // Remove extension
-    const cursorFileName = `${contentType}-${baseName}.mdc`;
+    const cursorFileName = `${baseName}.mdc`;
 
     super({
       baseDir: ".",

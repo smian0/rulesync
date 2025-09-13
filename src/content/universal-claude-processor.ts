@@ -123,7 +123,7 @@ export class UniversalClaudeProcessor extends FeatureProcessor {
       const pathParts = relativePath.split("/");
       pathParts.pop(); // Remove filename
       const subPath = pathParts.join("-");
-      return `${contentType}-${subPath}-${fileName}`;
+      return `${subPath}-${fileName}`;
     }
     
     return `${contentType}-${fileName}`;
