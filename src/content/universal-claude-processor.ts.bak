@@ -1,0 +1,325 @@
+import { basename, join } from "path";
+import { readFile, readdir, stat } from "fs/promises";
+import { FeatureProcessor } from "../types/feature-processor.js";
+import { RulesyncFile } from "../types/rulesync-file.js";
+import { ToolFile } from "../types/tool-file.js";
+import { ToolTarget } from "../types/tool-targets.js";
+import { logger } from "../utils/logger.js";
+import { ContentScanner, ContentMap } from "../discovery/content-scanner.js";
+import { CursorGenericContent } from "./cursor-generic-content.js";
+import { GenericRulesyncFile } from "./generic-rulesync-file.js";
+import { parseFrontmatter } from "../utils/frontmatter.js";
+
+export interface UniversalClaudeProcessorOptions {
+  baseDir?: string;
+  toolTarget: ToolTarget;
+}
+
+/**
+ * Universal Claude Processor - handles ANY .claude directory structure automatically
+ * No need for specific processors or feature flags - discovers and processes everything
+ */
+export class UniversalClaudeProcessor extends FeatureProcessor {
+  private readonly toolTarget: ToolTarget;
+  
+  constructor({ baseDir = ".", toolTarget }: UniversalClaudeProcessorOptions) {
+    super({ baseDir });
+    this.toolTarget = toolTarget;
+  }
+
+  static getToolTargets(): ToolTarget[] {
+    return ["cursor", "opencode"];
+  }
+
+  async loadRulesyncFiles(): Promise<RulesyncFile[]> {
+    const rulesyncContentDir = join(this.baseDir, ".rulesync/content");
+    const rulesyncFiles: RulesyncFile[] = [];
+    
+    try {
+      // Scan for all universal files in .rulesync/content/ following rulesync pattern
+      const allFiles = await this.scanForMdFiles(rulesyncContentDir);
+      
+      for (const filePath of allFiles) {
+        try {
+          const content = await readFile(filePath, "utf-8");
+          const fileName = basename(filePath, ".md");
+          
+          // Skip files that don't match universal naming pattern (let other processors handle them)
+          if (!this.isUniversalFile(fileName)) {
+            continue;
+          }
+          
+          // Parse the existing rulesync file content
+          const { frontmatter, body } = parseFrontmatter(content);
+          
+          const rulesyncFile = new GenericRulesyncFile({
+            baseDir: this.baseDir,
+            fileName: fileName,
+            body: body,
+            frontmatter: {
+              contentType: frontmatter.contentType || 'unknown',
+              source: frontmatter.source || fileName,
+              ...frontmatter
+            },
+            validate: false
+          });
+          rulesyncFiles.push(rulesyncFile);
+        } catch (error) {
+          logger.error(`Error reading rulesync file ${filePath}: ${error}`);
+        }
+      }
+      
+      logger.info(`Loaded ${rulesyncFiles.length} files from rulesync/content (universal pattern)`);
+      return rulesyncFiles;
+    } catch (error) {
+      logger.error(`Error loading from .rulesync/content: ${error}`);
+      return [];
+    }
+  }
+
+  async loadToolFiles(): Promise<ToolFile[]> {
+    const scanner = new ContentScanner(this.baseDir);
+    const contentMap = await scanner.scanClaudeDirectory();
+    
+    const allToolFiles: ToolFile[] = [];
+    
+    // Process all discovered content types automatically
+    for (const [contentType, contentDir] of Object.entries(contentMap)) {
+      const allFiles = ContentScanner.getAllFiles(contentDir);
+      
+      if (allFiles.length === 0) {
+        continue;
+      }
+      
+      logger.info(`Processing ${contentType}: ${allFiles.length} files`);
+      
+      for (const filePath of allFiles) {
+        try {
+          const content = await readFile(filePath, "utf-8");
+          const relativePath = filePath.replace(join(this.baseDir, ".claude") + "/", "");
+          const fileName = basename(filePath, ".md");
+          
+          // Create generic tool file for any content type
+          if (this.toolTarget === "cursor") {
+            // Extract directory path from relativePath (e.g., "agents/code-analyzer.md" -> "agents")
+            const directoryPath = relativePath.includes('/') 
+              ? relativePath.substring(0, relativePath.lastIndexOf('/'))
+              : contentType;
+            
+            const toolFile = new CursorGenericContent({
+              fileName: fileName,
+              fileContent: content,
+              contentType,
+              relativePath,
+              directoryPath: directoryPath
+            });
+            allToolFiles.push(toolFile);
+          }
+          
+        } catch (error) {
+          logger.error(`Error reading ${contentType} file ${filePath}: ${error}`);
+        }
+      }
+    }
+    
+    // Process individual files in .claude root (like CLAUDE.md, settings.json)
+    await this.processRootFiles(allToolFiles);
+    
+    logger.info(`Universal processor loaded ${allToolFiles.length} files total`);
+    return allToolFiles;
+  }
+
+  private async processRootFiles(allToolFiles: ToolFile[]): Promise<void> {
+    try {
+      const claudeRootPath = join(this.baseDir, ".claude");
+      const entries = await readdir(claudeRootPath, { withFileTypes: true });
+      
+      // Process all files in .claude root (not subdirectories)
+      for (const entry of entries) {
+        if (entry.isFile() && (entry.name.endsWith('.md') || entry.name.endsWith('.json'))) {
+          const filePath = join(claudeRootPath, entry.name);
+          try {
+            const content = await readFile(filePath, "utf-8");
+            
+            if (this.toolTarget === "cursor") {
+              const toolFile = new CursorGenericContent({
+                fileName: entry.name.replace(/\.(md|json)$/, ""),
+                fileContent: content,
+                contentType: "root",
+                relativePath: entry.name,
+                directoryPath: "" // Root files go directly into .cursor/rules/
+              });
+              allToolFiles.push(toolFile);
+            }
+            
+            logger.info(`Processed root file: ${entry.name}`);
+          } catch (error) {
+            logger.error(`Error reading root file ${entry.name}: ${error}`);
+          }
+        }
+      }
+    } catch (error) {
+      logger.error(`Error scanning .claude root directory: ${error}`);
+    }
+  }
+
+  private generateFileName(contentType: string, relativePath: string): string {
+    const fileName = basename(relativePath, ".md");
+    
+    // Handle nested files (like epics/mcp-ccpm-server/001.md)
+    if (relativePath.includes("/")) {
+      const pathParts = relativePath.split("/");
+      pathParts.pop(); // Remove filename
+      const subPath = pathParts.join("-");
+      return `${subPath}-${fileName}`;
+    }
+    
+    return `${contentType}-${fileName}`;
+  }
+
+  async convertRulesyncFilesToToolFiles(rulesyncFiles: RulesyncFile[]): Promise<ToolFile[]> {
+    const toolFiles: ToolFile[] = [];
+    
+    for (const rulesyncFile of rulesyncFiles) {
+      const genericFile = rulesyncFile as GenericRulesyncFile;
+      const fileName = genericFile.getFileName(); // This preserves directory structure
+      const frontmatter = genericFile.getFrontmatter();
+      
+      // Generate flattened filename for cursor from preserved structure
+      const flattenedFileName = this.generateFlattenedFileName(fileName);
+      
+      if (this.toolTarget === "cursor") {
+        // Decode the filename to reconstruct directory structure
+        const originalPath = frontmatter.originalPath || fileName;
+        
+        // Extract directory path and base filename from original path
+        const directoryPath = originalPath.includes('/') 
+          ? originalPath.substring(0, originalPath.lastIndexOf('/'))
+          : '';
+        
+        const baseName = originalPath.includes('/') 
+          ? originalPath.substring(originalPath.lastIndexOf('/') + 1)
+          : originalPath;
+        
+        // Remove contentType from originalPath to avoid duplication in cursor structure
+        // e.g., "agents/code-analyzer" becomes "code-analyzer" 
+        // e.g., "commands/pm/epic-status" becomes "pm/epic-status"
+        const pathWithoutContentType = originalPath.startsWith(`${frontmatter.contentType}/`) 
+          ? originalPath.substring(frontmatter.contentType.length + 1)
+          : originalPath;
+        
+        // Extract directory and filename from cleaned path
+        const cleanDirectoryPath = pathWithoutContentType.includes('/') 
+          ? pathWithoutContentType.substring(0, pathWithoutContentType.lastIndexOf('/'))
+          : '';
+        
+        const cleanBaseName = pathWithoutContentType.includes('/') 
+          ? pathWithoutContentType.substring(pathWithoutContentType.lastIndexOf('/') + 1)
+          : pathWithoutContentType;
+        
+        // Create final cursor directory structure
+        const fullDirectoryPath = cleanDirectoryPath 
+          ? `${frontmatter.contentType}/${cleanDirectoryPath}`
+          : frontmatter.contentType;
+        
+        const cursorContent = new CursorGenericContent({
+          fileName: cleanBaseName,
+          fileContent: genericFile.getBody(),
+          contentType: frontmatter.contentType || 'unknown',
+          relativePath: frontmatter.source || fileName,
+          directoryPath: fullDirectoryPath
+        });
+        toolFiles.push(cursorContent);
+      }
+    }
+    
+    return toolFiles;
+  }
+
+  private generateFlattenedFileName(preservedPath: string): string {
+    // Convert preserved directory structure to flattened filename
+    // e.g., "agents/code-analyzer" -> "agents-code-analyzer"
+    // e.g., "commands/pm/epic-status" -> "commands-pm-epic-status"
+    // e.g., "epics/mcp-ccpm-server/001" -> "epics-mcp-ccpm-server-001"
+    
+    return preservedPath.replace(/\//g, "-");
+  }
+
+  private isUniversalFile(fileName: string): boolean {
+    // Handle files that match universal content types or custom patterns
+    // Let dedicated processors handle their specific patterns (context-*, epics-*, etc.)
+    const universalContentTypes = ["agents", "commands", "context", "epics", "prds", "rules", "technical", "root"];
+    
+    // Check if it matches our universal naming pattern
+    return universalContentTypes.some(contentType => 
+      fileName.startsWith(`${contentType}-`)
+    ) || fileName === 'CLAUDE' || fileName === 'settings';
+  }
+
+  private async scanForMdFiles(dirPath: string): Promise<string[]> {
+    const allFiles: string[] = [];
+    
+    try {
+      const entries = await readdir(dirPath);
+      
+      for (const entry of entries) {
+        const fullPath = join(dirPath, entry);
+        const stats = await stat(fullPath);
+        
+        if (stats.isDirectory()) {
+          // Recursively scan subdirectories
+          const subFiles = await this.scanForMdFiles(fullPath);
+          allFiles.push(...subFiles);
+        } else if (entry.endsWith('.md')) {
+          allFiles.push(fullPath);
+        }
+      }
+    } catch (error) {
+      // Directory doesn't exist or can't be read
+      logger.error(`Error scanning directory ${dirPath}: ${error}`);
+    }
+    
+    return allFiles;
+  }
+
+  async convertToolFilesToRulesyncFiles(toolFiles: ToolFile[]): Promise<RulesyncFile[]> {
+    const rulesyncFiles: RulesyncFile[] = [];
+    
+    for (const toolFile of toolFiles) {
+      const cursorContent = toolFile as CursorGenericContent;
+      const originalRelativePath = cursorContent.getRelativePath();
+      const originalContent = cursorContent.getOriginalContent();
+      
+      // Preserve original directory structure from .claude
+      const preservedPath = originalRelativePath.replace(/\.(md|json)$/, "");
+      
+      // Use enhanced frontmatter parser to extract original frontmatter safely
+      const { frontmatter: originalFrontmatter, body } = parseFrontmatter(originalContent);
+      
+      // Follow rulesync's established pattern: store in .rulesync/content/ with encoded filename
+      const contentType = cursorContent.contentType || 'unknown';
+      const relativePath = originalRelativePath.replace(/\.(md|json)$/, "");
+      
+      // Encode directory structure in filename following rulesync pattern
+      // e.g., "agents/code-analyzer" becomes "agents-code-analyzer"
+      // e.g., "commands/pm/epic-status" becomes "commands-pm-epic-status"
+      const encodedFileName = relativePath.replace(/\//g, "-");
+      
+      const rulesyncFile = new GenericRulesyncFile({
+        baseDir: this.baseDir,
+        fileName: encodedFileName, // Encoded filename with directory structure
+        body: body, // Original body content
+        frontmatter: { 
+          contentType: contentType,
+          source: originalRelativePath,
+          originalPath: relativePath, // Preserve original path for reconstruction
+          ...originalFrontmatter // Include original frontmatter
+        },
+        validate: false // Disable validation to avoid YAML issues with XML
+      });
+      rulesyncFiles.push(rulesyncFile);
+    }
+    
+    return rulesyncFiles;
+  }
+}

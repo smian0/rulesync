@@ -7,6 +7,7 @@ export interface CursorGenericContentOptions {
   fileContent: string;
   contentType: string;
   relativePath: string;
+  directoryPath?: string;
 }
 
 /**
@@ -17,13 +18,18 @@ export class CursorGenericContent extends ToolFile {
   private readonly contentType: string;
   private readonly sourceRelativePath: string;
 
-  constructor({ fileName, fileContent, contentType, relativePath }: CursorGenericContentOptions) {
+  constructor({ fileName, fileContent, contentType, relativePath, directoryPath }: CursorGenericContentOptions) {
     const baseName = fileName.replace(/\.[^/.]+$/, ""); // Remove extension
     const cursorFileName = `${baseName}.mdc`;
+    
+    // Preserve directory structure in .cursor/rules
+    const cursorDirPath = directoryPath 
+      ? join(".cursor/rules", directoryPath)
+      : ".cursor/rules";
 
     super({
       baseDir: ".",
-      relativeDirPath: ".cursor/rules",
+      relativeDirPath: cursorDirPath,
       relativeFilePath: cursorFileName,
       fileContent: fileContent,
       validate: false // Disable parent validation, we'll validate after setting our properties
@@ -61,6 +67,10 @@ export class CursorGenericContent extends ToolFile {
 
   getRelativePath(): string {
     return this.sourceRelativePath;
+  }
+
+  getOriginalContent(): string {
+    return super.getFileContent();
   }
 
   private createContentHeader(): string {

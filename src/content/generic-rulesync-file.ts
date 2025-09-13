@@ -9,6 +9,7 @@ import { stringifyFrontmatter } from "../utils/frontmatter.js";
 export const GenericRulesyncFileFrontmatterSchema = z.object({
   contentType: z.optional(z.string()),
   source: z.optional(z.string()),
+  originalPath: z.optional(z.string()),
 });
 
 export type GenericRulesyncFileFrontmatter = z.infer<typeof GenericRulesyncFileFrontmatterSchema>;
@@ -37,7 +38,7 @@ export class GenericRulesyncFile extends RulesyncFile {
 
     super({
       ...rest,
-      relativeDirPath: ".rulesync/content",
+      relativeDirPath: rest.relativeDirPath || ".rulesync/content",
       relativeFilePath: `${fileName}.md`,
       fileContent: stringifyFrontmatter(body, frontmatter),
     });

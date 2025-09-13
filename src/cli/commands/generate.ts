@@ -355,7 +355,9 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
           logger.info("Clearing existing generated files for universal sync...");
         }
 
-        const toolFiles = await processor.loadToolFiles();
+        // Two-phase processing: read from preserved .rulesync/content structure
+        const rulesyncFiles = await processor.loadRulesyncFiles();
+        const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
         const writtenCount = await processor.writeAiFiles(toolFiles);
         totalUniversalOutputs += writtenCount;
         logger.success(`Universal sync: Generated ${writtenCount} ${toolTarget} files from ALL .claude content in ${baseDir}`);

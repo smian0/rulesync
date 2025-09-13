@@ -9,6 +9,7 @@ import { EpicsProcessor } from "../../content/epics-processor.js";
 import { PRDsProcessor } from "../../content/prds-processor.js";
 import { TechnicalDesignProcessor } from "../../content/technical-design-processor.js";
 import { AdditionalRulesProcessor } from "../../content/additional-rules-processor.js";
+import { UniversalClaudeProcessor } from "../../content/universal-claude-processor.js";
 import { logger } from "../../utils/logger.js";
 
 export type ImportOptions = Omit<ConfigResolverResolveParams, "delete" | "baseDirs">;
@@ -258,6 +259,30 @@ export async function importCommand(options: ImportOptions): Promise<void> {
 
     if (config.getVerbose() && additionalRulesCreated > 0) {
       logger.success(`Created ${additionalRulesCreated} additional-rules files`);
+    }
+  }
+
+  // Universal import - preserves directory structure from .claude in .rulesync/content
+  let universalCreated = 0;
+  if (config.getFeatures().includes("universal") || config.getFeatures().includes("scan-all")) {
+    if (UniversalClaudeProcessor.getToolTargets().includes(tool)) {
+      logger.info("Universal import: preserving ALL .claude directory structure...");
+      
+      const universalProcessor = new UniversalClaudeProcessor({
+        baseDir: ".",
+        toolTarget: tool,
+      });
+
+      const toolFiles = await universalProcessor.loadToolFiles();
+      if (toolFiles.length > 0) {
+        const rulesyncFiles = await universalProcessor.convertToolFilesToRulesyncFiles(toolFiles);
+        const writtenCount = await universalProcessor.writeAiFiles(rulesyncFiles);
+        universalCreated = writtenCount;
+      }
+    }
+
+    if (config.getVerbose() && universalCreated > 0) {
+      logger.success(`Universal import: Created ${universalCreated} files with preserved directory structure`);
     }
   }
 }
