@@ -132,6 +132,8 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
         } else if (this.toolTarget === "opencode") {
           // Check if this is a subagent file
           const isSubagent = this.isSubagentFile(cleanFileName, body, frontmatter);
+          // Check if this is a command file
+          const isCommand = this.isCommandFile(cleanFileName, body, frontmatter, contentType);
           
           if (isSubagent) {
             // Track detected subagent for opencode.json generation
@@ -143,6 +145,15 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
             
             const OpencodeAgentContent = this.createOpencodeAgentContent();
             toolFile = new OpencodeAgentContent({
+              fileName: cleanFileName,
+              fileContent: body,
+              contentType: contentType,
+              relativePath: originalPath,
+              directoryPath: directoryPath
+            });
+          } else if (isCommand) {
+            const OpencodeCommandContent = this.createOpencodeCommandContent();
+            toolFile = new OpencodeCommandContent({
               fileName: cleanFileName,
               fileContent: body,
               contentType: contentType,
@@ -245,6 +256,30 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
     return false;
   }
 
+  private isCommandFile(fileName: string, body: string, frontmatter: any, contentType: string): boolean {
+    // Check if this is from a commands directory
+    if (contentType === 'commands' || contentType === 'command') {
+      return true;
+    }
+    
+    // Check if the file contains command frontmatter patterns
+    if (frontmatter.type === 'command' || frontmatter.command) {
+      return true;
+    }
+    
+    // Check if filename suggests it's a command
+    if (fileName.startsWith('cmd-') || fileName.endsWith('-command')) {
+      return true;
+    }
+    
+    // Check if the body contains command patterns
+    if (body.includes('allowed-tools:') || body.includes('Usage:') || body.includes('Command:')) {
+      return true;
+    }
+    
+    return false;
+  }
+
   private createOpencodeAgentContent() {
     return class OpencodeAgentContent extends ToolFile {
       private readonly contentType: string;
@@ -281,6 +316,91 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
         const processedContent = super.getFileContent();
         
         return `${header}\n${processedContent}`;
+      }
+    };
+  }
+
+  private createOpencodeCommandContent() {
+    return class OpencodeCommandContent extends ToolFile {
+      private readonly contentType: string;
+      private readonly sourceRelativePath: string;
+
+      constructor({ fileName, fileContent, contentType, relativePath, directoryPath }: {
+        fileName: string;
+        fileContent: string;
+        contentType: string;
+        relativePath: string;
+        directoryPath?: string;
+      }) {
+        const baseName = fileName.replace(/\.[^/.]+$/, ""); // Remove extension
+        const commandFileName = `${baseName}.md`;
+        
+        super({
+          baseDir: ".",
+          relativeDirPath: ".opencode/command",
+          relativeFilePath: commandFileName,
+          fileContent: fileContent,
+          validate: false
+        });
+        
+        this.contentType = contentType;
+        this.sourceRelativePath = relativePath;
+      }
+
+      getFileContent(): string {
+        const originalContent = super.getFileContent();
+        
+        // Parse existing frontmatter or create new one
+        let frontmatter = '';
+        let body = originalContent;
+        
+        // Check if content has frontmatter
+        const frontmatterMatch = originalContent.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)/);
+        if (frontmatterMatch) {
+          const existingFrontmatter = frontmatterMatch[1];
+          body = frontmatterMatch[2];
+          
+          // Convert CCPM format to OpenCode format
+          const lines = existingFrontmatter.split('\n');
+          const opencodeLines: string[] = [];
+          
+          for (const line of lines) {
+            if (line.includes('description:')) {
+              opencodeLines.push(line);
+            } else if (line.includes('allowed-tools:')) {
+              // Skip allowed-tools - not used in OpenCode commands
+              continue;
+            } else {
+              opencodeLines.push(line);
+            }
+          }
+          
+          // Add OpenCode-specific fields if not present
+          if (!existingFrontmatter.includes('agent:')) {
+            opencodeLines.push('agent: build');
+          }
+          if (!existingFrontmatter.includes('model:')) {
+            opencodeLines.push('model: anthropic/claude-3-5-sonnet-20241022');
+          }
+          
+          frontmatter = opencodeLines.join('\n');
+        } else {
+          // Create new frontmatter for OpenCode
+          frontmatter = `description: Generated from ${this.sourceRelativePath}
+agent: build
+model: anthropic/claude-3-5-sonnet-20241022`;
+        }
+        
+        // Format for OpenCode command structure
+        return `---
+${frontmatter}
+---
+
+<!-- Generated from .claude/${this.contentType}/${this.sourceRelativePath} -->
+<!-- OpenCode Command Configuration -->
+<!-- Generated by rulesync Universal Claude Code Sync -->
+
+${body.trim()}`;
       }
     };
   }
