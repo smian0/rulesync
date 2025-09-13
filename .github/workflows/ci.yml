@@ -23,7 +23,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2
         with:
-          version: 10.12.2
+          version: 10.15.1
 
       - name: Install dependencies
         run: pnpm install --ignore-scripts
@@ -36,19 +36,10 @@ jobs:
             exit 1
           fi
 
-      - name: Run check
-        run: pnpm check
+      - name: Run cicheck
+        run: pnpm cicheck
 
-      - name: Run secretlint
-        run: pnpm secretlint
-
-      - name: Run cspell
-        run: pnpm cspell
-
-      - name: Run tests
-        run: pnpm test
-
-      - name: Build project
+      - name: Build
         run: pnpm build
 
       - name: Check build artifacts
