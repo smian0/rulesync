@@ -34,53 +34,65 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
   }
 
   async loadRulesyncFiles(): Promise<RulesyncFile[]> {
-    const customDir = join(this.baseDir, ".rulesync/custom");
     const rulesyncFiles: RulesyncFile[] = [];
     
-    try {
-      // Scan for all files in .rulesync/custom/ following directory structure
-      const allFiles = await this.scanForMdFiles(customDir);
-      
-      for (const filePath of allFiles) {
-        try {
-          const content = await readFile(filePath, "utf-8");
-          const relativePath = relative(customDir, filePath);
-          const fileName = basename(filePath, ".md");
-          const dirPath = dirname(relativePath);
-          
-          // Parse the existing file content with custom frontmatter
-          const { frontmatter, body } = parseFrontmatter(content);
-          
-          // Convert custom frontmatter to rulesync format
-          const convertedFrontmatter = {
-            targets: ["*"] as const,
-            description: frontmatter.source || `Generated from ${relativePath}`,
-            originalPath: frontmatter.originalPath || relativePath.replace(/\.md$/, ""),
-            contentType: frontmatter.contentType || dirPath
-          };
-          
-          const rulesyncFile = new GenericRulesyncFile({
-            baseDir: this.baseDir,
-            fileName: `${dirPath}-${fileName}`, // Encode directory in filename for compatibility
-            body: body,
-            frontmatter: convertedFrontmatter,
-            validate: false
-          });
-          
-          rulesyncFiles.push(rulesyncFile);
-        } catch (error) {
-          logger.warn(`Failed to process universal file ${filePath}:`, error);
-          continue;
+    // Define standard rulesync directories
+    const standardDirectories = [
+      { path: join(this.baseDir, ".rulesync/rules"), type: "rules" },
+      { path: join(this.baseDir, ".rulesync/commands"), type: "commands" },
+      { path: join(this.baseDir, ".rulesync/subagents"), type: "subagents" },
+    ];
+
+    // Auto-discover custom directories (any non-standard directories)
+    const customDirectories = await this.discoverCustomDirectories(join(this.baseDir, ".rulesync/custom"));
+    
+    // Combine all directories to scan
+    const directoriesToScan = [...standardDirectories, ...customDirectories];
+    
+    for (const directory of directoriesToScan) {
+      try {
+        const allFiles = await this.scanForMdFiles(directory.path);
+        
+        for (const filePath of allFiles) {
+          try {
+            const content = await readFile(filePath, "utf-8");
+            const relativePath = relative(directory.path, filePath);
+            const fileName = basename(filePath, ".md");
+            
+            // Parse the existing file content with custom frontmatter
+            const { frontmatter, body } = parseFrontmatter(content);
+            
+            // Convert custom frontmatter to rulesync format
+            const convertedFrontmatter = {
+              targets: ["*"] as const,
+              description: frontmatter.description || frontmatter.source || `Generated from ${directory.type}/${relativePath}`,
+              originalPath: frontmatter.originalPath || relativePath.replace(/\.md$/, ""),
+              contentType: directory.type
+            };
+            
+            const rulesyncFile = new GenericRulesyncFile({
+              baseDir: this.baseDir,
+              fileName: fileName, // Use clean filename without directory encoding
+              body: body,
+              frontmatter: convertedFrontmatter,
+              validate: false
+            });
+            
+            rulesyncFiles.push(rulesyncFile);
+          } catch (error) {
+            logger.warn(`Failed to process file ${filePath}:`, error);
+            continue;
+          }
         }
+      } catch (error) {
+        // Directory might not exist, continue with others
+        logger.debug(`Directory ${directory.path} not found or inaccessible`);
+        continue;
       }
-      
-      logger.info(`Loaded ${rulesyncFiles.length} files from rulesync/custom (universal pattern)`);
-      return rulesyncFiles;
-      
-    } catch (error) {
-      logger.warn("Failed to load universal files:", error);
-      return [];
     }
+    
+    logger.info(`Loaded ${rulesyncFiles.length} files from standard + auto-discovered directories (universal pattern)`);
+    return rulesyncFiles;
   }
 
   async convertRulesyncFilesToToolFiles(rulesyncFiles: RulesyncFile[]): Promise<ToolFile[]> {
@@ -130,13 +142,9 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
             directoryPath: directoryPath
           });
         } else if (this.toolTarget === "opencode") {
-          // Check if this is a subagent file
-          const isSubagent = this.isSubagentFile(cleanFileName, body, frontmatter);
-          // Check if this is a command file
-          const isCommand = this.isCommandFile(cleanFileName, body, frontmatter, contentType);
-          
-          if (isSubagent) {
-            // Track detected subagent for opencode.json generation
+          // Route based on content type (directory structure)
+          if (contentType === "subagents") {
+            // Route to .opencode/agents/ and track for opencode.json generation
             detectedAgents.push({
               name: cleanFileName,
               fileName: `${cleanFileName}.md`,
@@ -151,7 +159,8 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
               relativePath: originalPath,
               directoryPath: directoryPath
             });
-          } else if (isCommand) {
+          } else if (contentType === "commands") {
+            // Route to .opencode/command/
             const OpencodeCommandContent = this.createOpencodeCommandContent();
             toolFile = new OpencodeCommandContent({
               fileName: cleanFileName,
@@ -160,7 +169,8 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
               relativePath: originalPath,
               directoryPath: directoryPath
             });
-          } else {
+          } else if (contentType === "rules" && cleanFileName !== "overview") {
+            // Route CCMP rules to .opencode/memories/ (skip standard rulesync overview.md)
             const OpencodeGenericContent = this.createOpencodeGenericContent();
             toolFile = new OpencodeGenericContent({
               fileName: cleanFileName,
@@ -169,6 +179,20 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
               relativePath: originalPath,
               directoryPath: directoryPath
             });
+          } else if (!["rules", "commands", "subagents"].includes(contentType)) {
+            // Route any non-standard content types (custom directories) to .opencode/memories/
+            const OpencodeGenericContent = this.createOpencodeGenericContent();
+            toolFile = new OpencodeGenericContent({
+              fileName: cleanFileName,
+              fileContent: body,
+              contentType: contentType,
+              relativePath: originalPath,
+              directoryPath: directoryPath
+            });
+          } else {
+            // Skip standard rulesync files (like overview.md) or unknown types
+            logger.debug(`Skipping file ${cleanFileName} with contentType ${contentType}`);
+            continue;
           }
         } else {
           logger.warn(`Unsupported tool target: ${this.toolTarget}`);
@@ -236,49 +260,38 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
     };
   }
 
-  private isSubagentFile(fileName: string, body: string, frontmatter: any): boolean {
-    // Check if file is a known subagent type
-    const subagentNames = ['code-analyzer', 'file-analyzer', 'test-runner', 'parallel-worker'];
-    if (subagentNames.includes(fileName)) {
-      return true;
+  private async discoverCustomDirectories(customBasePath: string): Promise<Array<{path: string, type: string}>> {
+    const customDirectories: Array<{path: string, type: string}> = [];
+    
+    try {
+      const { readdirSync, statSync } = await import("fs");
+      const entries = readdirSync(customBasePath);
+      
+      for (const entry of entries) {
+        const fullPath = join(customBasePath, entry);
+        try {
+          const stat = statSync(fullPath);
+          if (stat.isDirectory()) {
+            customDirectories.push({
+              path: fullPath,
+              type: entry // Use directory name as content type
+            });
+            logger.debug(`Discovered custom directory: ${entry}`);
+          }
+        } catch (error) {
+          // Skip entries that can't be accessed
+          continue;
+        }
+      }
+    } catch (error) {
+      // Custom directory doesn't exist or can't be read
+      logger.debug(`No custom directories found at ${customBasePath}`);
     }
     
-    // Check if the file contains subagent frontmatter patterns
-    if (frontmatter.mode === 'subagent') {
-      return true;
-    }
-    
-    // Check if the body contains subagent patterns
-    if (body.includes('mode: subagent') || body.includes('description:') && body.includes('tools:')) {
-      return true;
-    }
-    
-    return false;
+    return customDirectories;
   }
 
-  private isCommandFile(fileName: string, body: string, frontmatter: any, contentType: string): boolean {
-    // Check if this is from a commands directory
-    if (contentType === 'commands' || contentType === 'command') {
-      return true;
-    }
-    
-    // Check if the file contains command frontmatter patterns
-    if (frontmatter.type === 'command' || frontmatter.command) {
-      return true;
-    }
-    
-    // Check if filename suggests it's a command
-    if (fileName.startsWith('cmd-') || fileName.endsWith('-command')) {
-      return true;
-    }
-    
-    // Check if the body contains command patterns
-    if (body.includes('allowed-tools:') || body.includes('Usage:') || body.includes('Command:')) {
-      return true;
-    }
-    
-    return false;
-  }
+  // Note: Removed heuristic detection methods - now using directory-based routing
 
   private createOpencodeAgentContent() {
     return class OpencodeAgentContent extends ToolFile {
