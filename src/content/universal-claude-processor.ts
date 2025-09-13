@@ -85,6 +85,7 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
 
   async convertRulesyncFilesToToolFiles(rulesyncFiles: RulesyncFile[]): Promise<ToolFile[]> {
     const toolFiles: ToolFile[] = [];
+    const detectedAgents: Array<{name: string, fileName: string, frontmatter: any}> = [];
     
     for (const rulesyncFile of rulesyncFiles) {
       try {
@@ -129,15 +130,35 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
             directoryPath: directoryPath
           });
         } else if (this.toolTarget === "opencode") {
-          // For opencode, create a simple markdown file in .opencode/memories
-          const OpencodeGenericContent = this.createOpencodeGenericContent();
-          toolFile = new OpencodeGenericContent({
-            fileName: cleanFileName,
-            fileContent: body,
-            contentType: contentType,
-            relativePath: originalPath,
-            directoryPath: directoryPath
-          });
+          // Check if this is a subagent file
+          const isSubagent = this.isSubagentFile(cleanFileName, body, frontmatter);
+          
+          if (isSubagent) {
+            // Track detected subagent for opencode.json generation
+            detectedAgents.push({
+              name: cleanFileName,
+              fileName: `${cleanFileName}.md`,
+              frontmatter: frontmatter
+            });
+            
+            const OpencodeAgentContent = this.createOpencodeAgentContent();
+            toolFile = new OpencodeAgentContent({
+              fileName: cleanFileName,
+              fileContent: body,
+              contentType: contentType,
+              relativePath: originalPath,
+              directoryPath: directoryPath
+            });
+          } else {
+            const OpencodeGenericContent = this.createOpencodeGenericContent();
+            toolFile = new OpencodeGenericContent({
+              fileName: cleanFileName,
+              fileContent: body,
+              contentType: contentType,
+              relativePath: originalPath,
+              directoryPath: directoryPath
+            });
+          }
         } else {
           logger.warn(`Unsupported tool target: ${this.toolTarget}`);
           continue;
@@ -149,6 +170,16 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
         logger.warn(`Failed to convert universal file ${rulesyncFile.getRelativeFilePath()}:`, error);
         continue;
       }
+    }
+    
+    // Generate opencode.json if we have detected subagents
+    if (this.toolTarget === "opencode" && detectedAgents.length > 0) {
+      const opencodeConfig = this.generateOpencodeConfig(detectedAgents);
+      const OpencodeConfigFile = this.createOpencodeConfigFile();
+      const configFile = new OpencodeConfigFile({
+        fileContent: JSON.stringify(opencodeConfig, null, 2)
+      });
+      toolFiles.push(configFile);
     }
     
     return toolFiles;
@@ -190,6 +221,165 @@ export class UniversalClaudeProcessor extends FeatureProcessor<RulesyncFile, Too
         const processedContent = super.getFileContent();
         
         return `${header}\n${processedContent}`;
+      }
+    };
+  }
+
+  private isSubagentFile(fileName: string, body: string, frontmatter: any): boolean {
+    // Check if file is a known subagent type
+    const subagentNames = ['code-analyzer', 'file-analyzer', 'test-runner', 'parallel-worker'];
+    if (subagentNames.includes(fileName)) {
+      return true;
+    }
+    
+    // Check if the file contains subagent frontmatter patterns
+    if (frontmatter.mode === 'subagent') {
+      return true;
+    }
+    
+    // Check if the body contains subagent patterns
+    if (body.includes('mode: subagent') || body.includes('description:') && body.includes('tools:')) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  private createOpencodeAgentContent() {
+    return class OpencodeAgentContent extends ToolFile {
+      private readonly contentType: string;
+      private readonly sourceRelativePath: string;
+
+      constructor({ fileName, fileContent, contentType, relativePath, directoryPath }: {
+        fileName: string;
+        fileContent: string;
+        contentType: string;
+        relativePath: string;
+        directoryPath?: string;
+      }) {
+        const baseName = fileName.replace(/\.[^/.]+$/, ""); // Remove extension
+        const agentFileName = `${baseName}.md`;
+        
+        super({
+          baseDir: ".",
+          relativeDirPath: ".opencode/agents",
+          relativeFilePath: agentFileName,
+          fileContent: fileContent,
+          validate: false
+        });
+        
+        this.contentType = contentType;
+        this.sourceRelativePath = relativePath;
+      }
+
+      getFileContent(): string {
+        // Format content for OpenCode agent with metadata header
+        const header = `<!-- Generated from .claude/${this.contentType}/${this.sourceRelativePath} -->\n` +
+                      `<!-- Subagent Configuration -->\n` +
+                      `<!-- Generated by rulesync Universal Claude Code Sync -->\n`;
+        
+        const processedContent = super.getFileContent();
+        
+        return `${header}\n${processedContent}`;
+      }
+    };
+  }
+
+  private generateOpencodeConfig(detectedAgents: Array<{name: string, fileName: string, frontmatter: any}>): any {
+    const agentConfigs: Record<string, any> = {};
+    
+    for (const agent of detectedAgents) {
+      const agentConfig: any = {
+        description: agent.frontmatter.description || `Generated agent: ${agent.name}`,
+        mode: "subagent",
+        model: agent.frontmatter.model || "anthropic/claude-sonnet-4-20250514",
+        temperature: agent.frontmatter.temperature || 0.1,
+        prompt: `{file:./agents/${agent.fileName}}`,
+        tools: {}
+      };
+      
+      // Extract tool configuration from frontmatter or use defaults
+      if (agent.frontmatter.tools) {
+        agentConfig.tools = agent.frontmatter.tools;
+      } else {
+        // Set default tools based on agent type
+        const defaultTools = this.getDefaultToolsForAgent(agent.name);
+        agentConfig.tools = defaultTools;
+      }
+      
+      agentConfigs[agent.name] = agentConfig;
+    }
+    
+    return {
+      "$schema": "https://opencode.ai/config.json",
+      agent: agentConfigs,
+      permission: {
+        edit: "ask",
+        bash: "ask",
+        webfetch: "allow"
+      }
+    };
+  }
+
+  private getDefaultToolsForAgent(agentName: string): Record<string, boolean> {
+    switch (agentName) {
+      case "code-analyzer":
+        return {
+          read: true,
+          grep: true,
+          glob: true,
+          write: false,
+          edit: false,
+          bash: false
+        };
+      case "file-analyzer":
+        return {
+          read: true,
+          write: false,
+          edit: false,
+          bash: false
+        };
+      case "test-runner":
+        return {
+          bash: true,
+          read: true,
+          grep: true,
+          write: false,
+          edit: false
+        };
+      case "parallel-worker":
+        return {
+          bash: true,
+          read: true,
+          write: true,
+          edit: true,
+          grep: true,
+          glob: true
+        };
+      default:
+        return {
+          read: true,
+          write: false,
+          edit: false,
+          bash: false
+        };
+    }
+  }
+
+  private createOpencodeConfigFile() {
+    return class OpencodeConfigFile extends ToolFile {
+      constructor({ fileContent }: { fileContent: string }) {
+        super({
+          baseDir: ".",
+          relativeDirPath: ".opencode",
+          relativeFilePath: "opencode.json",
+          fileContent: fileContent,
+          validate: false
+        });
+      }
+
+      getFileContent(): string {
+        return super.getFileContent();
       }
     };
   }
