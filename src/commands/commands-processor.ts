@@ -228,14 +228,32 @@ export class CommandsProcessor extends FeatureProcessor {
   }
 
   /**
-   * Load Claude Code command configurations from .claude/commands/ directory
+   * Load Claude Code command configurations from .claude/commands/ directory (including subdirectories)
    */
   private async loadClaudecodeCommands(): Promise<ToolCommand[]> {
-    return await this.loadToolCommandDefault({
-      toolTarget: "claudecode",
-      relativeDirPath: ClaudecodeCommand.getSettablePaths().relativeDirPath,
-      extension: "md",
-    });
+    const baseCommandPath = ClaudecodeCommand.getSettablePaths().relativeDirPath;
+    
+    // Search recursively for all .md files in .claude/commands/ and subdirectories
+    const commandFilePaths = await findFilesByGlobs(
+      join(this.baseDir, baseCommandPath, "**/*.md")
+    );
+
+    const toolCommands = (
+      await Promise.allSettled(
+        commandFilePaths.map(async (fullPath) => {
+          // Calculate relative path from the base command directory
+          const relativePath = fullPath.replace(join(this.baseDir, baseCommandPath) + "/", "");
+          return ClaudecodeCommand.fromFile({ relativeFilePath: relativePath });
+        })
+      )
+    )
+      .filter((result): result is PromiseFulfilledResult<ClaudecodeCommand> => 
+        result.status === "fulfilled"
+      )
+      .map((result) => result.value);
+
+
+    return toolCommands;
   }
 
   /**

@@ -15,6 +15,8 @@ export const ClaudecodeSubagentFrontmatterSchema = z.object({
   name: z.string(),
   description: z.string(),
   model: z.optional(z.enum(["opus", "sonnet", "haiku", "inherit"])),
+  tools: z.optional(z.string()),
+  color: z.optional(z.string()),
 });
 
 export type ClaudecodeSubagentFrontmatter = z.infer<typeof ClaudecodeSubagentFrontmatterSchema>;

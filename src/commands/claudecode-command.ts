@@ -12,7 +12,8 @@ import {
 } from "./tool-command.js";
 
 export const ClaudecodeCommandFrontmatterSchema = z.object({
-  description: z.string(),
+  description: z.optional(z.string()),
+  "allowed-tools": z.optional(z.string()),
 });
 
 export type ClaudecodeCommandFrontmatter = z.infer<typeof ClaudecodeCommandFrontmatterSchema>;
@@ -61,7 +62,7 @@ export class ClaudecodeCommand extends ToolCommand {
   toRulesyncCommand(): RulesyncCommand {
     const rulesyncFrontmatter: RulesyncCommandFrontmatter = {
       targets: ["*"],
-      description: this.frontmatter.description,
+      description: this.frontmatter.description || `Command with allowed tools: ${this.frontmatter["allowed-tools"]}`,
     };
 
     // Generate proper file content with Rulesync specific frontmatter
