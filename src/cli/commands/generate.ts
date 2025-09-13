@@ -5,6 +5,12 @@ import { IgnoreProcessor } from "../../ignore/ignore-processor.js";
 import { McpProcessor, type McpProcessorToolTarget } from "../../mcp/mcp-processor.js";
 import { RulesProcessor } from "../../rules/rules-processor.js";
 import { SubagentsProcessor } from "../../subagents/subagents-processor.js";
+import { ContextProcessor } from "../../content/context-processor.js";
+import { EpicsProcessor } from "../../content/epics-processor.js";
+import { PRDsProcessor } from "../../content/prds-processor.js";
+import { TechnicalDesignProcessor } from "../../content/technical-design-processor.js";
+import { AdditionalRulesProcessor } from "../../content/additional-rules-processor.js";
+import { UniversalClaudeProcessor } from "../../content/universal-claude-processor.js";
 import { fileExists } from "../../utils/file.js";
 import { logger } from "../../utils/logger.js";
 
@@ -202,13 +208,174 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
     }
   }
 
+  // Generate context files
+  let totalContextOutputs = 0;
+  if (config.getFeatures().includes("context")) {
+    logger.info("Generating context files...");
+
+    for (const baseDir of config.getBaseDirs()) {
+      for (const toolTarget of intersection(config.getTargets(), ContextProcessor.getToolTargets())) {
+        const processor = new ContextProcessor({
+          baseDir: baseDir,
+          toolTarget: toolTarget,
+        });
+
+        if (config.getDelete()) {
+          const oldToolFiles = await processor.loadToolFiles();
+          await processor.removeAiFiles(oldToolFiles);
+        }
+
+        const rulesyncFiles = await processor.loadRulesyncFiles();
+        const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
+        const writtenCount = await processor.writeAiFiles(toolFiles);
+        totalContextOutputs += writtenCount;
+        logger.success(`Generated ${writtenCount} ${toolTarget} context file(s) in ${baseDir}`);
+      }
+    }
+  }
+
+  // Generate epics files
+  let totalEpicsOutputs = 0;
+  if (config.getFeatures().includes("epics")) {
+    logger.info("Generating epics files...");
+
+    for (const baseDir of config.getBaseDirs()) {
+      for (const toolTarget of intersection(config.getTargets(), EpicsProcessor.getToolTargets())) {
+        const processor = new EpicsProcessor({
+          baseDir: baseDir,
+          toolTarget: toolTarget,
+        });
+
+        if (config.getDelete()) {
+          const oldToolFiles = await processor.loadToolFiles();
+          await processor.removeAiFiles(oldToolFiles);
+        }
+
+        const rulesyncFiles = await processor.loadRulesyncFiles();
+        const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
+        const writtenCount = await processor.writeAiFiles(toolFiles);
+        totalEpicsOutputs += writtenCount;
+        logger.success(`Generated ${writtenCount} ${toolTarget} epics file(s) in ${baseDir}`);
+      }
+    }
+  }
+
+  // Generate PRD files
+  let totalPRDOutputs = 0;
+  if (config.getFeatures().includes("prds")) {
+    logger.info("Generating PRD files...");
+
+    for (const baseDir of config.getBaseDirs()) {
+      for (const toolTarget of intersection(config.getTargets(), PRDsProcessor.getToolTargets())) {
+        const processor = new PRDsProcessor({
+          baseDir: baseDir,
+          toolTarget: toolTarget,
+        });
+
+        if (config.getDelete()) {
+          const oldToolFiles = await processor.loadToolFiles();
+          await processor.removeAiFiles(oldToolFiles);
+        }
+
+        const rulesyncFiles = await processor.loadRulesyncFiles();
+        const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
+        const writtenCount = await processor.writeAiFiles(toolFiles);
+        totalPRDOutputs += writtenCount;
+        logger.success(`Generated ${writtenCount} ${toolTarget} PRD file(s) in ${baseDir}`);
+      }
+    }
+  }
+
+  // Generate technical-design files
+  let totalTechnicalDesignOutputs = 0;
+  if (config.getFeatures().includes("technical-design")) {
+    logger.info("Generating technical-design files...");
+
+    for (const baseDir of config.getBaseDirs()) {
+      for (const toolTarget of intersection(config.getTargets(), TechnicalDesignProcessor.getToolTargets())) {
+        const processor = new TechnicalDesignProcessor({
+          baseDir: baseDir,
+          toolTarget: toolTarget,
+        });
+
+        if (config.getDelete()) {
+          const oldToolFiles = await processor.loadToolFiles();
+          await processor.removeAiFiles(oldToolFiles);
+        }
+
+        const rulesyncFiles = await processor.loadRulesyncFiles();
+        const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
+        const writtenCount = await processor.writeAiFiles(toolFiles);
+        totalTechnicalDesignOutputs += writtenCount;
+        logger.success(`Generated ${writtenCount} ${toolTarget} technical-design file(s) in ${baseDir}`);
+      }
+    }
+  }
+
+  // Generate additional-rules files
+  let totalAdditionalRulesOutputs = 0;
+  if (config.getFeatures().includes("additional-rules")) {
+    logger.info("Generating additional-rules files...");
+
+    for (const baseDir of config.getBaseDirs()) {
+      for (const toolTarget of intersection(config.getTargets(), AdditionalRulesProcessor.getToolTargets())) {
+        const processor = new AdditionalRulesProcessor({
+          baseDir: baseDir,
+          toolTarget: toolTarget,
+        });
+
+        if (config.getDelete()) {
+          const oldToolFiles = await processor.loadToolFiles();
+          await processor.removeAiFiles(oldToolFiles);
+        }
+
+        const rulesyncFiles = await processor.loadRulesyncFiles();
+        const toolFiles = await processor.convertRulesyncFilesToToolFiles(rulesyncFiles);
+        const writtenCount = await processor.writeAiFiles(toolFiles);
+        totalAdditionalRulesOutputs += writtenCount;
+        logger.success(`Generated ${writtenCount} ${toolTarget} additional-rules file(s) in ${baseDir}`);
+      }
+    }
+  }
+
+  // Universal Claude Processing - handles ALL .claude content automatically
+  let totalUniversalOutputs = 0;
+  if (config.getFeatures().includes("universal") || config.getFeatures().includes("all-content")) {
+    logger.info("Universal processing: syncing ALL .claude content...");
+
+    for (const baseDir of config.getBaseDirs()) {
+      for (const toolTarget of intersection(config.getTargets(), UniversalClaudeProcessor.getToolTargets())) {
+        const processor = new UniversalClaudeProcessor({
+          baseDir: baseDir,
+          toolTarget: toolTarget,
+        });
+
+        if (config.getDelete()) {
+          // Clear existing files before universal sync
+          logger.info("Clearing existing generated files for universal sync...");
+        }
+
+        const toolFiles = await processor.loadToolFiles();
+        const writtenCount = await processor.writeAiFiles(toolFiles);
+        totalUniversalOutputs += writtenCount;
+        logger.success(`Universal sync: Generated ${writtenCount} ${toolTarget} files from ALL .claude content in ${baseDir}`);
+      }
+    }
+  }
+
   // Check if any features generated content
   const totalGenerated =
     totalRulesOutputs +
     totalMcpOutputs +
     totalCommandOutputs +
     totalIgnoreOutputs +
-    totalSubagentOutputs;
+    totalSubagentOutputs +
+    totalContextOutputs +
+    totalEpicsOutputs +
+    totalPRDOutputs +
+    totalTechnicalDesignOutputs +
+    totalAdditionalRulesOutputs +
+    totalUniversalOutputs;
   if (totalGenerated === 0) {
     const enabledFeatures = config.getFeatures().join(", ");
     logger.warn(`⚠️  No files generated for enabled features: ${enabledFeatures}`);
@@ -223,6 +390,12 @@ export async function generateCommand(options: GenerateOptions): Promise<void> {
     if (totalMcpOutputs > 0) parts.push(`${totalMcpOutputs} MCP files`);
     if (totalCommandOutputs > 0) parts.push(`${totalCommandOutputs} commands`);
     if (totalSubagentOutputs > 0) parts.push(`${totalSubagentOutputs} subagents`);
+    if (totalContextOutputs > 0) parts.push(`${totalContextOutputs} context files`);
+    if (totalEpicsOutputs > 0) parts.push(`${totalEpicsOutputs} epics files`);
+    if (totalPRDOutputs > 0) parts.push(`${totalPRDOutputs} PRD files`);
+    if (totalTechnicalDesignOutputs > 0) parts.push(`${totalTechnicalDesignOutputs} technical-design files`);
+    if (totalAdditionalRulesOutputs > 0) parts.push(`${totalAdditionalRulesOutputs} additional-rules files`);
+    if (totalUniversalOutputs > 0) parts.push(`${totalUniversalOutputs} universal files`);
 
     logger.success(`🎉 All done! Generated ${totalGenerated} file(s) total (${parts.join(" + ")})`);
   }

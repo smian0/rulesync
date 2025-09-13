@@ -110,7 +110,10 @@ export class ContentScanner {
    * Check if a specific content type exists
    */
   hasContentType(contentMap: ContentMap, contentType: string): boolean {
-    return contentType in contentMap && contentMap[contentType].files.length > 0;
+    return contentType in contentMap && (
+      contentMap[contentType].files.length > 0 || 
+      this.hasFilesInSubdirectories(contentMap[contentType])
+    );
   }
 
   /**

@@ -26,16 +26,22 @@ export class CursorGenericContent extends ToolFile {
       relativeDirPath: ".cursor/rules",
       relativeFilePath: cursorFileName,
       fileContent: fileContent,
-      validate: true // Enable validation now that we have our validate method
+      validate: false // Disable parent validation, we'll validate after setting our properties
     });
     
     this.contentType = contentType;
     this.sourceRelativePath = relativePath;
+    
+    // Now validate with all properties set
+    const result = this.validate();
+    if (!result.success) {
+      throw result.error;
+    }
   }
 
   validate(): ValidationResult {
     // Basic validation - ensure we have content and proper content type
-    if (!this.contentType || !this.getFileContent()) {
+    if (!this.contentType || !super.getFileContent()) {
       return {
         success: false,
         error: new Error(`Invalid generic content: missing content type or file content`)

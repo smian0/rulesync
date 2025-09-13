@@ -8,6 +8,7 @@ import { findFilesByGlobs } from "../utils/file.js";
 import { logger } from "../utils/logger.js";
 import { ContentScanner, ContentMap } from "../discovery/content-scanner.js";
 import { CursorGenericContent } from "./cursor-generic-content.js";
+import { GenericRulesyncFile } from "./generic-rulesync-file.js";
 
 export interface GenericContentProcessorOptions {
   baseDir?: string;
@@ -41,8 +42,8 @@ export class GenericContentProcessor extends FeatureProcessor {
   }
 
   async loadRulesyncFiles(): Promise<RulesyncFile[]> {
-    const rulesyncDir = join(this.baseDir, ".rulesync", "content", this.contentType);
-    const contentFiles = await findFilesByGlobs(join(rulesyncDir, "**/*.md"));
+    const rulesyncDir = join(this.baseDir, ".rulesync", "content");
+    const contentFiles = await findFilesByGlobs(join(rulesyncDir, `${this.contentType}-*.md`));
     
     const rulesyncFiles: RulesyncFile[] = [];
     
@@ -51,9 +52,10 @@ export class GenericContentProcessor extends FeatureProcessor {
         const content = await readFile(filePath, "utf-8");
         const fileName = basename(filePath, ".md");
         
-        rulesyncFiles.push(new RulesyncFile({
+        rulesyncFiles.push(new GenericRulesyncFile({
+          baseDir: this.baseDir,
           fileName,
-          fileContent: content,
+          body: content,
           frontmatter: { contentType: this.contentType }
         }));
       } catch (error) {
@@ -108,11 +110,12 @@ export class GenericContentProcessor extends FeatureProcessor {
     
     for (const rulesyncFile of rulesyncFiles) {
       if (this.toolTarget === "cursor") {
+        const genericFile = rulesyncFile as GenericRulesyncFile;
         const cursorContent = new CursorGenericContent({
-          fileName: rulesyncFile.getFileName(),
-          fileContent: rulesyncFile.getFileContent(),
+          fileName: genericFile.getFileName(),
+          fileContent: genericFile.getBody(),
           contentType: this.contentType,
-          relativePath: `${rulesyncFile.getFileName()}.md`
+          relativePath: `${genericFile.getFileName()}.md`
         });
         toolFiles.push(cursorContent);
       }
@@ -128,9 +131,10 @@ export class GenericContentProcessor extends FeatureProcessor {
       // Extract filename from relative file path
       const fileName = basename(toolFile.getRelativeFilePath(), '.mdc');
       
-      const rulesyncFile = new RulesyncFile({
+      const rulesyncFile = new GenericRulesyncFile({
+        baseDir: this.baseDir,
         fileName: fileName,
-        fileContent: toolFile.getFileContent(),
+        body: toolFile.getFileContent(),
         frontmatter: { 
           contentType: this.contentType,
           source: toolFile.getRelativeFilePath()
